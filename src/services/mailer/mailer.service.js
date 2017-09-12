@@ -1,12 +1,8 @@
-import Mailer from 'feathers-mailer'
+import mailer from 'feathers-mailer'
 import smtpTransport from 'nodemailer-smtp-transport'
 
 export default function (name, app, options) {
-  return Mailer(smtpTransport({
-    service: 'gmail',
-    auth: {
-      user: app.get('GMAIL'),
-      pass: app.get('GMAIL_PASSWORD')
-    }
-  }))
+  // Keep track of config
+  Object.assign(options, app.get('mailer'))
+  return mailer(smtpTransport(options))
 }
