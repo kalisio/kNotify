@@ -5,7 +5,7 @@
 [![Test Coverage](https://codeclimate.com/github/kalisio/kNotify/badges/coverage.svg)](https://codeclimate.com/github/kalisio/kNotify/coverage)
 [![Dependency Status](https://img.shields.io/david/kalisio/kNotify.svg?style=flat-square)](https://david-dm.org/kalisio/kNotify)
 
-> Basic utils to support notifications (push, emails, etc.) for Kaelia applications and services
+> Basic utils to support notifications (push, emails, etc.) for Kalisio applications and services
 
 ## Installation
 
@@ -17,7 +17,7 @@ yarn add kNotify
 
 ## Documentation
 
-The [kDocs](https://kalisio.gitbooks.io/kalisio/) are loaded with awesome stuff and tell you everything you need to know about using and configuring Kalisio.
+The [kDocs](https://kalisio.gitbooks.io/kalisio/) are loaded with awesome stuff and tell you everything you need to know about using and configuring it.
 
 ## Tests
 
