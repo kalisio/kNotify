@@ -12,20 +12,21 @@ export default function (name, app, options) {
     const mailerService = app.getService('mailer')
     let email = {
       from: mailerService.options.auth.user,
-      to: user.email,
-      // Link to the app to perform the different actions
-      link: app.get('domain') + '/account/' + type
+      to: user.email
     }
-    // Build the subject
+    let domainPath = app.get('domain') + app.get('apiPath') + '/account/'
+    // Build the subject & link to the app to perform the different actions
     switch (type) {
       case 'resendVerifySignup': // send another email with link for verifying user's email addr
-        email.subject = 'Confirm Signup'
+        email.subject = 'Confirm your signup'
+        email.link = domainPath + 'verifySignup/' + user.verifyToken
         break
       case 'verifySignup': // inform that user's email is now confirmed
         email.subject = 'Thank you, your email has been verified'
         break
       case 'sendResetPwd': // send email with link to reset password
-        email.subject = 'Reset Password'
+        email.subject = 'Reset your password'
+        email.link = domainPath + 'resetPassword/' + user.resetToken
         break
       case 'resetPwd': // inform that user's password is now reset
         email.subject = 'Your password was reset'
@@ -34,7 +35,8 @@ export default function (name, app, options) {
         email.subject = 'Your password was changed'
         break
       case 'identityChange': // inform that user's email has now changed
-        email.subject = 'Your account was changed. Please verify the changes'
+        email.subject = 'Your account information was changed'
+        email.link = domainPath + 'changeIdentity/' + user.verifyToken
     }
     const templateDir = path.join(mailerService.options.templateDir, type)
     const template = new emails.EmailTemplate(templateDir)
@@ -51,7 +53,9 @@ export default function (name, app, options) {
   }
 
   const servicePath = app.get('apiPath') + '/account'
+  const userService = app.getService('users')
   app.configure(accountManager({
+    service: userService.getPath(true),
     path: servicePath,
     notifier: options.notifier
   }))

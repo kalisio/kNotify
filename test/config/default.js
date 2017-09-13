@@ -1,4 +1,5 @@
 var path = require('path')
+var googleApiKey = require('./googleapi.json')
 var containerized = require('containerized')()
 
 var API_PREFIX = '/api'
@@ -25,8 +26,8 @@ module.exports = {
   mailer: {
     service: 'gmail',
     auth: {
-      user: 'support@kaelia-tech.com',
-      pass: '2017kalisio'
+      user: 'support@kalisio.xyz',
+      pass: 'kalisio2017'
     },
     templateDir: path.join(__dirname, '..', 'email-templates')
   },
@@ -43,5 +44,6 @@ module.exports = {
   db: {
     adapter: 'mongodb',
     url: (containerized ? 'mongodb://mongodb:27017/kalisio-test' : 'mongodb://127.0.0.1:27017/kalisio-test')
-  }
+  },
+  googleApiKey
 }
