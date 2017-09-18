@@ -31,7 +31,7 @@ let accountMixin = {
       return this.accountService.create({
         action: 'passwordChange',
         value: {
-          user: email,
+          user: { email },
           oldPassword,
           password
         }
