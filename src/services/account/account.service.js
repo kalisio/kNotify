@@ -1,4 +1,3 @@
-
 import accountManager from 'feathers-authentication-management'
 import emails from 'email-templates'
 import path from 'path'
@@ -14,19 +13,19 @@ export default function (name, app, options) {
       from: mailerService.options.auth.user,
       to: user.email
     }
-    let domainPath = app.get('domain') + app.get('apiPath') + '/account/'
+    let domainPath = app.get('domain') + '/#/'
     // Build the subject & link to the app to perform the different actions
     switch (type) {
       case 'resendVerifySignup': // send another email with link for verifying user's email addr
         email.subject = 'Confirm your signup'
-        email.link = domainPath + 'verifySignup/' + user.verifyToken
+        email.link = domainPath + 'verify-signup/' + user.verifyToken
         break
       case 'verifySignup': // inform that user's email is now confirmed
         email.subject = 'Thank you, your email has been verified'
         break
       case 'sendResetPwd': // send email with link to reset password
         email.subject = 'Reset your password'
-        email.link = domainPath + 'resetPassword/' + user.resetToken
+        email.link = domainPath + 'reset-password/' + user.resetToken
         break
       case 'resetPwd': // inform that user's password is now reset
         email.subject = 'Your password was reset'
@@ -36,7 +35,7 @@ export default function (name, app, options) {
         break
       case 'identityChange': // inform that user's email has now changed
         email.subject = 'Your account information was changed'
-        email.link = domainPath + 'changeIdentity/' + user.verifyToken
+        email.link = domainPath + 'change-identity/' + user.verifyToken
     }
     const templateDir = path.join(mailerService.options.templateDir, type)
     const template = new emails.EmailTemplate(templateDir)
