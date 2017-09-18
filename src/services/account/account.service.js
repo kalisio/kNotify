@@ -11,7 +11,8 @@ export default function (name, app, options) {
     const mailerService = app.getService('mailer')
     let email = {
       from: mailerService.options.auth.user,
-      to: user.email
+      // When changing email send to the new one so that it can be verified
+      to: (type === 'identityChange' ? user.verifyChanges.email : user.email )
     }
     let domainPath = app.get('domain') + '/#/'
     // Build the subject & link to the app to perform the different actions

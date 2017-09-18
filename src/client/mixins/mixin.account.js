@@ -37,17 +37,17 @@ let accountMixin = {
         }
       })
     },
-    changeIdentity(email, token, password) {
+    sendChangeIdentity(oldEmail, email, password) {
       return this.accountService.create({
         action: 'identityChange',
         value: {
-          user: email,
-          oldPassword,
+          user: { email: oldEmail },
+          changes: { email },
           password
         }
       })
     },
-    verifyIdentityChange(token) {
+    changeIdentity(token) {
       return this.verifySignup(token)
     }
   },
