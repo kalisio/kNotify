@@ -18,6 +18,11 @@
               <q-btn color="primary" loader @click="onReset">Reset</q-btn>
             </div>
           </div>
+          <div class="self-center">
+            <a @click="$router.push({name: 'send-reset-password'})">
+              Resend reset password email
+            </a>
+          </div>
       </div>
     </div>
   </k-screen>
@@ -94,6 +99,9 @@ export default {
           switch (type) {
             case 'badParams':
               this.message = 'Your password has already been reset or your account has been removed'
+              break
+            case 'verifyExpired':
+              this.message = 'The delay to reset has expired, please resend the reset password email with the link below'
               break
             default:
               this.message = 'Error while trying to reset password, please try again later'
