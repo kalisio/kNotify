@@ -21,6 +21,8 @@ The [kDocs](https://kalisio.gitbooks.io/kalisio/) are loaded with awesome stuff 
 
 ## Tests
 
+### Mailer
+
 To make test run we need two gmail accounts:
 * support@kalisio.xyz used as email sender
 * test@kalisio.xyz used as user test email
@@ -32,6 +34,12 @@ The second one requires OAuth2 to be able to read emails using the GMail API. Th
 Standard OAuth2 with refresh token might also be used as detailed [here](https://medium.com/@pandeysoni/nodemailer-service-in-node-js-using-smtp-and-xoauth2-7c638a39a37e) and [here](https://medium.com/@pandeysoni/nodemailer-service-in-node-js-using-smtp-and-xoauth2-7c638a39a37e).
 
 Details on how to use Google APIs from Node.js [here](https://github.com/google/google-api-nodejs-client#authorizing-and-authenticating).
+
+### Pusher
+
+Push notifications rely on [sns-mobile](https://github.com/evanshortiss/sns-mobile).
+
+Since 2017 Google Cloud Messaging (GCM) has become Firebase Cloud Messaging (FCM), to generate an API key follow [this issue](https://stackoverflow.com/questions/39417797/amazon-sns-platform-credentials-are-invalid-when-re-entering-a-gcm-api-key-th) and enter the server key when creating the SNS application on AWS. Although you use the Firebase console you should also see the created API through the Google Cloud console.
 
 ## License
 
