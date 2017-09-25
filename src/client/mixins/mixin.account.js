@@ -1,24 +1,24 @@
 let accountMixin = {
   methods: {
-    resendVerifySignup(email) {
+    resendVerifySignup (email) {
       return this.accountService.create({
         action: 'resendVerifySignup',
         value: { email }
       })
     },
-    verifySignup(token) {
+    verifySignup (token) {
       return this.accountService.create({
         action: 'verifySignupLong',
         value: token
       })
     },
-    sendResetPassword(email) {
+    sendResetPassword (email) {
       return this.accountService.create({
         action: 'sendResetPwd',
         value: { email }
       })
     },
-    resetPassword(token, password) {
+    resetPassword (token, password) {
       return this.accountService.create({
         action: 'resetPwdLong',
         value: {
@@ -27,7 +27,7 @@ let accountMixin = {
         }
       })
     },
-    changePassword(email, oldPassword, password) {
+    changePassword (email, oldPassword, password) {
       return this.accountService.create({
         action: 'passwordChange',
         value: {
@@ -37,7 +37,7 @@ let accountMixin = {
         }
       })
     },
-    sendChangeIdentity(oldEmail, email, password) {
+    sendChangeIdentity (oldEmail, email, password) {
       return this.accountService.create({
         action: 'identityChange',
         value: {
@@ -47,7 +47,7 @@ let accountMixin = {
         }
       })
     },
-    changeIdentity(token) {
+    changeIdentity (token) {
       return this.verifySignup(token)
     }
   },
