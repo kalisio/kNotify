@@ -1,21 +1,21 @@
-import { addVerification, removeVerification, sendVerificationEmail, unregisterDevices } from '../../hooks'
+import { registerDevice } from '../../hooks'
 
 module.exports = {
   before: {
     all: [],
     find: [],
     get: [],
-    create: [ addVerification ],
+    create: [],
     update: [],
     patch: [],
-    remove: [ unregisterDevices ]
+    remove: []
   },
 
   after: {
     all: [],
     find: [],
     get: [],
-    create: [ sendVerificationEmail, removeVerification ],
+    create: [ registerDevice ],
     update: [],
     patch: [],
     remove: []

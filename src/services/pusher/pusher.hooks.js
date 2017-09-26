@@ -1,21 +1,21 @@
-import { addVerification, removeVerification, sendVerificationEmail, unregisterDevices } from '../../hooks'
+import { disallow } from 'feathers-hooks-common'
 
 module.exports = {
   before: {
-    all: [],
+    all: [ disallow('external') ],
     find: [],
     get: [],
-    create: [ addVerification ],
+    create: [],
     update: [],
     patch: [],
-    remove: [ unregisterDevices ]
+    remove: []
   },
 
   after: {
     all: [],
     find: [],
     get: [],
-    create: [ sendVerificationEmail, removeVerification ],
+    create: [],
     update: [],
     patch: [],
     remove: []

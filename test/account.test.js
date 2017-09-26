@@ -6,7 +6,7 @@ import chailint from 'chai-lint'
 import core, { kalisio } from 'kCore'
 import notify from '../src'
 
-describe('kNotify', () => {
+describe('kNotify:account', () => {
   let app, server, port, baseUrl,
     userService, mailerService, accountService, jwtClient, gmail, userObject
 

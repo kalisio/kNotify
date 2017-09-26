@@ -218,6 +218,10 @@ async-each@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/async-each/-/async-each-1.0.1.tgz#19d386a1d9edc6e7c1c85d388aedbcc56d33602d"
 
+async@0.2.10:
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/async/-/async-0.2.10.tgz#b6bbe0b0674b9d719708ca38de8c237cb526c3d1"
+
 async@1.x, async@^1.4.0:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
@@ -248,6 +252,13 @@ autoprefixer@^6.3.1:
     num2fraction "^1.2.2"
     postcss "^5.2.16"
     postcss-value-parser "^3.2.3"
+
+aws-sdk@2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1.5.tgz#22ddd9dfff6b4caff5021d6d1812ba6d1c6d9a6b"
+  dependencies:
+    xml2js "0.2.6"
+    xmlbuilder "0.4.2"
 
 aws-sign2@~0.6.0:
   version "0.6.0"
@@ -4211,6 +4222,10 @@ safe-buffer@^5.0.1, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.1.tgz#893312af69b2123def71f57889001671eeb2c853"
 
+sax@0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/sax/-/sax-0.4.2.tgz#39f3b601733d6bec97105b242a2a40fd6978ac3c"
+
 sax@~1.2.1:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
@@ -4323,6 +4338,13 @@ smtp-connection@2.12.0:
   dependencies:
     httpntlm "1.6.1"
     nodemailer-shared "1.1.0"
+
+sns-mobile@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/sns-mobile/-/sns-mobile-1.3.0.tgz#4527494360920c8b3ccc166503d30c98cdc58569"
+  dependencies:
+    async "0.2.10"
+    aws-sdk "2.1.5"
 
 sntp@1.x.x:
   version "1.0.9"
@@ -4873,6 +4895,16 @@ write@^0.2.1:
   resolved "https://registry.yarnpkg.com/write/-/write-0.2.1.tgz#5fc03828e264cea3fe91455476f7a3c566cb0757"
   dependencies:
     mkdirp "^0.5.1"
+
+xml2js@0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.2.6.tgz#d209c4e4dda1fc9c452141ef41c077f5adfdf6c4"
+  dependencies:
+    sax "0.4.2"
+
+xmlbuilder@0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-0.4.2.tgz#1776d65f3fdbad470a08d8604cdeb1c4e540ff83"
 
 xtend@^4.0.0, xtend@^4.0.1:
   version "4.0.1"
