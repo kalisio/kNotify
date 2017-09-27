@@ -5,7 +5,7 @@ import core, { kalisio } from 'kCore'
 import notify from '../src'
 
 describe('kNotify:notifications', () => {
-  let app, server, port, baseUrl, authenticationService, userService, pusherService, sns, userObject
+  let app, server, port, baseUrl, authenticationService, userService, pusherService, sns, publisherObject, subscriberObject
   const deviceId = 'myfakeId'
   const devicePlatform = 'ANDROID'
 
@@ -42,40 +42,135 @@ describe('kNotify:notifications', () => {
     expect(sns).toExist()
   })
 
-  it('creates a user', () => {
+  it('creates a publisher', () => {
     return userService.create({
-      email: 'test@kalisio.xyz',
-      password: 'test-password',
-      name: 'test-user'
+      email: 'publisher@kalisio.xyz',
+      password: 'publisher-password',
+      name: 'publisher-user'
     }, { noVerificationEmail: true })
     .then(user => {
-      userObject = user
+      publisherObject = user
     })
   })
 
-  it('authenticates a user should register its device', () => {
+  it('creates a subscriber', () => {
+    return userService.create({
+      email: 'subscriber@kalisio.xyz',
+      password: 'subscriber-password',
+      name: 'subscriber-user'
+    }, { noVerificationEmail: true })
+    .then(user => {
+      subscriberObject = user
+    })
+  })
+
+  it('authenticates a subscriber should register its device', () => {
     return request
     .post(`${baseUrl}/authentication`)
-    .send({ email: 'test@kalisio.xyz', password: 'test-password', strategy: 'local', deviceId, devicePlatform })
+    .send({ email: 'subscriber@kalisio.xyz', password: 'subscriber-password', strategy: 'local', deviceId, devicePlatform })
     .then(response => {
-      return userService.find({ query: { name: 'test-user' } })
+      return userService.find({ query: { name: 'subscriber-user' } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
-      userObject = users.data[0]
+      subscriberObject = users.data[0]
       // Added registered device
-      expect(userObject.devices).toExist()
-      expect(userObject.devices.length > 0).beTrue()
-      expect(userObject.devices[0].id).to.equal(deviceId)
-      expect(userObject.devices[0].platform).to.equal(devicePlatform)
-      expect(userObject.devices[0].endpoint).toExist()
+      expect(subscriberObject.devices).toExist()
+      expect(subscriberObject.devices.length > 0).beTrue()
+      expect(subscriberObject.devices[0].id).to.equal(deviceId)
+      expect(subscriberObject.devices[0].platform).to.equal(devicePlatform)
+      expect(subscriberObject.devices[0].arn).toExist()
     })
   })
 
-  it('removes a user should unregister its device', (done) => {
-    userService.remove(userObject._id, { user: userObject })
+  it('creates the topic on the publisher object', (done) => {
+    pusherService.create({
+      action: 'topic',
+      pushObject: publisherObject._id.toString(),
+      pushObjectService: 'users'
+    })
+    sns.on('topicCreated', (topicArn, topicName) => {
+      // Check for user object update
+      userService.find({ query: { name: 'publisher-user' } })
+      .then(users => {
+        expect(users.data.length > 0).beTrue()
+        publisherObject = users.data[0]
+        expect(publisherObject.topics).toExist()
+        expect(publisherObject.topics[devicePlatform]).to.equal(topicArn)
+        expect(publisherObject._id.toString()).to.equal(topicName)
+        done()
+      })
+    })
+  })
+
+  it('subscribes a user to the publisher topic', (done) => {
+    pusherService.create({
+      action: 'subscriptions',
+      pushObject: publisherObject._id.toString(),
+      pushObjectService: 'users'
+    }, {
+      users: [subscriberObject]
+    }).catch(error => console.log(error))
+    sns.on('subscribed', (subscriptionArn, endpointArn, topicArn) => {
+      expect(publisherObject.topics[devicePlatform]).to.equal(topicArn)
+      expect(subscriberObject.devices[0].arn).to.equal(endpointArn)
+      done()
+    })
+  })
+  // Let enough time to process
+  .timeout(5000)
+
+  it('publishes a message on the publisher topic', (done) => {
+    pusherService.create({
+      action: 'message',
+      pushObject: publisherObject._id.toString(),
+      pushObjectService: 'users',
+      message: 'test-message'
+    })
+    sns.on('publishedMessage', (topicArn, messageId) => {
+      expect(publisherObject.topics[devicePlatform]).to.equal(topicArn)
+      done()
+    })
+  })
+
+  it('unsubscribes a user from the publisher topic', (done) => {
+    pusherService.remove(publisherObject._id.toString(), {
+      query: {
+        action: 'subscriptions',
+        pushObjectService: 'users'
+      },
+      users: [subscriberObject]
+    }).catch(error => console.log(error))
+    sns.on('unsubscribed', (subscriptionArn) => {
+      // We do not store subscription ARN
+      done()
+    })
+  })
+
+  it('removes the topic on the publisher object', (done) => {
+    pusherService.remove(publisherObject._id.toString(), {
+      query: {
+        action: 'topic',
+        pushObjectService: 'users'
+      }
+    })
+    sns.on('topicDeleted', (topicArn) => {
+      expect(publisherObject.topics[devicePlatform]).to.equal(topicArn)
+      // Check for user object update
+      userService.find({ query: { name: 'publisher-user' } })
+      .then(users => {
+        expect(users.data.length > 0).beTrue()
+        publisherObject = users.data[0]
+        expect(publisherObject.topics).beNull()
+        done()
+      })
+    })
+  })
+
+  it('removes a subscriber should unregister its device', (done) => {
+    userService.remove(subscriberObject._id, { user: subscriberObject })
     sns.on('userDeleted', endpointArn => {
-      expect(userObject.devices[0].endpoint).to.equal(endpointArn)
+      expect(subscriberObject.devices[0].arn).to.equal(endpointArn)
       done()
     })
   })
