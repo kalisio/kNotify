@@ -24,29 +24,28 @@ export default function (name, app, options) {
     getSnsApplication (platform) {
       return _.find(snsApplications, application => application.platform === platform)
     },
-    registerDevice (deviceId, devicePlatform, user) {
+    registerDevice (device, user) {
       return new Promise((resolve, reject) => {
-        let application = this.getSnsApplication(devicePlatform)
+        let application = this.getSnsApplication(device.platform)
         if (!application) {
-          reject(new Error('Cannot register device ' + deviceId + ' because there is no platform application for ' + devicePlatform))
+          reject(new Error('Cannot register device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
           return
         }
         let userService = app.getService('users')
         // Check if already registered
         let devices = user.devices || []
-        let device = _.find(user.devices, device => device.id === deviceId)
-        if (device) {
+        if (_.find(devices, userDevice => userDevice.registrationId === device.registrationId)) {
+          debug('Already registered device ' + device.registrationId + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
           resolve(device.arn)
           return
         }
-        application.addUser(deviceId, '', (err, endpointArn) => {
+        application.addUser(device.registrationId, '', (err, endpointArn) => {
           if (err) {
             reject(err)
           } else {
             // Register new user device
-            let device = { platform: devicePlatform, id: deviceId, arn: endpointArn }
-            devices.push(device)
-            debug('Registered device ' + device.id + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
+            devices.push(Object.assign({ arn: endpointArn }, device))
+            debug('Registered device ' + device.registrationId + ' with ARN ' + endpointArn + ' for user ' + user._id.toString())
             resolve(
               userService.patch(user._id, { devices })
               .then(user => device)
@@ -60,22 +59,22 @@ export default function (name, app, options) {
         let userService = app.getService('users')
         // Check if already registered
         let devices = user.devices || []
-        let device = _.find(user.devices, device => device.id === deviceId)
+        let device = _.find(devices, device => device.registrationId === deviceId)
         if (!device) {
           resolve()
           return
         }
         let application = this.getSnsApplication(device.platform)
         if (!application) {
-          reject(new Error('Cannot register device ' + deviceId + ' because there is no platform application for ' + device.platform))
+          reject(new Error('Cannot unregister device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
           return
         }
         application.deleteUser(device.arn, (err) => {
           if (err) {
             reject(err)
           } else {
-            devices = _.remove(devices, device => device.id === deviceId)
-            debug('Unregistered device ' + device.id + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
+            devices = _.remove(devices, userDevice => userDevice.registrationId === deviceId)
+            debug('Unregistered device ' + device.registrationId + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
             resolve(
               userService.patch(user._id, { devices })
               .then(user => device)
@@ -94,6 +93,7 @@ export default function (name, app, options) {
             if (err) {
               reject(err)
             } else {
+              debug('Created topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform)
               resolve({ [application.platform]: topicArn })
             }
           })
@@ -108,10 +108,12 @@ export default function (name, app, options) {
       let messagePromises = []
       snsApplications.forEach(application => {
         messagePromises.push(new Promise((resolve, reject) => {
-          application.publishToTopic(_.get(object, topicField + '.' + application.platform), { default: message }, (err, messageId) => {
+          const topicArn = _.get(object, topicField + '.' + application.platform)
+          application.publishToTopic(topicArn, { default: message }, (err, messageId) => {
             if (err) {
               reject(err)
             } else {
+              debug('Published message ' + messageId + ' to topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform + ': ' + message)
               resolve({ [application.platform]: messageId })
             }
           })
@@ -125,10 +127,12 @@ export default function (name, app, options) {
       let topicPromises = []
       snsApplications.forEach(application => {
         topicPromises.push(new Promise((resolve, reject) => {
-          application.deleteTopic(_.get(object, topicField + '.' + application.platform), (err) => {
+          const topicArn = _.get(object, topicField + '.' + application.platform)
+          application.deleteTopic(topicArn, (err) => {
             if (err) {
               reject(err)
             } else {
+              debug('Removed topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform)
               resolve(_.get(object, topicField + '.' + application.platform))
             }
           })
@@ -149,12 +153,27 @@ export default function (name, app, options) {
             if (device.platform === application.platform) {
               subscriptionPromises.push(new Promise((resolve, reject) => {
                 const topicArn = _.get(object, topicField + '.' + application.platform)
-                application.subscribe(device.arn, topicArn, (err, subscriptionArn) => {
+                application.subscribeWithProtocol(device.arn, topicArn, 'application', (err, subscriptionArn) => {
                   if (err) {
-                    reject(new GeneralError(err, { [device.id]: { user: user._id } }))
+                    reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
                   } else {
-                    debug('Subscribed device ' + device.id + ' with ARN ' + device.arn + ' to topic with ARN ' + topicArn)
-                    resolve({ [device.id]: { user: user._id, arn: subscriptionArn } })
+                    debug('Subscribed device ' + device.registrationId + ' with ARN ' + device.arn + ' to application topic with ARN ' + topicArn)
+                    // Register for SMS as well
+                    if (device.number) {
+                      application.subscribeWithProtocol(device.number, topicArn, 'sms', (err, smsSubscriptionArn) => {
+                        if (err) {
+                          reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
+                        } else {
+                          debug('Subscribed device number  ' + device.number + ' with ARN ' + device.arn + ' to SMS topic with ARN ' + topicArn)
+                          resolve({
+                            [device.registrationId]: { user: user._id, arn: subscriptionArn },
+                            [device.number]: { user: user._id, arn: smsSubscriptionArn }
+                          })
+                        }
+                      })
+                    } else {
+                      resolve({ [device.registrationId]: { user: user._id, arn: subscriptionArn } })
+                    }
                   }
                 })
               }))
@@ -177,6 +196,7 @@ export default function (name, app, options) {
             if (err) {
               reject(err)
             } else {
+              debug('Retrieved subscriptions for topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform)
               resolve(subscriptions)
             }
           })
@@ -192,16 +212,17 @@ export default function (name, app, options) {
             users.forEach(user => {
               let devices = user.devices || []
               devices.forEach(device => {
-                if (device.arn === subscription.Endpoint) {
+                // check for number as well for SMS subscriptions
+                if ((device.arn === subscription.Endpoint) || (device.number === subscription.Endpoint)) {
                   unsubscriptionPromises.push(new Promise((resolve, reject) => {
                     let application = this.getSnsApplication(device.platform)
                     const topicArn = _.get(object, topicField + '.' + application.platform)
                     application.unsubscribe(subscription.SubscriptionArn, (err) => {
                       if (err) {
-                        reject(new GeneralError(err, { [device.id]: { user: user._id } }))
+                        reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
                       } else {
-                        debug('Unsubscribed device ' + device.id + ' with ARN ' + device.arn + ' from topic with ARN ' + topicArn)
-                        resolve({ [device.id]: { user: user._id, arn: subscription.SubscriptionArn } })
+                        debug('Unsubscribed device ' + device.registrationId + ' with ARN ' + device.arn + ' from topic with ARN ' + topicArn)
+                        resolve({ [device.registrationId]: { user: user._id, arn: subscription.SubscriptionArn } })
                       }
                     })
                   }))
@@ -215,11 +236,11 @@ export default function (name, app, options) {
     },
     // Used to perform service actions such as create a user, a push notification, a topic, etc.
     create (data, params) {
-      debug(`pusher service called for create action=${data.action}`)
+      debug(`pusher service called for create action=${data.action}`, data)
 
       switch (data.action) {
         case 'device':
-          return this.registerDevice(data.deviceId, data.devicePlatform, params.user)
+          return this.registerDevice(data.device, params.user)
         case 'topic':
           return this.createPlatformTopics(params.pushObject, params.pushObjectService, data.topicField || defaultTopicField)
         case 'subscriptions':
@@ -231,7 +252,7 @@ export default function (name, app, options) {
     // Used to perform service actions such as remove a user, a topic, etc.
     remove (id, params) {
       const query = params.query
-      debug(`pusher service called for remove action=${query.action}`)
+      debug(`pusher service called for remove action=${query.action}`, params)
 
       switch (query.action) {
         case 'device':

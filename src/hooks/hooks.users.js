@@ -43,7 +43,7 @@ export function registerDevice (hook) {
   .then(user => {
     debug('Registering device for user ', user)
     let pusherService = app.getService('pusher')
-    return pusherService.create({ action: 'device', deviceId: hook.data.device.registrationId, devicePlatform: hook.data.device.platform.toUpperCase() }, { user })
+    return pusherService.create({ action: 'device', device: hook.data.device }, { user })
   })
   .then(result => hook)
 }
@@ -59,7 +59,7 @@ export function unregisterDevices (hook) {
   // Process with each registered device
   let unregisterPromises = []
   user.devices.forEach(device => {
-    unregisterPromises.push(pusherService.remove(device.id, { query: { action: 'device' }, user: hook.params.user }))
+    unregisterPromises.push(pusherService.remove(device.registrationId, { query: { action: 'device' }, user: hook.params.user }))
   })
 
   return Promise.all(unregisterPromises)

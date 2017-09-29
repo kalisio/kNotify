@@ -4339,9 +4339,9 @@ smtp-connection@2.12.0:
     httpntlm "1.6.1"
     nodemailer-shared "1.1.0"
 
-sns-mobile@^1.3.0:
+"sns-mobile@https://github.com/kalisio/sns-mobile#protocol":
   version "1.3.0"
-  resolved "https://registry.yarnpkg.com/sns-mobile/-/sns-mobile-1.3.0.tgz#4527494360920c8b3ccc166503d30c98cdc58569"
+  resolved "https://github.com/kalisio/sns-mobile#41ce9243a1ae8aafbc57a1922d558a7902f46b42"
   dependencies:
     async "0.2.10"
     aws-sdk "2.1.5"
