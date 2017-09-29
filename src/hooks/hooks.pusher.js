@@ -1,6 +1,6 @@
-// import makeDebug from 'debug'
+import makeDebug from 'debug'
 import { hooks } from 'kCore'
-// const debug = makeDebug('kalisio:kNotify:pusher:hooks')
+const debug = makeDebug('kalisio:kNotify:pusher:hooks')
 
 export function populatePushObject (hook) {
   if (hook.type !== 'before') {
@@ -18,3 +18,62 @@ export function populatePushObject (hook) {
   if (action === 'device') return Promise.resolve(hook)
   else return hooks.populateObject({ serviceField: 'pushObjectService', idField: 'pushObject', throwOnNotFound: true })(hook)
 }
+
+export function createTopic (hook) {
+  let pusherService = hook.app.getService('pusher')
+  return pusherService.create(
+    { action: 'topic' }, {
+    pushObject: hook.result,
+    pushObjectService: hook.service
+  })
+  .then(result => {
+    debug('Added topic to object ' + hook.result._id.toString() + ' from service ' + hook.service.path)
+    return hook
+  })
+}
+
+export function removeTopic (hook) {
+  let pusherService = hook.app.getService('pusher')
+  return pusherService.remove(hook.result._id.toString(), {
+    query: { action: 'topic' },
+    pushObject: hook.result,
+    pushObjectService: hook.service
+  })
+  .then(result => {
+    debug('Removed topic on object ' + hook.result._id.toString() + ' from service ' + hook.service.path)
+    return hook
+  })
+}
+
+export function subscribeSubjectsToResourceTopic (hook) {
+  if (!hook.params.resource || !hook.params.resource.topics) return Promise.resolve(hook)
+
+  let pusherService = hook.app.getService('pusher')
+  return pusherService.create(
+    { action: 'subscriptions' }, {
+    pushObject: hook.params.resource,
+    pushObjectService: hook.params.resourcesService,
+    users: hook.params.subjects
+  })
+  .then(result => {
+    debug('Subscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name))
+    return hook
+  })
+}
+
+export function unsubscribeSubjectsFromResourceTopic (hook) {
+  if (!hook.params.resource || !hook.params.resource.topics) return Promise.resolve(hook)
+  
+  let pusherService = hook.app.getService('pusher')
+  return pusherService.remove(hook.params.resource._id.toString(), {
+    query: { action: 'subscriptions' },
+    pushObject: hook.params.resource,
+    pushObjectService: hook.params.resourcesService,
+    users: hook.params.subjects
+  })
+  .then(result => {
+    debug('Unsubscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name))
+    return hook
+  })
+}
+

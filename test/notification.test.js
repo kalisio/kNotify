@@ -6,8 +6,10 @@ import notify from '../src'
 
 describe('kNotify:notifications', () => {
   let app, server, port, baseUrl, authenticationService, userService, pusherService, sns, publisherObject, subscriberObject
-  const deviceId = 'myfakeId'
-  const devicePlatform = 'ANDROID'
+  const device = {
+    registrationId: 'myfakeId',
+    platform: 'ANDROID'
+  }
 
   before(() => {
     chailint(chai, util)
@@ -38,7 +40,7 @@ describe('kNotify:notifications', () => {
 
   it('setup access to SNS', () => {
     // For now we only test 1 platform, should be sufficient due to SNS facade
-    sns = pusherService.getSnsApplication(devicePlatform)
+    sns = pusherService.getSnsApplication(device.platform)
     expect(sns).toExist()
   })
 
@@ -67,7 +69,7 @@ describe('kNotify:notifications', () => {
   it('authenticates a subscriber should register its device', () => {
     return request
     .post(`${baseUrl}/authentication`)
-    .send({ email: 'subscriber@kalisio.xyz', password: 'subscriber-password', strategy: 'local', deviceId, devicePlatform })
+    .send({ email: 'subscriber@kalisio.xyz', password: 'subscriber-password', strategy: 'local', device })
     .then(response => {
       return userService.find({ query: { name: 'subscriber-user' } })
     })
@@ -77,8 +79,8 @@ describe('kNotify:notifications', () => {
       // Added registered device
       expect(subscriberObject.devices).toExist()
       expect(subscriberObject.devices.length > 0).beTrue()
-      expect(subscriberObject.devices[0].id).to.equal(deviceId)
-      expect(subscriberObject.devices[0].platform).to.equal(devicePlatform)
+      expect(subscriberObject.devices[0].id).to.equal(device.registrationId)
+      expect(subscriberObject.devices[0].platform).to.equal(device.platform)
       expect(subscriberObject.devices[0].arn).toExist()
     })
   })
@@ -96,7 +98,7 @@ describe('kNotify:notifications', () => {
         expect(users.data.length > 0).beTrue()
         publisherObject = users.data[0]
         expect(publisherObject.topics).toExist()
-        expect(publisherObject.topics[devicePlatform]).to.equal(topicArn)
+        expect(publisherObject.topics[device.platform]).to.equal(topicArn)
         expect(publisherObject._id.toString()).to.equal(topicName)
         done()
       })
@@ -112,7 +114,7 @@ describe('kNotify:notifications', () => {
       users: [subscriberObject]
     }).catch(error => console.log(error))
     sns.on('subscribed', (subscriptionArn, endpointArn, topicArn) => {
-      expect(publisherObject.topics[devicePlatform]).to.equal(topicArn)
+      expect(publisherObject.topics[device.platform]).to.equal(topicArn)
       expect(subscriberObject.devices[0].arn).to.equal(endpointArn)
       done()
     })
@@ -128,7 +130,7 @@ describe('kNotify:notifications', () => {
       message: 'test-message'
     })
     sns.on('publishedMessage', (topicArn, messageId) => {
-      expect(publisherObject.topics[devicePlatform]).to.equal(topicArn)
+      expect(publisherObject.topics[device.platform]).to.equal(topicArn)
       done()
     })
   })
@@ -155,7 +157,7 @@ describe('kNotify:notifications', () => {
       }
     })
     sns.on('topicDeleted', (topicArn) => {
-      expect(publisherObject.topics[devicePlatform]).to.equal(topicArn)
+      expect(publisherObject.topics[device.platform]).to.equal(topicArn)
       // Check for user object update
       userService.find({ query: { name: 'publisher-user' } })
       .then(users => {

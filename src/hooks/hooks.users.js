@@ -32,7 +32,7 @@ export function registerDevice (hook) {
   }
 
   // check if registered from mobile app
-  if (!hook.data.deviceId || !hook.data.devicePlatform) return Promise.resolve(hook)
+  if (!hook.data.device || !hook.data.device.registrationId || !hook.data.device.platform) return Promise.resolve(hook)
 
   let app = hook.app
   return app.passport.verifyJWT(hook.result.accessToken, { secret: app.get('authentication').secret })
@@ -43,7 +43,7 @@ export function registerDevice (hook) {
   .then(user => {
     debug('Registering device for user ', user)
     let pusherService = app.getService('pusher')
-    return pusherService.create({ action: 'device', deviceId: hook.data.deviceId, devicePlatform: hook.data.devicePlatform }, { user })
+    return pusherService.create({ action: 'device', deviceId: hook.data.device.registrationId, devicePlatform: hook.data.device.platform.toUpperCase() }, { user })
   })
   .then(result => hook)
 }

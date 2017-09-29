@@ -46,6 +46,7 @@ export default function (name, app, options) {
             // Register new user device
             let device = { platform: devicePlatform, id: deviceId, arn: endpointArn }
             devices.push(device)
+            debug('Registered device ' + device.id + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
             resolve(
               userService.patch(user._id, { devices })
               .then(user => device)
@@ -74,6 +75,7 @@ export default function (name, app, options) {
             reject(err)
           } else {
             devices = _.remove(devices, device => device.id === deviceId)
+            debug('Unregistered device ' + device.id + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
             resolve(
               userService.patch(user._id, { devices })
               .then(user => device)
@@ -146,11 +148,12 @@ export default function (name, app, options) {
           devices.forEach(device => {
             if (device.platform === application.platform) {
               subscriptionPromises.push(new Promise((resolve, reject) => {
-                // The topic name will be the object ID
-                application.subscribe(device.arn, _.get(object, topicField + '.' + application.platform), (err, subscriptionArn) => {
+                const topicArn = _.get(object, topicField + '.' + application.platform)
+                application.subscribe(device.arn, topicArn, (err, subscriptionArn) => {
                   if (err) {
                     reject(new GeneralError(err, { [device.id]: { user: user._id } }))
                   } else {
+                    debug('Subscribed device ' + device.id + ' with ARN ' + device.arn + ' to topic with ARN ' + topicArn)
                     resolve({ [device.id]: { user: user._id, arn: subscriptionArn } })
                   }
                 })
@@ -169,8 +172,8 @@ export default function (name, app, options) {
       let subscriptionPromises = []
       snsApplications.forEach(application => {
         subscriptionPromises.push(new Promise((resolve, reject) => {
-          // The topic name will be the object ID
-          application.getSubscriptions(_.get(object, topicField + '.' + application.platform), (err, subscriptions) => {
+          const topicArn = _.get(object, topicField + '.' + application.platform)
+          application.getSubscriptions(topicArn, (err, subscriptions) => {
             if (err) {
               reject(err)
             } else {
@@ -191,10 +194,13 @@ export default function (name, app, options) {
               devices.forEach(device => {
                 if (device.arn === subscription.Endpoint) {
                   unsubscriptionPromises.push(new Promise((resolve, reject) => {
-                    this.getSnsApplication(device.platform).unsubscribe(subscription.SubscriptionArn, (err) => {
+                    let application = this.getSnsApplication(device.platform)
+                    const topicArn = _.get(object, topicField + '.' + application.platform)
+                    application.unsubscribe(subscription.SubscriptionArn, (err) => {
                       if (err) {
                         reject(new GeneralError(err, { [device.id]: { user: user._id } }))
                       } else {
+                        debug('Unsubscribed device ' + device.id + ' with ARN ' + device.arn + ' from topic with ARN ' + topicArn)
                         resolve({ [device.id]: { user: user._id, arn: subscription.SubscriptionArn } })
                       }
                     })
