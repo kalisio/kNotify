@@ -8,8 +8,4 @@ module.exports = async function () {
   app.createService('mailer', { servicesPath })
   app.createService('pusher', { servicesPath })
   app.createService('account', { servicesPath })
-  // Add hook to automatically add verification attributes when creating a new user,
-  // send verification email, register devices, etc.
-  app.configureService('users', app.getService('users'), servicesPath)
-  app.configureService('authentication', app.getService('authentication'), servicesPath)
 }
