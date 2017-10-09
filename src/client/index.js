@@ -20,7 +20,36 @@ export default function init () {
   // -----------------------------------------------------------------------
   if (!Platform.is.cordova) return
 
+  /* NOT SURE IF THIS IS REQUIRED
+  let permissionsPlugin = cordova.plugins.permissions
+  const notificationPermissions = [
+    permissionsPlugin.INTERNET,
+    permissionsPlugin.ACCESS_NETWORK_STATE,
+    permissionsPlugin.WAKE_LOCK,
+    permissionsPlugin.VIBRATE
+  ]
+
+  function permissionsError() {
+    const message = 'Required permissions for push notifications are missing or have been rejected, the application will not work as expected'
+    logger.error(message)
+    Toast.create.negative({
+      html: message,
+      timeout: 10000
+    })
+  }
+  function permissionsCheckSuccess(status) {
+    // Request again if not given
+    if (!status.hasPermission) {
+      permissionsPlugin.requestPermissions(notificationPermissions, status => { if (!status.hasPermission) permissionsError() }, permissionsError)
+    }
+  }
+  */
+  
   document.addEventListener('deviceready', _ => {
+    // Check for permissions, will launch permission request on failure
+    // NOT SURE IF THIS IS REQUIRED
+    //permissionsPlugin.hasPermission(notificationPermissions, permissionsCheckSuccess, null)
+
     let notifier = PushNotification.init({
       android: { vibrate: true, sound: true, forceShow: true },
       ios: { alert: true, badge: true, sound: true },

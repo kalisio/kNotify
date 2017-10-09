@@ -22,7 +22,7 @@ export default function (name, app, options) {
   return {
     // Used to retrieve the underlying interface for a platform
     getSnsApplication (platform) {
-      return _.find(snsApplications, application => application.platform === platform)
+      return _.find(snsApplications, application => application.platform === platform.toUpperCase())
     },
     registerDevice (device, user) {
       return new Promise((resolve, reject) => {
@@ -109,7 +109,16 @@ export default function (name, app, options) {
       snsApplications.forEach(application => {
         messagePromises.push(new Promise((resolve, reject) => {
           const topicArn = _.get(object, topicField + '.' + application.platform)
-          application.publishToTopic(topicArn, { default: message }, (err, messageId) => {
+          // Add SMS protocol target in cas we have some phone numbers registered to the topic
+          let jsonMessage = { default: message, sms: message }
+          if (application.platform === SNS.SUPPORTED_PLATFORMS.IOS) {
+            jsonMessage.APNS = JSON.stringify({ data: { message } })
+          }
+          // ANDROID
+          else {
+            jsonMessage.GCM = JSON.stringify({ data: { message } })
+          }
+          application.publishToTopic(topicArn, jsonMessage, (err, messageId) => {
             if (err) {
               reject(err)
             } else {
@@ -150,7 +159,7 @@ export default function (name, app, options) {
           let devices = user.devices || []
           // Then each target device
           devices.forEach(device => {
-            if (device.platform === application.platform) {
+            if (device.platform.toUpperCase() === application.platform) {
               subscriptionPromises.push(new Promise((resolve, reject) => {
                 const topicArn = _.get(object, topicField + '.' + application.platform)
                 application.subscribeWithProtocol(device.arn, topicArn, 'application', (err, subscriptionArn) => {
