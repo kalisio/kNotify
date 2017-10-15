@@ -70,8 +70,9 @@
     "loglevel": "^1.4.1",
     "nodemailer-smtp-transport": "^2.7.4",
     "quasar-extras": "^0.0.7",
-    "quasar-framework": "^0.14.1",
-    "sns-mobile": "https://github.com/kalisio/sns-mobile#protocol"
+    "quasar-framework": "0.14.5",
+    "sns-mobile": "https://github.com/kalisio/sns-mobile#protocol",
+    "vue": "2.5.2"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -99,7 +100,7 @@
     "superagent": "^3.5.2",
     "vue-loader": "^13.0.4",
     "vue-style-loader": "^3.0.1",
-    "vue-template-compiler": "^2.4.2"
+    "vue-template-compiler": "2.5.2"
   },
   "peerDependencies": {}
 }
