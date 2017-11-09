@@ -113,9 +113,8 @@ export default function (name, app, options) {
           let jsonMessage = { default: message, sms: message }
           if (application.platform === SNS.SUPPORTED_PLATFORMS.IOS) {
             jsonMessage.APNS = JSON.stringify({ data: { message } })
-          }
-          // ANDROID
-          else {
+          } else {
+            // ANDROID
             jsonMessage.GCM = JSON.stringify({ data: { message } })
           }
           application.publishToTopic(topicArn, jsonMessage, (err, messageId) => {

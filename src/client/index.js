@@ -44,13 +44,13 @@ export default function init () {
     }
   }
   */
-  
+
   document.addEventListener('deviceready', _ => {
     // Check for permissions, will launch permission request on failure
     // NOT SURE IF THIS IS REQUIRED
-    //permissionsPlugin.hasPermission(notificationPermissions, permissionsCheckSuccess, null)
+    // permissionsPlugin.hasPermission(notificationPermissions, permissionsCheckSuccess, null)
 
-    let notifier = PushNotification.init({
+    let notifier = window.PushNotification.init({
       android: { vibrate: true, sound: true, forceShow: true },
       ios: { alert: true, badge: true, sound: true },
       windows: { }

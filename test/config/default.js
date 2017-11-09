@@ -1,5 +1,4 @@
 var path = require('path')
-var googleApiKey = require('./googleapi.json')
 var containerized = require('containerized')()
 
 var API_PREFIX = '/api'
@@ -26,18 +25,18 @@ module.exports = {
   mailer: {
     service: 'gmail',
     auth: {
-      user: 'support@kalisio.xyz',
-      pass: 'kalisio2017'
+      user: process.env.GOOGLE_MAIL_USER,
+      pass: process.env.GOOGLE_MAIL_PASSWORD
     },
     templateDir: path.join(__dirname, '..', 'email-templates')
   },
   pusher: {
-    accessKeyId: 'AKIAJFKD4XALWT7LKJNQ',
-    secretAccessKey: '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',
+    accessKeyId: process.env.SNS_ACCESS_KEY,
+    secretAccessKey: process.env.SNS_SECRET_ACCESS_KEY,
     region: 'eu-west-1',
     apiVersion: '2010-03-31',
     platforms: {
-      ANDROID: 'arn:aws:sns:eu-west-1:348995669582:app/GCM/kApp'
+      ANDROID: process.env.SNS_ANDROID_ARN
     }
   },
   logs: {
@@ -54,5 +53,11 @@ module.exports = {
     adapter: 'mongodb',
     url: (containerized ? 'mongodb://mongodb:27017/kalisio-test' : 'mongodb://127.0.0.1:27017/kalisio-test')
   },
-  googleApiKey
+  gmailApi: {
+    user: process.env.GMAIL_API_USER,
+    clientEmail: process.env.GMAIL_API_CLIENT_EMAIL,
+    // The private key file is set as an environment variable containing \n
+    // So we need to parse it such as if it came from a JSON file
+    privateKey: JSON.parse('{ "key": "' + process.env.GMAIL_API_PRIVATE_KEY + '" }').key
+  }
 }

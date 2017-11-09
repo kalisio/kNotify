@@ -23,9 +23,9 @@ export function createTopic (hook) {
   let pusherService = hook.app.getService('pusher')
   return pusherService.create(
     { action: 'topic' }, {
-    pushObject: hook.result,
-    pushObjectService: hook.service
-  })
+      pushObject: hook.result,
+      pushObjectService: hook.service
+    })
   .then(result => {
     debug('Added topic to object ' + hook.result._id.toString() + ' from service ' + hook.service.path)
     return hook
@@ -51,10 +51,10 @@ export function subscribeSubjectsToResourceTopic (hook) {
   let pusherService = hook.app.getService('pusher')
   return pusherService.create(
     { action: 'subscriptions' }, {
-    pushObject: hook.params.resource,
-    pushObjectService: hook.params.resourcesService,
-    users: hook.params.subjects
-  })
+      pushObject: hook.params.resource,
+      pushObjectService: hook.params.resourcesService,
+      users: hook.params.subjects
+    })
   .then(result => {
     debug('Subscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name))
     return pusherService.create({
@@ -70,7 +70,7 @@ export function subscribeSubjectsToResourceTopic (hook) {
 
 export function unsubscribeSubjectsFromResourceTopic (hook) {
   if (!hook.params.resource || !hook.params.resource.topics) return Promise.resolve(hook)
-  
+
   let pusherService = hook.app.getService('pusher')
   return pusherService.remove(hook.params.resource._id.toString(), {
     query: { action: 'subscriptions' },
@@ -83,4 +83,3 @@ export function unsubscribeSubjectsFromResourceTopic (hook) {
     return hook
   })
 }
-

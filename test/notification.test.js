@@ -2,7 +2,7 @@ import request from 'superagent'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import core, { kalisio } from 'kCore'
-import notify from '../src'
+import notify, { hooks } from '../src'
 
 describe('kNotify:notifications', () => {
   let app, server, port, baseUrl, authenticationService, userService, pusherService, sns, publisherObject, subscriberObject
@@ -28,7 +28,17 @@ describe('kNotify:notifications', () => {
     app.configure(core)
     userService = app.getService('users')
     expect(userService).toExist()
+    userService.hooks({
+      before: {
+        remove: [ hooks.unregisterDevices ]
+      }
+    })
     authenticationService = app.getService('authentication')
+    authenticationService.hooks({
+      after: {
+        create: [ hooks.registerDevice ]
+      }
+    })
     expect(authenticationService).toExist()
     app.configure(notify)
     pusherService = app.getService('pusher')
@@ -71,7 +81,7 @@ describe('kNotify:notifications', () => {
     .post(`${baseUrl}/authentication`)
     .send({ email: 'subscriber@kalisio.xyz', password: 'subscriber-password', strategy: 'local', device })
     .then(response => {
-      return userService.find({ query: { name: 'subscriber-user' } })
+      return userService.find({ query: { email: 'subscriber@kalisio.xyz' } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -79,7 +89,7 @@ describe('kNotify:notifications', () => {
       // Added registered device
       expect(subscriberObject.devices).toExist()
       expect(subscriberObject.devices.length > 0).beTrue()
-      expect(subscriberObject.devices[0].id).to.equal(device.registrationId)
+      expect(subscriberObject.devices[0].registrationId).to.equal(device.registrationId)
       expect(subscriberObject.devices[0].platform).to.equal(device.platform)
       expect(subscriberObject.devices[0].arn).toExist()
     })
@@ -93,10 +103,11 @@ describe('kNotify:notifications', () => {
     })
     sns.on('topicCreated', (topicArn, topicName) => {
       // Check for user object update
-      userService.find({ query: { name: 'publisher-user' } })
+      userService.find({ query: { email: 'subscriber@kalisio.xyz' } })
       .then(users => {
         expect(users.data.length > 0).beTrue()
         publisherObject = users.data[0]
+        console.log(publisherObject)
         expect(publisherObject.topics).toExist()
         expect(publisherObject.topics[device.platform]).to.equal(topicArn)
         expect(publisherObject._id.toString()).to.equal(topicName)
@@ -159,7 +170,7 @@ describe('kNotify:notifications', () => {
     sns.on('topicDeleted', (topicArn) => {
       expect(publisherObject.topics[device.platform]).to.equal(topicArn)
       // Check for user object update
-      userService.find({ query: { name: 'publisher-user' } })
+      userService.find({ query: { email: 'publisher@kalisio.xyz' } })
       .then(users => {
         expect(users.data.length > 0).beTrue()
         publisherObject = users.data[0]

@@ -4,11 +4,11 @@ import request from 'superagent'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import core, { kalisio } from 'kCore'
-import notify from '../src'
+import notify, { hooks } from '../src'
 
 describe('kNotify:account', () => {
   let app, server, port, baseUrl,
-    userService, mailerService, accountService, jwtClient, gmail, userObject
+    userService, mailerService, accountService, jwtClient, gmail, gmailApiConfig, userObject
 
   // Helper function used to check if a given email has been retrieved in GMail inbox
   // Erase it after check
@@ -51,6 +51,7 @@ describe('kNotify:account', () => {
 
     gmail = google.gmail('v1')
     app = kalisio()
+    gmailApiConfig = app.get('gmailApi')
     port = app.get('port')
     baseUrl = `http://localhost:${port}${app.get('apiPath')}`
     return app.db.connect()
@@ -64,6 +65,16 @@ describe('kNotify:account', () => {
     app.configure(core)
     userService = app.getService('users')
     expect(userService).toExist()
+    userService.hooks({
+      before: {
+        create: [ hooks.addVerification ],
+        remove: [ hooks.unregisterDevices ]
+      },
+
+      after: {
+        create: [ hooks.sendVerificationEmail, hooks.removeVerification ]
+      }
+    })
     app.configure(notify)
     mailerService = app.getService('mailer')
     expect(mailerService).toExist()
@@ -75,13 +86,12 @@ describe('kNotify:account', () => {
   })
 
   it('setup access to gmail', (done) => {
-    const key = app.get('googleApiKey')
     jwtClient = new google.auth.JWT(
-      key.client_email,
+      gmailApiConfig.clientEmail,
       null,
-      key.private_key,
+      gmailApiConfig.privateKey,
       ['https://mail.google.com/', 'https://www.googleapis.com/auth/gmail.readonly'], // an array of auth scopes
-      'test@kalisio.xyz'
+      gmailApiConfig.user
     )
 
     jwtClient.authorize((err, tokens) => {
@@ -93,7 +103,7 @@ describe('kNotify:account', () => {
 
   it('creates a user', () => {
     return userService.create({
-      email: 'test@kalisio.xyz',
+      email: gmailApiConfig.user,
       password: 'test-password',
       name: 'test-user'
     })
@@ -145,7 +155,7 @@ describe('kNotify:account', () => {
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { name: 'test-user' } })
+      return userService.find({ query: { email: gmailApiConfig.user } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -175,7 +185,7 @@ describe('kNotify:account', () => {
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { name: 'test-user' } })
+      return userService.find({ query: { email: gmailApiConfig.user } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -215,7 +225,7 @@ describe('kNotify:account', () => {
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { name: 'test-user' } })
+      return userService.find({ query: { email: gmailApiConfig.user } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -250,12 +260,12 @@ describe('kNotify:account', () => {
       value: {
         user: { email: userObject.email },
         password: 'changed-password',
-        changes: { email: 'support@kalisio.xyz' }
+        changes: { email: gmailApiConfig.user.replace('com', 'xyz') }
       }
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { name: 'test-user' } })
+      return userService.find({ query: { email: gmailApiConfig.user } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -284,12 +294,12 @@ describe('kNotify:account', () => {
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { name: 'test-user' } })
+      return userService.find({ query: { email: gmailApiConfig.user } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
       userObject = users.data[0]
-      expect(userObject.email).to.equal('support@kalisio.xyz')
+      expect(userObject.email).to.equal(gmailApiConfig.user.replace('com', 'xyz'))
     })
   })
   // Let enough time to process
