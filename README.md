@@ -37,7 +37,7 @@ Details on how to use Google APIs from Node.js [here](https://github.com/google/
 
 ### Pusher
 
-Push notifications rely on [sns-mobile](https://github.com/evanshortiss/sns-mobile), which has a [nice tutorial](http://evanshortiss.com/development/mobile/2014/02/22/sns-push-notifications-using-nodejs.html).
+Push notifications rely on [sns-mobile](https://github.com/evanshortiss/sns-mobile), which has a [nice tutorial](http://evanshortiss.com/development/mobile/2014/02/22/sns-push-notifications-using-nodejs.html). To get an API access/secret key you need to create a new user in IAM with a role giving access to SNS like AmazonSNSFullAccess but in production [you should control access more precisely](http://docs.aws.amazon.com/sns/latest/dg/UsingIAMwithSNS.html).
 
 Since 2017 Google Cloud Messaging (GCM) has become Firebase Cloud Messaging (FCM), to generate an API key follow [this issue](https://stackoverflow.com/questions/39417797/amazon-sns-platform-credentials-are-invalid-when-re-entering-a-gcm-api-key-th) and enter the server key when creating the SNS application on AWS. Although you use the Firebase console you should also see the created API through the Google Cloud console.
 
