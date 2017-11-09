@@ -103,11 +103,10 @@ describe('kNotify:notifications', () => {
     })
     sns.on('topicCreated', (topicArn, topicName) => {
       // Check for user object update
-      userService.find({ query: { email: 'subscriber@kalisio.xyz' } })
+      userService.find({ query: { email: 'publisher@kalisio.xyz' } })
       .then(users => {
         expect(users.data.length > 0).beTrue()
         publisherObject = users.data[0]
-        console.log(publisherObject)
         expect(publisherObject.topics).toExist()
         expect(publisherObject.topics[device.platform]).to.equal(topicArn)
         expect(publisherObject._id.toString()).to.equal(topicName)
