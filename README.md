@@ -24,10 +24,10 @@ The [kDocs](https://kalisio.gitbooks.io/kalisio/) are loaded with awesome stuff 
 ### Mailer
 
 To make test run we need two gmail accounts:
-* support@kalisio.xyz used as email sender
-* test@kalisio.xyz used as user test email
+* email-notifications@kalisio.com used as email sender
+* test@kalisio.com used as user test email
 
-The first one should authorise connection by email/password on https://myaccount.google.com/lesssecureapps.
+The first one should authorise connection by email/password on https://myaccount.google.com/lesssecureapps. Before that the domain admin should allow him to manage this setting (Admin Console > Security > General > Less secure apps settings). To avoid changing it for all users first create a group, add the user to the group and let the group manage less secure apps setting.
 
 The second one requires OAuth2 to be able to read emails using the GMail API. The simplest way is by creating a service account for a JWT-based authentication. Interesting issue to make all the configuration work can be found [here](https://stackoverflow.com/a/29328258).
 
