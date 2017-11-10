@@ -294,7 +294,7 @@ describe('kNotify:account', () => {
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailApiConfig.user } })
+      return userService.find({ query: { email: gmailApiConfig.user.replace('com', 'xyz') } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
