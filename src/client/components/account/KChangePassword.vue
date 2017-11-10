@@ -9,6 +9,13 @@
               &nbsp;&nbsp;
               {{ message }}.
             </p>
+            <p v-show="changed && success">
+              <q-icon name="keyboard_backspace"/>
+              &nbsp;&nbsp;
+              <a @click="$router.push({name: 'home'})">
+              Back to home
+              </a>
+            </p>
           </div>
           <div>
             <k-form ref="form" :schema="schema" />
