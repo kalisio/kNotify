@@ -27,7 +27,7 @@ To make test run we need two gmail accounts:
 * `email-notifications@kalisio.com` used as email sender
 * `test@kalisio.com` used as user test email
 
-> When testing identity change we also use the `test@kalisio.xyz` address as user test email. However to avoid creating a new account in Google we simply add an alias for this address to the `test@kalisio.com` account.
+> When testing identity change we also use the `test@kalisio.xyz` address as user test email. However to avoid creating a new account in Google you simply have add an alias for this address to the `test@kalisio.com` account.
 
 The first email account should authorise connection by email/password on https://myaccount.google.com/lesssecureapps. Before that the domain admin should allow him to manage this setting (Admin Console > Security > General > Less secure apps settings). To avoid changing it for all users first create a group, add the user to the group and let the group manage less secure apps setting.
 
