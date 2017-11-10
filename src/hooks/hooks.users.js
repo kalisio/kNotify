@@ -58,10 +58,11 @@ export function unregisterDevices (hook) {
   let user = hook.params.user
   // Process with each registered device
   let unregisterPromises = []
-  user.devices.forEach(device => {
-    unregisterPromises.push(pusherService.remove(device.registrationId, { query: { action: 'device' }, user: hook.params.user }))
-  })
-
+  if (user.devices) {
+    user.devices.forEach(device => {
+      unregisterPromises.push(pusherService.remove(device.registrationId, { query: { action: 'device' }, user: hook.params.user }))
+    })
+  }
   return Promise.all(unregisterPromises)
   .then(results => hook)
 }
