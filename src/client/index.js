@@ -9,6 +9,7 @@ import { Platform, Toast } from 'quasar'
 // export * from './components'
 
 export * as mixins from './mixins'
+export * as hooks from './hooks'
 
 export default function init () {
   // const app = this
