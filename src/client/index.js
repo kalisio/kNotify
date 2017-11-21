@@ -12,9 +12,11 @@ export * as mixins from './mixins'
 export * as hooks from './hooks'
 
 export default function init () {
-  // const app = this
+  const api = this
 
   logger.debug('Initializing kalisio notify')
+  
+  api.declareService('account')
 
   // -----------------------------------------------------------------------
   // | After this we should only have specific cordova initialisation code |
