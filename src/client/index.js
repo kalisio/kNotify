@@ -15,7 +15,7 @@ export default function init () {
   const api = this
 
   logger.debug('Initializing kalisio notify')
-  
+
   api.declareService('account')
 
   // -----------------------------------------------------------------------
