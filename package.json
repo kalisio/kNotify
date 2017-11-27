@@ -67,7 +67,7 @@
     "feathers-mailer": "^2.0.0",
     "fs-extra": "^3.0.0",
     "lodash": "^4.17.4",
-    "loglevel": "^1.4.1",
+    "loglevel": "^1.6.0",
     "nodemailer-smtp-transport": "^2.7.4",
     "quasar-extras": "^0.0.7",
     "quasar-framework": "0.14.5",
