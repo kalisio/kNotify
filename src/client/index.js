@@ -8,6 +8,7 @@ import { Platform, Toast } from 'quasar'
 // FIXME: we don't build vue component anymore, they are processed by webpack in the application template
 // export * from './components'
 
+export * from '../common'
 export * as mixins from './mixins'
 export * as hooks from './hooks'
 
