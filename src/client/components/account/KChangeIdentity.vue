@@ -60,8 +60,7 @@ export default {
     // Retrieve the loadComponent function and load the components
     // We need this so that we can dynamically load the component
     // with a function that has previously been statically analyzed by the bundler (eg webpack)
-    let loadComponent = this.$store.get('loadComponent')
-    this.$options.components['k-screen'] = loadComponent('frame/KScreen')
+    this.$options.components['k-screen'] = this.$load('frame/KScreen')
   },
   mounted () {
     this.title = 'Changes verification'
