@@ -69,8 +69,8 @@
     "lodash": "^4.17.4",
     "loglevel": "^1.6.0",
     "nodemailer-smtp-transport": "^2.7.4",
-    "quasar-extras": "^0.0.7",
-    "quasar-framework": "0.14.5",
+    "quasar-extras": "1.0.0",
+    "quasar-framework": "0.14.7",
     "sns-mobile": "https://github.com/kalisio/sns-mobile#protocol",
     "vue": "2.5.2"
   },
