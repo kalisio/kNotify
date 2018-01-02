@@ -39,6 +39,8 @@ Standard OAuth2 with refresh token might also be used as detailed [here](https:/
 
 Details on how to use Google APIs from Node.js [here](https://github.com/google/google-api-nodejs-client#authorizing-and-authenticating).
 
+> Some anti-virus or firewalls softwares intercept HTTPS traffic, decrypting it, and then encrypting it using a self-signed certificate causing a "*Self-Signed Certificate in Certificate Chain*" error. If so deactivate the SSL analysys in your software.
+
 ### Pusher
 
 Push notifications rely on [sns-mobile](https://github.com/evanshortiss/sns-mobile), which has a [nice tutorial](http://evanshortiss.com/development/mobile/2014/02/22/sns-push-notifications-using-nodejs.html). To get an API access/secret key you need to create a new user in IAM with a role giving access to SNS like AmazonSNSFullAccess but in production [you should control access more precisely](http://docs.aws.amazon.com/sns/latest/dg/UsingIAMwithSNS.html).
