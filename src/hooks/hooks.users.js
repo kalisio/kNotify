@@ -7,9 +7,11 @@ export function sendVerificationEmail (hook) {
     throw new Error(`The 'sendVerificationEmail' hook should only be used as a 'after' hook.`)
   }
 
-  // Check for by-passing
-  if (hook.params.noVerificationEmail) return Promise.resolve(hook)
-
+  // Check for by-passing OAuth2 providers
+  for (let provider of hook.app.authenticationProviders) {
+    if (hook.result[provider + 'Id']) return Promise.resolve(hook)
+  }
+  
   let accountService = hook.app.getService('account')
   return accountService.options.notifier('resendVerifySignup', hook.result)
   .then(result => {
@@ -19,7 +21,17 @@ export function sendVerificationEmail (hook) {
 
 export function addVerification (hook) {
   let accountService = hook.app.getService('account')
+
   return verifyHooks.addVerification(accountService.getPath(true))(hook)
+  .then(hook => {
+    // Check for OAuth2 providers
+    let isVerified = false
+    for (let provider of hook.app.authenticationProviders) {
+      if (hook.data[provider + 'Id']) isVerified = true
+    }
+    hook.data.isVerified = isVerified
+    return hook
+  })
 }
 
 export function removeVerification (hook) {

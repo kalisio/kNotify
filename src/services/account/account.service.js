@@ -2,12 +2,19 @@ import accountManager from 'feathers-authentication-management'
 import emails from 'email-templates'
 import path from 'path'
 import makeDebug from 'debug'
+import _ from 'lodash'
 
 const debug = makeDebug('kalisio:kNotify:account')
 
 export default function (name, app, options) {
   // Keep track of notifier
   options.notifier = function (type, user, notifierOptions) {
+    // OAuth2 providers
+    const message = 'You cannot modify your account because it is managed by '
+    for (let provider of app.authenticationProviders) {
+      if (user[provider + 'Id']) return Promise.reject(new Error(message + _.startCase(provider)))
+    }
+    
     const mailerService = app.getService('mailer')
     let email = {
       from: mailerService.options.auth.user,
