@@ -11,7 +11,7 @@ export function sendVerificationEmail (hook) {
   for (let provider of hook.app.authenticationProviders) {
     if (hook.result[provider + 'Id']) return Promise.resolve(hook)
   }
-  
+
   let accountService = hook.app.getService('account')
   return accountService.options.notifier('resendVerifySignup', hook.result)
   .then(result => {

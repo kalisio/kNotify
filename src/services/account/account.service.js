@@ -14,7 +14,7 @@ export default function (name, app, options) {
     for (let provider of app.authenticationProviders) {
       if (user[provider + 'Id']) return Promise.reject(new Error(message + _.startCase(provider)))
     }
-    
+
     const mailerService = app.getService('mailer')
     let email = {
       from: mailerService.options.auth.user,

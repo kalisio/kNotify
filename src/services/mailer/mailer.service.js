@@ -8,5 +8,5 @@ export default function (name, app, options) {
   // Keep track of config
   Object.assign(options, app.get('mailer'))
   debug('Mailer created with config ', options)
-   return mailer(smtpTransport(options))
+  return mailer(smtpTransport(options))
 }
