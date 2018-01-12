@@ -121,7 +121,7 @@ export default function (name, app, options) {
       snsApplications.forEach(application => {
         messagePromises.push(new Promise((resolve, reject) => {
           const topicArn = _.get(object, topicField + '.' + application.platform)
-          // Add SMS protocol target in cas we have some phone numbers registered to the topic
+          // Add SMS protocol target in case we have some phone numbers registered to the topic
           let jsonMessage = { default: message, sms: message }
           if (application.platform === SNS.SUPPORTED_PLATFORMS.IOS) {
             jsonMessage.APNS = JSON.stringify({ data: { message } })
