@@ -37,7 +37,8 @@ export function removeTopic (hook) {
   return pusherService.remove(hook.result._id.toString(), {
     query: { action: 'topic' },
     pushObject: hook.result,
-    pushObjectService: hook.service
+    pushObjectService: hook.service,
+    patch: hook.method !== 'remove' // Do not patch object when it is deleted
   })
   .then(result => {
     debug('Removed topic on object ' + hook.result._id.toString() + ' from service ' + hook.service.path)

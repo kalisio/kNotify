@@ -24,14 +24,13 @@ export default function (name, app, options) {
     getSnsApplication (platform) {
       return _.find(snsApplications, application => application.platform === platform.toUpperCase())
     },
-    registerDevice (device, user) {
+    registerDevice (device, user, patch = true) {
       return new Promise((resolve, reject) => {
         let application = this.getSnsApplication(device.platform)
         if (!application) {
           reject(new Error('Cannot register device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
           return
         }
-        let userService = app.getService('users')
         // Check if already registered
         let devices = user.devices || []
         if (_.find(devices, userDevice => userDevice.registrationId === device.registrationId)) {
@@ -46,17 +45,21 @@ export default function (name, app, options) {
             // Register new user device
             devices.push(Object.assign({ arn: endpointArn }, device))
             debug('Registered device ' + device.registrationId + ' with ARN ' + endpointArn + ' for user ' + user._id.toString())
-            resolve(
-              userService.patch(user._id, { devices })
-              .then(user => device)
-            )
+            if (patch) {
+              let userService = app.getService('users')
+              resolve(
+                userService.patch(user._id, { devices })
+                .then(user => device)
+              )
+            } else {
+              resolve(device)
+            }
           }
         })
       })
     },
-    unregisterDevice (deviceId, user) {
+    unregisterDevice (deviceId, user, patch = true) {
       return new Promise((resolve, reject) => {
-        let userService = app.getService('users')
         // Check if already registered
         let devices = user.devices || []
         let device = _.find(devices, device => device.registrationId === deviceId)
@@ -75,15 +78,20 @@ export default function (name, app, options) {
           } else {
             devices = _.remove(devices, userDevice => userDevice.registrationId === deviceId)
             debug('Unregistered device ' + device.registrationId + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
-            resolve(
-              userService.patch(user._id, { devices })
-              .then(user => device)
-            )
+            if (patch) {
+              let userService = app.getService('users')
+              resolve(
+                userService.patch(user._id, { devices })
+                .then(user => device)
+              )
+            } else {
+              resolve(device)
+            }
           }
         })
       })
     },
-    createPlatformTopics (object, service, topicField) {
+    async createPlatformTopics (object, service, topicField, patch = true) {
       // Process with each registered platform
       let topicPromises = []
       snsApplications.forEach(application => {
@@ -99,9 +107,13 @@ export default function (name, app, options) {
           })
         }))
       })
-      return Promise.all(topicPromises)
-      .then(results => results.reduce((topics, topic) => Object.assign(topics, topic), {}))
-      .then(topics => service.patch(object._id, { [topicField]: topics }))
+      let results = await Promise.all(topicPromises)
+      let topics = results.reduce((topics, topic) => Object.assign(topics, topic), {})
+      if (patch) {
+        return service.patch(object._id, { [topicField]: topics })
+      } else {
+        return topics
+      }
     },
     publishToPlatformTopics (object, message, topicField) {
       // Process with each registered platform
@@ -130,7 +142,7 @@ export default function (name, app, options) {
       return Promise.all(messagePromises)
       .then(results => results.reduce((messageIds, messageId) => Object.assign(messageIds, messageId), {}))
     },
-    removePlatformTopics (object, service, topicField) {
+    async removePlatformTopics (object, service, topicField, patch = true) {
       // Process with each registered platform
       let topicPromises = []
       snsApplications.forEach(application => {
@@ -141,13 +153,17 @@ export default function (name, app, options) {
               reject(err)
             } else {
               debug('Removed topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform)
-              resolve(_.get(object, topicField + '.' + application.platform))
+              resolve(topicArn)
             }
           })
         }))
       })
-      return Promise.all(topicPromises)
-      .then(_ => service.patch(object._id, { [topicField]: null }))
+      let topicArns = await Promise.all(topicPromises)
+      if (patch) {
+        return service.patch(object._id, { [topicField]: null })
+      } else {
+        return topicArns
+      }
     },
     createPlatformSubscriptions (object, users, topicField) {
       // Process with each registered platform
@@ -248,9 +264,9 @@ export default function (name, app, options) {
 
       switch (data.action) {
         case 'device':
-          return this.registerDevice(data.device, params.user)
+          return this.registerDevice(data.device, params.user, params.patch)
         case 'topic':
-          return this.createPlatformTopics(params.pushObject, params.pushObjectService, data.topicField || defaultTopicField)
+          return this.createPlatformTopics(params.pushObject, params.pushObjectService, data.topicField || defaultTopicField, params.patch)
         case 'subscriptions':
           return this.createPlatformSubscriptions(params.pushObject, params.users, data.topicField || defaultTopicField)
         case 'message':
@@ -264,9 +280,9 @@ export default function (name, app, options) {
 
       switch (query.action) {
         case 'device':
-          return this.unregisterDevice(id, params.user)
+          return this.unregisterDevice(id, params.user, params.patch)
         case 'topic':
-          return this.removePlatformTopics(params.pushObject, params.pushObjectService, query.topicField || defaultTopicField)
+          return this.removePlatformTopics(params.pushObject, params.pushObjectService, query.topicField || defaultTopicField, params.patch)
         case 'subscriptions':
           return this.removePlatformSubscriptions(params.pushObject, params.users, query.topicField || defaultTopicField)
       }

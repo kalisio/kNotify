@@ -72,7 +72,13 @@ export function unregisterDevices (hook) {
   let unregisterPromises = []
   if (user.devices) {
     user.devices.forEach(device => {
-      unregisterPromises.push(pusherService.remove(device.registrationId, { query: { action: 'device' }, user: hook.params.user }))
+      unregisterPromises.push(
+        pusherService.remove(device.registrationId,
+          { query: { action: 'device' },
+          user: hook.params.user,
+          patch: hook.method !== 'remove' // Do not patch object when it is deleted
+        })
+      )
     })
   }
   return Promise.all(unregisterPromises)
