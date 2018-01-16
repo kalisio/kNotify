@@ -95,6 +95,19 @@ describe('kNotify:notifications', () => {
     })
   })
 
+  it('publishes a message on the subscriber device', (done) => {
+    pusherService.create({
+      action: 'message',
+      pushObject: subscriberObject._id.toString(),
+      pushObjectService: 'users',
+      message: 'test-message'
+    })
+    sns.on('messageSent', (endpointArn, messageId) => {
+      expect(subscriberObject.devices[0].arn).to.equal(endpointArn)
+      done()
+    })
+  })
+
   it('creates the topic on the publisher object', (done) => {
     pusherService.create({
       action: 'topic',

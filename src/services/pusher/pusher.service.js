@@ -91,6 +91,30 @@ export default function (name, app, options) {
         })
       })
     },
+    publishToDevices (user, message) {
+      // Process with each registered platform
+      let messagePromises = []
+      const devices = user.devices || []
+      devices.forEach(device => {
+        let application = this.getSnsApplication(device.platform)
+        messagePromises.push(new Promise((resolve, reject) => {
+          if (!application) {
+            reject(new Error('Cannot send message to device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
+            return
+          }
+          application.sendMessage(device.arn, message, (err, messageId) => {
+            if (err) {
+              reject(err)
+            } else {
+              debug('Published message ' + messageId + ' to device ' + object._id.toString() + ' with ARN ' + device.arn + ' for platform ' + application.platform + ': ' + message)
+              resolve({ [application.platform]: messageId })
+            }
+          })
+        }))
+      })
+      return Promise.all(messagePromises)
+      .then(results => results.reduce((messageIds, messageId) => Object.assign(messageIds, messageId), {}))
+    },
     async createPlatformTopics (object, service, topicField, patch = true) {
       // Process with each registered platform
       let topicPromises = []
@@ -269,8 +293,13 @@ export default function (name, app, options) {
           return this.createPlatformTopics(params.pushObject, params.pushObjectService, data.topicField || defaultTopicField, params.patch)
         case 'subscriptions':
           return this.createPlatformSubscriptions(params.pushObject, params.users, data.topicField || defaultTopicField)
-        case 'message':
-          return this.publishToPlatformTopics(params.pushObject, data.message, data.topicField || defaultTopicField)
+        case 'message': {
+          const topicField = data.topicField || defaultTopicField
+          // If no topic we assume we want to publish on specific devices
+          return _.get(params.pushObject, topicField) ?
+            this.publishToPlatformTopics(params.pushObject, data.message, topicField) :
+            this.publishToDevices(params.pushObject, data.message)
+        }
       }
     },
     // Used to perform service actions such as remove a user, a topic, etc.
