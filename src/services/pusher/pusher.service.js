@@ -106,7 +106,7 @@ export default function (name, app, options) {
             if (err) {
               reject(err)
             } else {
-              debug('Published message ' + messageId + ' to device ' + object._id.toString() + ' with ARN ' + device.arn + ' for platform ' + application.platform + ': ' + message)
+              debug('Published message ' + messageId + ' to device ' + device._id.toString() + ' with ARN ' + device.arn + ' for platform ' + application.platform + ': ' + message)
               resolve({ [application.platform]: messageId })
             }
           })
@@ -296,9 +296,9 @@ export default function (name, app, options) {
         case 'message': {
           const topicField = data.topicField || defaultTopicField
           // If no topic we assume we want to publish on specific devices
-          return _.get(params.pushObject, topicField) ?
-            this.publishToPlatformTopics(params.pushObject, data.message, topicField) :
-            this.publishToDevices(params.pushObject, data.message)
+          return _.get(params.pushObject, topicField)
+            ? this.publishToPlatformTopics(params.pushObject, data.message, topicField)
+            : this.publishToDevices(params.pushObject, data.message)
         }
       }
     },
