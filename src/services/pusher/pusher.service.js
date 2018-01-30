@@ -106,7 +106,7 @@ export default function (name, app, options) {
             if (err) {
               reject(err)
             } else {
-              debug('Published message ' + messageId + ' to device ' + device.uuid.toString() + ' with ARN ' + device.arn + ' for platform ' + application.platform + ': ' + message)
+              debug('Published message ' + messageId + ' to device ' + device.registrationId + ' with ARN ' + device.arn + ' for platform ' + application.platform + ': ' + message)
               resolve({ [application.platform]: messageId })
             }
           })
