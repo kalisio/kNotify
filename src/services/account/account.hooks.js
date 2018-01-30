@@ -1,5 +1,3 @@
-import { iff } from 'feathers-hooks-common'
-
 module.exports = {
   before: {
     all: [],
