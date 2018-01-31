@@ -130,7 +130,7 @@ export default {
       } else {
         done()
       }
-    },
+    }
   },
   created () {
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
