@@ -61,10 +61,6 @@ export function registerDevice (hook) {
 }
 
 export function unregisterDevices (hook) {
-  if (hook.type !== 'before') {
-    throw new Error(`The 'unregisterDevices' hook should only be used as a 'before' hook.`)
-  }
-
   debug('Unregistering devices for user ', hook.params.user)
   let pusherService = hook.app.getService('pusher')
   let user = hook.params.user
