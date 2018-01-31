@@ -1,4 +1,5 @@
 import makeDebug from 'debug'
+import generatePassword from 'password-generator'
 const verifyHooks = require('feathers-authentication-management').hooks
 const debug = makeDebug('kalisio:kNotify:users:hooks')
 
@@ -14,6 +15,20 @@ export function sendVerificationEmail (hook) {
 
   let accountService = hook.app.getService('account')
   return accountService.options.notifier('resendVerifySignup', hook.result)
+  .then(result => {
+    return hook
+  })
+}
+
+export function sendInvitationEmail (hook) {
+  if (hook.type !== 'before') {
+    throw new Error(`The 'sendInvitationEmail' hook should only be used as a 'before' hook.`)
+  }
+  // generte a password
+  hook.data.password = generatePassword(15, false, /[\w\d\?\-]/)
+  // send the invitation mail
+  let accountService = hook.app.getService('account')
+  return accountService.options.notifier('sendInvitation', hook.data)
   .then(result => {
     return hook
   })
@@ -75,9 +90,9 @@ export function unregisterDevices (hook) {
       unregisterPromises.push(
         pusherService.remove(device.registrationId,
           { query: { action: 'device' },
-          user: hook.params.user,
-          patch: hook.method !== 'remove' // Do not patch object when it is deleted
-        })
+            user: hook.params.user,
+            patch: hook.method !== 'remove' // Do not patch object when it is deleted
+          })
       )
     })
   }
