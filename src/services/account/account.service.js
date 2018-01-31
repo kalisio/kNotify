@@ -23,6 +23,7 @@ export default function (name, app, options) {
     }
     let domainPath = app.get('domain') + '/#/'
     // Build the subject & link to the app to perform the different actions
+    let emailTemplateDir = type
     switch (type) {
       case 'resendVerifySignup': // send another email with link for verifying user's email addr
         email.subject = 'Confirm your signup'
@@ -44,8 +45,13 @@ export default function (name, app, options) {
       case 'identityChange': // inform that user's email has now changed
         email.subject = 'Your account information was changed'
         email.link = domainPath + 'change-identity/' + user.verifyToken
+        break
+      case 'sendInvitation':
+        email.subject = 'Welcome'
+        email.link = domainPath + 'login'
+        emailTemplateDir = 'confirmInvitation'
     }
-    const templateDir = path.join(mailerService.options.templateDir, type)
+    const templateDir = path.join(mailerService.options.templateDir, emailTemplateDir)
     const template = new emails.EmailTemplate(templateDir)
     return template.render({
       email,
