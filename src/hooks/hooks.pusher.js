@@ -1,4 +1,6 @@
 import makeDebug from 'debug'
+import _ from 'lodash'
+import { getItems } from 'feathers-hooks-common'
 import { hooks } from 'kCore'
 const debug = makeDebug('kalisio:kNotify:pusher:hooks')
 
@@ -19,31 +21,27 @@ export function populatePushObject (hook) {
   else return hooks.populateObject({ serviceField: 'pushObjectService', idField: 'pushObject', throwOnNotFound: true })(hook)
 }
 
-export function createTopic (hook) {
+export async function createTopic (hook) {
   let pusherService = hook.app.getService('pusher')
-  return pusherService.create(
-    { action: 'topic' }, {
+  hook.result = await pusherService.create(
+  { action: 'topic' }, {
       pushObject: hook.result,
       pushObjectService: hook.service
-    })
-  .then(result => {
-    debug('Added topic to object ' + hook.result._id.toString() + ' from service ' + hook.service.path)
-    return hook
   })
+  debug('Added topic to object ' + hook.result._id.toString() + ' from service ' + hook.service.path)
+  return hook
 }
 
-export function removeTopic (hook) {
+export async function removeTopic (hook) {
   let pusherService = hook.app.getService('pusher')
-  return pusherService.remove(hook.result._id.toString(), {
+  hook.result = pusherService.remove(hook.result._id.toString(), {
     query: { action: 'topic' },
     pushObject: hook.result,
     pushObjectService: hook.service,
     patch: hook.method !== 'remove' // Do not patch object when it is deleted
   })
-  .then(result => {
-    debug('Removed topic on object ' + hook.result._id.toString() + ' from service ' + hook.service.path)
-    return hook
-  })
+  debug('Removed topic on object ' + hook.result._id.toString() + ' from service ' + hook.service.path)
+  return hook
 }
 
 export function subscribeSubjectsToResourceTopic (hook) {
@@ -77,3 +75,57 @@ export function unsubscribeSubjectsFromResourceTopic (hook) {
     return hook
   })
 }
+
+export function updateSubjectSubscriptions (field, service) {
+  return async function (hook) {
+    function isTopicEqual(topic1, topic2) {
+      return topic1.arn === topic2.arn
+    }
+
+    // Service can be contextual, look for context on initiator service
+    const itemService = hook.app.getService(service, hook.service.context)
+    let item = getItems(hook)
+    let pusherService = hook.app.getService('pusher')
+    let topics = _.get(item, field)
+    topics = (Array.isArray(topics) ? topics : [topics])
+    // Retrieve previous version of the item
+    let previousTopics = _.get(hook.params.previousItem, field)
+    if (previousTopics) {
+      previousTopics = (Array.isArray(previousTopics) ? previousTopics : [previousTopics])
+      // Find common topics
+      const commonTopics = _.intersectionWith(topics, previousTopics, isTopicEqual)
+      // Unsubscribe removed topics
+      const removedTopics = _.pullAllWith(previousTopics, commonTopics, isTopicEqual)
+      debug('Removing topic subscriptions for object ' + item._id.toString(), removedTopics)
+      const unsubscribePromises = removedTopics.map(topic => pusherService.remove(topic._id.toString(), {
+        query: { action: 'subscriptions' },
+        pushObject: topic,
+        pushObjectService: itemService,
+        users: [hook.params.user]
+      }))
+      // And subscribe new ones
+      const addedTopics = _.pullAllWith(topics, commonTopics, isTopicEqual)
+      debug('Adding topic subscriptions for object ' + item._id.toString(), addedTopics)
+      const subscribePromises = addedTopics.map(topic => pusherService.create(
+      { action: 'subscriptions' }, {
+        pushObject: topic,
+        pushObjectService: itemService,
+        users: [hook.params.user]
+      }))
+      await Promise.all(unsubscribePromises.concat(subscribePromises))
+    } else {
+      // Subscribed new topics
+      debug('Adding topic subscriptions for object ' + item._id.toString(), topics)
+      const subscribePromises = topics.map(topic => pusherService.create(
+      { action: 'subscriptions' }, {
+        pushObject: topic,
+        pushObjectService: itemService,
+        users: [hook.params.user]
+      }))
+      await Promise.all(subscribePromises)
+    }
+    
+    return hook
+  }
+}
+
