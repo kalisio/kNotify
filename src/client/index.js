@@ -1,5 +1,6 @@
 import logger from 'loglevel'
 import { Platform, Toast } from 'quasar'
+import { Store } from 'kCore/client'
 
 // We faced a bug in babel so that transform-runtime with export * from 'x' generates import statements in transpiled code
 // Tracked here : https://github.com/babel/babel/issues/2877
@@ -18,6 +19,7 @@ export default function init () {
   logger.debug('Initializing kalisio notify')
 
   api.declareService('account')
+  api.declareService('device')
 
   // -----------------------------------------------------------------------
   // | After this we should only have specific cordova initialisation code |
@@ -53,6 +55,10 @@ export default function init () {
     // Check for permissions, will launch permission request on failure
     // NOT SURE IF THIS IS REQUIRED
     // permissionsPlugin.hasPermission(notificationPermissions, permissionsCheckSuccess, null)
+    if (!window.device) {
+      logger.error('Unable to reach device information')
+      return
+    }
 
     let notifier = window.PushNotification.init({
       android: { vibrate: true, sound: true, forceShow: true },
@@ -60,9 +66,18 @@ export default function init () {
       windows: { }
     })
     notifier.on('registration', (data) => {
-      logger.debug('Registered device with ID ' + data.registrationId)
-      // Should be provided by cordova plugin
-      if (window.device) window.device.registrationId = data.registrationId
+      logger.debug('Push registrationID changed: ' + data.registrationId)
+      // Store the registrationId
+      window.device.registrationId = data.registrationId
+      // update the user device
+      const user = Store.get('user')
+      if (user) {
+        const devicesService = api.getService('devices')
+        devicesService.update(window.device.registrationId, window.device)
+        .then(device => {
+          logger.debug(`device ${device.uuid} updated with the id ${device.registrationId}`)
+        })
+      }
     })
     notifier.on('notification', (data) => {
       // data.message,
@@ -77,6 +92,13 @@ export default function init () {
       Toast.create.negative({
         html: error.message,
         timeout: 10000
+      })
+    })
+    api.on('authenticated', response => {
+      const devicesService = api.getService('devices')
+      devicesService.update(window.device.registrationId, window.device)
+      .then(device => {
+        logger.debug(`device ${device.uuid} registered with the id ${device.registrationId}`)
       })
     })
   }, false)

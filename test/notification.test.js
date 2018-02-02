@@ -5,7 +5,7 @@ import core, { kalisio } from 'kCore'
 import notify, { hooks } from '../src'
 
 describe('kNotify:notifications', () => {
-  let app, server, port, baseUrl, authenticationService, userService, pusherService, sns, publisherObject, subscriberObject
+  let app, server, port, baseUrl, authenticationService, userService, devicesService, pusherService, sns, publisherObject, subscriberObject
   const device = {
     registrationId: 'myfakeId',
     platform: 'ANDROID'
@@ -34,13 +34,10 @@ describe('kNotify:notifications', () => {
       }
     })
     authenticationService = app.getService('authentication')
-    authenticationService.hooks({
-      after: {
-        create: [ hooks.registerDevice ]
-      }
-    })
     expect(authenticationService).toExist()
     app.configure(notify)
+    devicesService = app.getService('devices')
+    expect(devicesService).toExist()
     pusherService = app.getService('pusher')
     expect(pusherService).toExist()
     // Now app is configured launch the server
@@ -79,14 +76,21 @@ describe('kNotify:notifications', () => {
   it('authenticates a subscriber should register its device', () => {
     return request
     .post(`${baseUrl}/authentication`)
-    .send({ email: 'subscriber@kalisio.xyz', password: 'subscriber-password', strategy: 'local', device })
+    .send({ email: 'subscriber@kalisio.xyz', password: 'subscriber-password', strategy: 'local' })
     .then(response => {
       return userService.find({ query: { email: 'subscriber@kalisio.xyz' } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
       subscriberObject = users.data[0]
-      // Added registered device
+      return devicesService.update(device.registrationId, device, { user: subscriberObject })
+    })
+    .then(device => {
+      return userService.get(subscriberObject._id)
+    })
+    .then(user => {
+      // Check registered device
+      subscriberObject = user
       expect(subscriberObject.devices).toExist()
       expect(subscriberObject.devices.length > 0).beTrue()
       expect(subscriberObject.devices[0].registrationId).to.equal(device.registrationId)

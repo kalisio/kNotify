@@ -25,7 +25,8 @@ export function sendInvitationEmail (hook) {
     throw new Error(`The 'sendInvitationEmail' hook should only be used as a 'before' hook.`)
   }
   // generte a password
-  hook.data.password = generatePassword(15, false, /[\w\d\?\-]/)
+  let passwordRule = new RegExp('[\\w\\d\\?\\-]')
+  hook.data.password = generatePassword(15, false, passwordRule)
   // send the invitation mail
   let accountService = hook.app.getService('account')
   return accountService.options.notifier('sendInvitation', hook.data)
@@ -53,28 +54,6 @@ export function removeVerification (hook) {
   return verifyHooks.removeVerification()(hook)
 }
 
-export function registerDevice (hook) {
-  if (hook.type !== 'after') {
-    throw new Error(`The 'registerDevice' hook should only be used as a 'after' hook.`)
-  }
-
-  // check if registered from mobile app
-  if (!hook.data.device || !hook.data.device.registrationId || !hook.data.device.platform) return Promise.resolve(hook)
-
-  let app = hook.app
-  return app.passport.verifyJWT(hook.result.accessToken, { secret: app.get('authentication').secret })
-  .then(data => {
-    let userService = app.getService('users')
-    return userService.get(data.userId)
-  })
-  .then(user => {
-    debug('Registering device for user ', user)
-    let pusherService = app.getService('pusher')
-    return pusherService.create({ action: 'device', device: hook.data.device }, { user })
-  })
-  .then(result => hook)
-}
-
 export function unregisterDevices (hook) {
   debug('Unregistering devices for user ', hook.params.user)
   let pusherService = hook.app.getService('pusher')
@@ -86,8 +65,7 @@ export function unregisterDevices (hook) {
       unregisterPromises.push(
         pusherService.remove(device.registrationId,
           { query: { action: 'device' },
-            user: hook.params.user,
-            patch: hook.method !== 'remove' // Do not patch object when it is deleted
+            user: hook.params.user
           })
       )
     })

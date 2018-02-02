@@ -8,4 +8,5 @@ module.exports = async function () {
   app.createService('mailer', { servicesPath })
   app.createService('pusher', { servicesPath })
   app.createService('account', { servicesPath })
+  app.createService('devices', { servicesPath })
 }

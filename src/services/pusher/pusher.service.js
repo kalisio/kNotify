@@ -24,7 +24,7 @@ export default function (name, app, options) {
     getSnsApplication (platform) {
       return _.find(snsApplications, application => application.platform === platform.toUpperCase())
     },
-    registerDevice (device, user, patch = true) {
+    createDevice (device, user) {
       return new Promise((resolve, reject) => {
         let application = this.getSnsApplication(device.platform)
         if (!application) {
@@ -33,61 +33,34 @@ export default function (name, app, options) {
         }
         // Check if already registered
         let devices = user.devices || []
-        if (_.find(devices, userDevice => userDevice.registrationId === device.registrationId)) {
+        if (_.find(devices, userDevice => userDevice.uuid === device.uuid)) {
           debug('Already registered device ' + device.registrationId + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
           resolve(device.arn)
           return
         }
         application.addUser(device.registrationId, '', (err, endpointArn) => {
-          if (err) {
-            reject(err)
-          } else {
-            // Register new user device
-            devices.push(Object.assign({ arn: endpointArn }, device))
-            debug('Registered device ' + device.registrationId + ' with ARN ' + endpointArn + ' for user ' + user._id.toString())
-            if (patch) {
-              let userService = app.getService('users')
-              resolve(
-                userService.patch(user._id, { devices })
-                .then(user => device)
-              )
-            } else {
-              resolve(device)
-            }
-          }
+          if (err) reject(err)
+          else resolve(endpointArn)
         })
       })
     },
-    unregisterDevice (deviceId, user, patch = true) {
+    removeDevice (registrationId, user) {
       return new Promise((resolve, reject) => {
         // Check if already registered
         let devices = user.devices || []
-        let device = _.find(devices, device => device.registrationId === deviceId)
+        let device = _.find(devices, device => device.registrationId === registrationId)
         if (!device) {
           resolve()
           return
         }
         let application = this.getSnsApplication(device.platform)
         if (!application) {
-          reject(new Error('Cannot unregister device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
+          reject(new Error('Cannot unbind device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
           return
         }
         application.deleteUser(device.arn, (err) => {
-          if (err) {
-            reject(err)
-          } else {
-            devices = _.remove(devices, userDevice => userDevice.registrationId === deviceId)
-            debug('Unregistered device ' + device.registrationId + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
-            if (patch) {
-              let userService = app.getService('users')
-              resolve(
-                userService.patch(user._id, { devices })
-                .then(user => device)
-              )
-            } else {
-              resolve(device)
-            }
-          }
+          if (err) reject(err)
+          else resolve(device)
         })
       })
     },
@@ -288,7 +261,8 @@ export default function (name, app, options) {
 
       switch (data.action) {
         case 'device':
-          return this.registerDevice(data.device, params.user, params.patch)
+          // return this.registerDevice(data.device, params.user, params.patch)
+          return this.createDevice(data.device, params.user)
         case 'topic':
           return this.createPlatformTopics(params.pushObject, params.pushObjectService, data.topicField || defaultTopicField, params.patch)
         case 'subscriptions':
@@ -309,7 +283,8 @@ export default function (name, app, options) {
 
       switch (query.action) {
         case 'device':
-          return this.unregisterDevice(id, params.user, params.patch)
+          // return this.unregisterDevice(id, params.user, params.patch)
+          return this.removeDevice(id, params.user)
         case 'topic':
           return this.removePlatformTopics(params.pushObject, params.pushObjectService, query.topicField || defaultTopicField, params.patch)
         case 'subscriptions':
