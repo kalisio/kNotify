@@ -58,15 +58,8 @@ export function subscribeSubjectsToResourceTopic (hook) {
     })
   .then(result => {
     debug('Subscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name))
-    return pusherService.create({
-      action: 'message',
-      message: 'New user added'
-    }, {
-      pushObject: hook.params.resource,
-      pushObjectService: hook.params.resourcesService
-    })
+    return hook
   })
-  .then(_ => hook)
 }
 
 export function unsubscribeSubjectsFromResourceTopic (hook) {
