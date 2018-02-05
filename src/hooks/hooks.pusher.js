@@ -34,7 +34,7 @@ export async function createTopic (hook) {
 
 export async function removeTopic (hook) {
   let pusherService = hook.app.getService('pusher')
-  hook.result = pusherService.remove(hook.result._id.toString(), {
+  await pusherService.remove(hook.result._id.toString(), {
     query: { action: 'topic' },
     pushObject: hook.result,
     pushObjectService: hook.service,
@@ -44,20 +44,18 @@ export async function removeTopic (hook) {
   return hook
 }
 
-export function subscribeSubjectsToResourceTopic (hook) {
+export async function subscribeSubjectsToResourceTopic (hook) {
   if (!hook.params.resource || !hook.params.resource.topics) return Promise.resolve(hook)
 
   let pusherService = hook.app.getService('pusher')
-  return pusherService.create(
+  await pusherService.create(
     { action: 'subscriptions' }, {
       pushObject: hook.params.resource,
       pushObjectService: hook.params.resourcesService,
       users: hook.params.subjects
-    })
-  .then(result => {
-    debug('Subscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name))
-    return hook
   })
+  debug('Subscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name))
+  return hook
 }
 
 export function unsubscribeSubjectsFromResourceTopic (hook) {
@@ -82,11 +80,15 @@ export function updateSubjectSubscriptions (field, service) {
       return topic1.arn === topic2.arn
     }
 
+    let item = getItems(hook)
+    let topics = _.get(item, field)
+    if (!topics) {
+      return Promise.resolve(hook)
+    }
+    
     // Service can be contextual, look for context on initiator service
     const itemService = hook.app.getService(service, hook.service.context)
-    let item = getItems(hook)
     let pusherService = hook.app.getService('pusher')
-    let topics = _.get(item, field)
     topics = (Array.isArray(topics) ? topics : [topics])
     // Retrieve previous version of the item
     let previousTopics = _.get(hook.params.previousItem, field)
