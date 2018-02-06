@@ -140,11 +140,29 @@ export default function (name, app, options) {
       .then(results => results.reduce((messageIds, messageId) => Object.assign(messageIds, messageId), {}))
     },
     async removePlatformTopics (object, service, topicField, patch = true) {
+      // First get all subscribers of the topic because we do not store them
       // Process with each registered platform
+      let platformSubscriptions = await this.getPlatformSubscriptions(object, topicField)
+      // Process with each registered platform
+      let unsubscriptionPromises = []
       let topicPromises = []
-      snsApplications.forEach(application => {
+      snsApplications.forEach((application, i) => {
+        const topicArn = _.get(object, topicField + '.' + application.platform)
+        // Unsubscribe all users
+        platformSubscriptions[i].forEach(subscription => {
+          unsubscriptionPromises.push(new Promise((resolve, reject) => {
+            application.unsubscribe(subscription.SubscriptionArn, (err) => {
+              if (err) {
+                reject(new GeneralError(err, { arn: subscription.SubscriptionArn }))
+              } else {
+                debug('Unsubscribed device with ARN ' + subscription.SubscriptionArn + ' from topic with ARN ' + topicArn)
+                resolve({ arn: subscription.SubscriptionArn })
+              }
+            })
+          }))
+        })
+        // Then delete topic
         topicPromises.push(new Promise((resolve, reject) => {
-          const topicArn = _.get(object, topicField + '.' + application.platform)
           application.deleteTopic(topicArn, (err) => {
             if (err) {
               reject(err)
@@ -155,6 +173,7 @@ export default function (name, app, options) {
           })
         }))
       })
+      let subscriptionArns = await Promise.all(unsubscriptionPromises)
       let topicArns = await Promise.all(topicPromises)
       if (patch) {
         return service.patch(object._id, { [topicField]: null })
@@ -206,9 +225,7 @@ export default function (name, app, options) {
       return Promise.all(subscriptionPromises.map(promise => promise.catch(error => error)))
       .then(results => results.reduce((subscriptions, subscription) => Object.assign(subscriptions, subscription), {}))
     },
-    removePlatformSubscriptions (object, users, topicField) {
-      // First get all subscribers of the topic because we do not store them
-      // Process with each registered platform
+    getPlatformSubscriptions (object, topicField) {
       let subscriptionPromises = []
       snsApplications.forEach(application => {
         subscriptionPromises.push(new Promise((resolve, reject) => {
@@ -224,6 +241,11 @@ export default function (name, app, options) {
         }))
       })
       return Promise.all(subscriptionPromises)
+    },
+    removePlatformSubscriptions (object, users, topicField) {
+      // First get all subscribers of the topic because we do not store them
+      // Process with each registered platform
+      return this.getPlatformSubscriptions(object, topicField)
       .then(platformSubscriptions => {
         let unsubscriptionPromises = []
         // Process with each registered platform
