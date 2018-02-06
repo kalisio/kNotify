@@ -7,7 +7,7 @@ export async function verifyGuest (hook) {
   }
   let app = hook.app
   let user = hook.params.user
-  debug('verifyGuest hook called on ', user._Id)
+  debug('verifyGuest hook called on ', user._id)
 
   // Check whether the user has been inivted. If not, nothing to do
   if (!user.sponsor) {

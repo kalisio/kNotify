@@ -36,7 +36,7 @@ export default function (name, app, options) {
       debug(`binding the device to the pusher service with the registrationId ${device.registrationId}`)
       device.arn = await pusherService.create({ action: 'device', device: data }, { user })
 
-      await usersService.patch(user._id, { devices })
+      await usersService.patch(user._id, { devices }, { user, checkAuthorisation: true })
       return device
     }
   }
