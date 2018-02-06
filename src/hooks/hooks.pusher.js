@@ -24,9 +24,9 @@ export function populatePushObject (hook) {
 export async function createTopic (hook) {
   let pusherService = hook.app.getService('pusher')
   hook.result = await pusherService.create(
-  { action: 'topic' }, {
-      pushObject: hook.result,
-      pushObjectService: hook.service
+    { action: 'topic' }, {
+    pushObject: hook.result,
+    pushObjectService: hook.service
   })
   debug('Added topic to object ' + hook.result._id.toString() + ' from service ' + hook.service.path)
   return hook
