@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import crypto from 'crypto'
 import { GeneralError } from 'feathers-errors'
 import SNS from 'sns-mobile'
 import makeDebug from 'debug'
@@ -23,6 +24,21 @@ export default function (name, app, options) {
     // Used to retrieve the underlying interface for a platform
     getSnsApplication (platform) {
       return _.find(snsApplications, application => application.platform === platform.toUpperCase())
+    },
+    getMessagePayload (message, platform) {
+      // Add SMS protocol target in case we have some phone numbers registered to the topic
+      let jsonMessage = { default: message, sms: message }
+      // For stacking we need a unique ID per notification on Android
+      // Use MD5 of the message then take care to overflow (32-bits integer)
+      const notId = parseInt(crypto.createHash('md5').update(message).digest('hex').substring(0, 8), 16)
+      if (platform === SNS.SUPPORTED_PLATFORMS.IOS) {
+        // iOS
+        jsonMessage.APNS = JSON.stringify({ data: { message } })
+      } else {
+        // ANDROID
+        jsonMessage.GCM = JSON.stringify({ data: { message, notId } })
+      }
+      return jsonMessage
     },
     createDevice (device, user) {
       return new Promise((resolve, reject) => {
@@ -75,11 +91,12 @@ export default function (name, app, options) {
             reject(new Error('Cannot send message to device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
             return
           }
-          application.sendMessage(device.arn, message, (err, messageId) => {
+          const jsonMessage = this.getMessagePayload(message, application.platform)
+          application.sendMessage(device.arn, jsonMessage, (err, messageId) => {
             if (err) {
               reject(err)
             } else {
-              debug('Published message ' + messageId + ' to device ' + device.registrationId + ' with ARN ' + device.arn + ' for platform ' + application.platform + ': ' + message)
+              debug('Published message ' + messageId + ' to device ' + device.registrationId + ' with ARN ' + device.arn + ' for platform ' + application.platform, jsonMessage)
               resolve({ [application.platform]: messageId })
             }
           })
@@ -118,19 +135,12 @@ export default function (name, app, options) {
       snsApplications.forEach(application => {
         messagePromises.push(new Promise((resolve, reject) => {
           const topicArn = _.get(object, topicField + '.' + application.platform)
-          // Add SMS protocol target in case we have some phone numbers registered to the topic
-          let jsonMessage = { default: message, sms: message }
-          if (application.platform === SNS.SUPPORTED_PLATFORMS.IOS) {
-            jsonMessage.APNS = JSON.stringify({ data: { message } })
-          } else {
-            // ANDROID
-            jsonMessage.GCM = JSON.stringify({ data: { message } })
-          }
+          const jsonMessage = this.getMessagePayload(message, application.platform)
           application.publishToTopic(topicArn, jsonMessage, (err, messageId) => {
             if (err) {
               reject(err)
             } else {
-              debug('Published message ' + messageId + ' to topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform + ': ' + message)
+              debug('Published message ' + messageId + ' to topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform, jsonMessage)
               resolve({ [application.platform]: messageId })
             }
           })
