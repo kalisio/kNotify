@@ -24,9 +24,9 @@ export function populatePushObject (hook) {
 export async function createTopic (hook) {
   let pusherService = hook.app.getService('pusher')
   hook.result = await pusherService.create(
-  { action: 'topic' }, {
-      pushObject: hook.result,
-      pushObjectService: hook.service
+    { action: 'topic' }, {
+    pushObject: hook.result,
+    pushObjectService: hook.service
   })
   debug('Added topic to object ' + hook.result._id.toString() + ' from service ' + hook.service.path)
   return hook
@@ -74,7 +74,7 @@ export function unsubscribeSubjectsFromResourceTopic (hook) {
   })
 }
 
-export function updateSubjectSubscriptions (field, service) {
+export function updateSubjectSubscriptions (field, service, filter) {
   return async function (hook) {
     function isTopicEqual(topic1, topic2) {
       return topic1.arn === topic2.arn
@@ -97,7 +97,11 @@ export function updateSubjectSubscriptions (field, service) {
       // Find common topics
       const commonTopics = _.intersectionWith(topics, previousTopics, isTopicEqual)
       // Unsubscribe removed topics
-      const removedTopics = _.pullAllWith(previousTopics, commonTopics, isTopicEqual)
+      let removedTopics = _.pullAllWith(previousTopics, commonTopics, isTopicEqual)
+      // Apply filter if any
+      if (typeof filter === 'function') {
+        removedTopics = filter('unsubscribe', removedTopics)
+      }
       debug('Removing topic subscriptions for object ' + item._id.toString(), removedTopics)
       const unsubscribePromises = removedTopics.map(topic => pusherService.remove(topic._id.toString(), {
         query: { action: 'subscriptions' },
@@ -106,7 +110,11 @@ export function updateSubjectSubscriptions (field, service) {
         users: [hook.params.user]
       }))
       // And subscribe new ones
-      const addedTopics = _.pullAllWith(topics, commonTopics, isTopicEqual)
+      let addedTopics = _.pullAllWith(topics, commonTopics, isTopicEqual)
+      // Apply filter if any
+      if (typeof filter === 'function') {
+        addedTopics = filter('subscribe', addedTopics)
+      }
       debug('Adding topic subscriptions for object ' + item._id.toString(), addedTopics)
       const subscribePromises = addedTopics.map(topic => pusherService.create(
       { action: 'subscriptions' }, {
@@ -118,6 +126,10 @@ export function updateSubjectSubscriptions (field, service) {
     } else {
       // Subscribed new topics
       debug('Adding topic subscriptions for object ' + item._id.toString(), topics)
+      // Apply filter if any
+      if (typeof filter === 'function') {
+        topics = filter('subscribe', topics)
+      }
       const subscribePromises = topics.map(topic => pusherService.create(
       { action: 'subscriptions' }, {
         pushObject: topic,

@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import crypto from 'crypto'
 import { GeneralError } from 'feathers-errors'
 import SNS from 'sns-mobile'
 import makeDebug from 'debug'
@@ -23,6 +24,21 @@ export default function (name, app, options) {
     // Used to retrieve the underlying interface for a platform
     getSnsApplication (platform) {
       return _.find(snsApplications, application => application.platform === platform.toUpperCase())
+    },
+    getMessagePayload (message, platform) {
+      // Add SMS protocol target in case we have some phone numbers registered to the topic
+      let jsonMessage = { default: message, sms: message }
+      // For stacking we need a unique ID per notification on Android
+      // Use MD5 of the message then take care to overflow (32-bits integer)
+      const notId = parseInt(crypto.createHash('md5').update(message).digest('hex').substring(0, 8), 16)
+      if (platform === SNS.SUPPORTED_PLATFORMS.IOS) {
+        // iOS
+        jsonMessage.APNS = JSON.stringify({ data: { message } })
+      } else {
+        // ANDROID
+        jsonMessage.GCM = JSON.stringify({ data: { message, notId } })
+      }
+      return jsonMessage
     },
     createDevice (device, user) {
       return new Promise((resolve, reject) => {
@@ -75,11 +91,12 @@ export default function (name, app, options) {
             reject(new Error('Cannot send message to device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
             return
           }
-          application.sendMessage(device.arn, message, (err, messageId) => {
+          const jsonMessage = this.getMessagePayload(message, application.platform)
+          application.sendMessage(device.arn, jsonMessage, (err, messageId) => {
             if (err) {
               reject(err)
             } else {
-              debug('Published message ' + messageId + ' to device ' + device.registrationId + ' with ARN ' + device.arn + ' for platform ' + application.platform + ': ' + message)
+              debug('Published message ' + messageId + ' to device ' + device.registrationId + ' with ARN ' + device.arn + ' for platform ' + application.platform, jsonMessage)
               resolve({ [application.platform]: messageId })
             }
           })
@@ -118,19 +135,12 @@ export default function (name, app, options) {
       snsApplications.forEach(application => {
         messagePromises.push(new Promise((resolve, reject) => {
           const topicArn = _.get(object, topicField + '.' + application.platform)
-          // Add SMS protocol target in case we have some phone numbers registered to the topic
-          let jsonMessage = { default: message, sms: message }
-          if (application.platform === SNS.SUPPORTED_PLATFORMS.IOS) {
-            jsonMessage.APNS = JSON.stringify({ data: { message } })
-          } else {
-            // ANDROID
-            jsonMessage.GCM = JSON.stringify({ data: { message } })
-          }
+          const jsonMessage = this.getMessagePayload(message, application.platform)
           application.publishToTopic(topicArn, jsonMessage, (err, messageId) => {
             if (err) {
               reject(err)
             } else {
-              debug('Published message ' + messageId + ' to topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform + ': ' + message)
+              debug('Published message ' + messageId + ' to topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform, jsonMessage)
               resolve({ [application.platform]: messageId })
             }
           })
@@ -140,11 +150,29 @@ export default function (name, app, options) {
       .then(results => results.reduce((messageIds, messageId) => Object.assign(messageIds, messageId), {}))
     },
     async removePlatformTopics (object, service, topicField, patch = true) {
+      // First get all subscribers of the topic because we do not store them
       // Process with each registered platform
+      let platformSubscriptions = await this.getPlatformSubscriptions(object, topicField)
+      // Process with each registered platform
+      let unsubscriptionPromises = []
       let topicPromises = []
-      snsApplications.forEach(application => {
+      snsApplications.forEach((application, i) => {
+        const topicArn = _.get(object, topicField + '.' + application.platform)
+        // Unsubscribe all users
+        platformSubscriptions[i].forEach(subscription => {
+          unsubscriptionPromises.push(new Promise((resolve, reject) => {
+            application.unsubscribe(subscription.SubscriptionArn, (err) => {
+              if (err) {
+                reject(new GeneralError(err, { arn: subscription.SubscriptionArn }))
+              } else {
+                debug('Unsubscribed device with ARN ' + subscription.SubscriptionArn + ' from topic with ARN ' + topicArn)
+                resolve({ arn: subscription.SubscriptionArn })
+              }
+            })
+          }))
+        })
+        // Then delete topic
         topicPromises.push(new Promise((resolve, reject) => {
-          const topicArn = _.get(object, topicField + '.' + application.platform)
           application.deleteTopic(topicArn, (err) => {
             if (err) {
               reject(err)
@@ -155,6 +183,7 @@ export default function (name, app, options) {
           })
         }))
       })
+      let subscriptionArns = await Promise.all(unsubscriptionPromises)
       let topicArns = await Promise.all(topicPromises)
       if (patch) {
         return service.patch(object._id, { [topicField]: null })
@@ -206,9 +235,7 @@ export default function (name, app, options) {
       return Promise.all(subscriptionPromises.map(promise => promise.catch(error => error)))
       .then(results => results.reduce((subscriptions, subscription) => Object.assign(subscriptions, subscription), {}))
     },
-    removePlatformSubscriptions (object, users, topicField) {
-      // First get all subscribers of the topic because we do not store them
-      // Process with each registered platform
+    getPlatformSubscriptions (object, topicField) {
       let subscriptionPromises = []
       snsApplications.forEach(application => {
         subscriptionPromises.push(new Promise((resolve, reject) => {
@@ -224,6 +251,11 @@ export default function (name, app, options) {
         }))
       })
       return Promise.all(subscriptionPromises)
+    },
+    removePlatformSubscriptions (object, users, topicField) {
+      // First get all subscribers of the topic because we do not store them
+      // Process with each registered platform
+      return this.getPlatformSubscriptions(object, topicField)
       .then(platformSubscriptions => {
         let unsubscriptionPromises = []
         // Process with each registered platform
