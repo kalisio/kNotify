@@ -98,6 +98,8 @@ describe('kNotify:notifications', () => {
       expect(subscriberObject.devices[0].arn).toExist()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('publishes a message on the subscriber device', (done) => {
     pusherService.create({
@@ -106,11 +108,13 @@ describe('kNotify:notifications', () => {
       pushObjectService: 'users',
       message: 'test-message'
     })
-    sns.on('messageSent', (endpointArn, messageId) => {
+    sns.once('messageSent', (endpointArn, messageId) => {
       expect(subscriberObject.devices[0].arn).to.equal(endpointArn)
       done()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('creates the topic on the publisher object', (done) => {
     pusherService.create({
@@ -118,7 +122,7 @@ describe('kNotify:notifications', () => {
       pushObject: publisherObject._id.toString(),
       pushObjectService: 'users'
     })
-    sns.on('topicCreated', (topicArn, topicName) => {
+    sns.once('topicCreated', (topicArn, topicName) => {
       // Check for user object update
       userService.find({ query: { email: 'publisher@kalisio.xyz' } })
       .then(users => {
@@ -131,6 +135,8 @@ describe('kNotify:notifications', () => {
       })
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('subscribes a user to the publisher topic', (done) => {
     pusherService.create({
@@ -140,7 +146,7 @@ describe('kNotify:notifications', () => {
     }, {
       users: [subscriberObject]
     }).catch(error => console.log(error))
-    sns.on('subscribed', (subscriptionArn, endpointArn, topicArn) => {
+    sns.once('subscribed', (subscriptionArn, endpointArn, topicArn) => {
       expect(publisherObject.topics[device.platform]).to.equal(topicArn)
       expect(subscriberObject.devices[0].arn).to.equal(endpointArn)
       done()
@@ -156,11 +162,13 @@ describe('kNotify:notifications', () => {
       pushObjectService: 'users',
       message: 'test-message'
     })
-    sns.on('publishedMessage', (topicArn, messageId) => {
+    sns.once('publishedMessage', (topicArn, messageId) => {
       expect(publisherObject.topics[device.platform]).to.equal(topicArn)
       done()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('unsubscribes a user from the publisher topic', (done) => {
     pusherService.remove(publisherObject._id.toString(), {
@@ -170,11 +178,13 @@ describe('kNotify:notifications', () => {
       },
       users: [subscriberObject]
     }).catch(error => console.log(error))
-    sns.on('unsubscribed', (subscriptionArn) => {
+    sns.once('unsubscribed', (subscriptionArn) => {
       // We do not store subscription ARN
       done()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('removes the topic on the publisher object', (done) => {
     pusherService.remove(publisherObject._id.toString(), {
@@ -183,7 +193,7 @@ describe('kNotify:notifications', () => {
         pushObjectService: 'users'
       }
     })
-    sns.on('topicDeleted', (topicArn) => {
+    sns.once('topicDeleted', (topicArn) => {
       expect(publisherObject.topics[device.platform]).to.equal(topicArn)
       // Check for user object update
       userService.find({ query: { email: 'publisher@kalisio.xyz' } })
@@ -195,14 +205,18 @@ describe('kNotify:notifications', () => {
       })
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('removes a subscriber should unregister its device', (done) => {
     userService.remove(subscriberObject._id, { user: subscriberObject })
-    sns.on('userDeleted', endpointArn => {
+    sns.once('userDeleted', endpointArn => {
       expect(subscriberObject.devices[0].arn).to.equal(endpointArn)
       done()
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   // Cleanup
   after(() => {
