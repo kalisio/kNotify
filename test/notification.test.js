@@ -73,7 +73,7 @@ describe('kNotify:notifications', () => {
     })
   })
 
-  it('authenticates a subscriber should register its device', () => {
+  it('a subscriber should be able to register its device', () => {
     return request
     .post(`${baseUrl}/authentication`)
     .send({ email: 'subscriber@kalisio.xyz', password: 'subscriber-password', strategy: 'local' })
