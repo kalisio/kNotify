@@ -22,6 +22,10 @@ export function populatePushObject (hook) {
 }
 
 export async function createTopic (hook) {
+  if (hook.type !== 'after') {
+    throw new Error(`The 'createTopic' hook should only be used as a 'before' hook.`)
+  }
+
   let pusherService = hook.app.getService('pusher')
   hook.result = await pusherService.create(
     { action: 'topic' }, {
@@ -33,6 +37,10 @@ export async function createTopic (hook) {
 }
 
 export async function removeTopic (hook) {
+  if (hook.type !== 'after') {
+    throw new Error(`The 'removeTopic' hook should only be used as a 'before' hook.`)
+  }
+  
   let pusherService = hook.app.getService('pusher')
   await pusherService.remove(hook.result._id.toString(), {
     query: { action: 'topic' },
@@ -54,7 +62,7 @@ export async function subscribeSubjectsToResourceTopic (hook) {
       pushObjectService: hook.params.resourcesService,
       users: hook.params.subjects
   })
-  debug('Subscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name))
+  debug('Subscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name), hook.params.subjects)
   return hook
 }
 
@@ -69,7 +77,7 @@ export function unsubscribeSubjectsFromResourceTopic (hook) {
     users: hook.params.subjects
   })
   .then(result => {
-    debug('Unsubscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name))
+    debug('Unsubscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name), hook.params.subjects)
     return hook
   })
 }
@@ -102,7 +110,7 @@ export function updateSubjectSubscriptions (field, service, filter) {
       if (typeof filter === 'function') {
         removedTopics = filter('unsubscribe', removedTopics)
       }
-      debug('Removing topic subscriptions for object ' + item._id.toString(), removedTopics)
+      debug('Removing topic subscriptions for object ' + item._id.toString(), removedTopics, hook.params.user)
       const unsubscribePromises = removedTopics.map(topic => pusherService.remove(topic._id.toString(), {
         query: { action: 'subscriptions' },
         pushObject: topic,
@@ -115,7 +123,7 @@ export function updateSubjectSubscriptions (field, service, filter) {
       if (typeof filter === 'function') {
         addedTopics = filter('subscribe', addedTopics)
       }
-      debug('Adding topic subscriptions for object ' + item._id.toString(), addedTopics)
+      debug('Adding topic subscriptions for object ' + item._id.toString(), addedTopics, hook.params.user)
       const subscribePromises = addedTopics.map(topic => pusherService.create(
       { action: 'subscriptions' }, {
         pushObject: topic,
@@ -125,7 +133,7 @@ export function updateSubjectSubscriptions (field, service, filter) {
       await Promise.all(unsubscribePromises.concat(subscribePromises))
     } else {
       // Subscribed new topics
-      debug('Adding topic subscriptions for object ' + item._id.toString(), topics)
+      debug('Adding topic subscriptions for object ' + item._id.toString(), topics, hook.params.user)
       // Apply filter if any
       if (typeof filter === 'function') {
         topics = filter('subscribe', topics)
