@@ -29,9 +29,9 @@ export async function createTopic (hook) {
   let pusherService = hook.app.getService('pusher')
   hook.result = await pusherService.create(
     { action: 'topic' }, {
-    pushObject: hook.result,
-    pushObjectService: hook.service
-  })
+      pushObject: hook.result,
+      pushObjectService: hook.service
+    })
   debug('Added topic to object ' + hook.result._id.toString() + ' from service ' + hook.service.path)
   return hook
 }
@@ -40,7 +40,7 @@ export async function removeTopic (hook) {
   if (hook.type !== 'after') {
     throw new Error(`The 'removeTopic' hook should only be used as a 'before' hook.`)
   }
-  
+
   let pusherService = hook.app.getService('pusher')
   await pusherService.remove(hook.result._id.toString(), {
     query: { action: 'topic' },
@@ -61,7 +61,7 @@ export async function subscribeSubjectsToResourceTopic (hook) {
       pushObject: hook.params.resource,
       pushObjectService: hook.params.resourcesService,
       users: hook.params.subjects
-  })
+    })
   debug('Subscribed users on topic object ' + hook.params.resource._id.toString() + ' from service ' + (hook.params.resourcesService.path || hook.params.resourcesService.name), hook.params.subjects)
   return hook
 }
@@ -84,7 +84,7 @@ export function unsubscribeSubjectsFromResourceTopic (hook) {
 
 export function updateSubjectSubscriptions (field, service, filter) {
   return async function (hook) {
-    function isTopicEqual(topic1, topic2) {
+    function isTopicEqual (topic1, topic2) {
       return topic1.arn === topic2.arn
     }
 
@@ -93,7 +93,7 @@ export function updateSubjectSubscriptions (field, service, filter) {
     if (!topics) {
       return Promise.resolve(hook)
     }
-    
+
     // Service can be contextual, look for context on initiator service
     const itemService = hook.app.getService(service, hook.service.context)
     let pusherService = hook.app.getService('pusher')
@@ -146,8 +146,7 @@ export function updateSubjectSubscriptions (field, service, filter) {
       }))
       await Promise.all(subscribePromises)
     }
-    
+
     return hook
   }
 }
-

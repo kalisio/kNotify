@@ -183,7 +183,7 @@ export default function (name, app, options) {
           })
         }))
       })
-      let subscriptionArns = await Promise.all(unsubscriptionPromises)
+      await Promise.all(unsubscriptionPromises)
       let topicArns = await Promise.all(topicPromises)
       if (patch) {
         return service.patch(object._id, { [topicField]: null })
