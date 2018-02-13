@@ -37,6 +37,8 @@ export default function (name, app, options) {
       device.arn = await pusherService.create({ action: 'device', device: data }, { user })
 
       await usersService.patch(user._id, { devices }, { user, checkAuthorisation: true })
+      // Update user for hooks
+      params.user.devices = devices
       return device
     }
   }

@@ -231,9 +231,10 @@ export default function (name, app, options) {
           })
         })
       })
-      // We should be tolerent to faulty subscriptions
-      return Promise.all(subscriptionPromises.map(promise => promise.catch(error => error)))
-      .then(results => results.reduce((subscriptions, subscription) => Object.assign(subscriptions, subscription), {}))
+      // FIXME: We should be tolerent to faulty subscriptions
+      //return Promise.all(subscriptionPromises.map(promise => promise.catch(error => console.log(error))))
+      //.then(results => results.reduce((subscriptions, subscription) => Object.assign(subscriptions, subscription), {}))
+      return Promise.all(subscriptionPromises)
     },
     getPlatformSubscriptions (object, topicField) {
       let subscriptionPromises = []
@@ -244,7 +245,7 @@ export default function (name, app, options) {
             if (err) {
               reject(err)
             } else {
-              debug('Retrieved subscriptions for topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform)
+              debug('Retrieved ' + subscriptions.length + ' subscriptions for topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform)
               resolve(subscriptions)
             }
           })
@@ -283,8 +284,11 @@ export default function (name, app, options) {
               })
             })
           })
-          return Promise.all(unsubscriptionPromises)
         })
+        // FIXME: We should be tolerent to faulty unsubscriptions
+        //return Promise.all(unsubscriptionPromises.map(promise => promise.catch(error => console.log(error))))
+        //.then(results => results.reduce((unsubscriptions, unsubscription) => Object.assign(unsubscriptions, unsubscription), {}))
+        return Promise.all(unsubscriptionPromises)
       })
     },
     // Used to perform service actions such as create a user, a push notification, a topic, etc.
