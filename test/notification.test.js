@@ -8,7 +8,8 @@ describe('kNotify:notifications', () => {
   let app, server, port, baseUrl, authenticationService, userService, devicesService, pusherService, sns, publisherObject, subscriberObject
   const device = {
     registrationId: 'myfakeId',
-    platform: 'ANDROID'
+    platform: 'ANDROID',
+    uuid: 'id'
   }
 
   before(() => {

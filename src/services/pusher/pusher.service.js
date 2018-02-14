@@ -49,14 +49,18 @@ export default function (name, app, options) {
         }
         // Check if already registered
         let devices = user.devices || []
-        if (_.find(devices, userDevice => userDevice.uuid === device.uuid)) {
-          debug('Already registered device ' + device.registrationId + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
+        const previousDevice = _.find(devices, userDevice => userDevice.registrationId === device.registrationId)
+        if (previousDevice) {
+          debug('Already registered device ' + previousDevice.registrationId + ' with ARN ' + previousDevice.arn + ' for user ' + user._id.toString())
           resolve(device.arn)
           return
         }
         application.addUser(device.registrationId, '', (err, endpointArn) => {
           if (err) reject(err)
-          else resolve(endpointArn)
+          else {
+            debug('Registered device ' + device.registrationId + ' with ARN ' + endpointArn + ' for user ' + user._id.toString())
+            resolve(endpointArn)
+          }
         })
       })
     },
@@ -76,7 +80,10 @@ export default function (name, app, options) {
         }
         application.deleteUser(device.arn, (err) => {
           if (err) reject(err)
-          else resolve(device)
+          else {
+            debug('Unregistered device ' + device.registrationId + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
+            resolve(device)
+          }
         })
       })
     },
@@ -293,7 +300,7 @@ export default function (name, app, options) {
     },
     // Used to perform service actions such as create a user, a push notification, a topic, etc.
     create (data, params) {
-      debug(`pusher service called for create action=${data.action}`, data)
+      debug(`pusher service called for create action=${data.action}`)
 
       switch (data.action) {
         case 'device':
@@ -315,7 +322,7 @@ export default function (name, app, options) {
     // Used to perform service actions such as remove a user, a topic, etc.
     remove (id, params) {
       const query = params.query
-      debug(`pusher service called for remove action=${query.action}`, params)
+      debug(`pusher service called for remove action=${query.action}`)
 
       switch (query.action) {
         case 'device':

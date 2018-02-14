@@ -38,7 +38,7 @@ export async function createTopic (hook) {
 
 export async function removeTopic (hook) {
   if (hook.type !== 'after') {
-    throw new Error(`The 'removeTopic' hook should only be used as a 'before' hook.`)
+    throw new Error(`The 'removeTopic' hook should only be used as a 'after' hook.`)
   }
 
   let pusherService = hook.app.getService('pusher')

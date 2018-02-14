@@ -8,10 +8,23 @@ export default function (name, app, options) {
   Object.assign(options, app.get('devices'))
   debug('devices service created with config ', options)
   return {
+    findDeviceByUuid(device, user) {
+      const devices = user.devices || []
+      return _.find(devices, { uuid: device.uuid })
+    },
+    isDeviceRegistered(device, user) {
+      // Find existing device if any
+      const previousDevice = this.findDeviceByUuid(device, user)
+      if (previousDevice) {
+        return (previousDevice.registrationId === device.registrationId)
+      } else {
+        return false
+      }
+    },
     async update (id, data, params) {
-      // id: userId
+      // id: registrationId
       // data: device
-      debug('devices service call for update', id, data)
+      debug('Devices service call for update', id, data)
       const usersService = app.getService('users')
       const pusherService = app.getService('pusher')
 
@@ -20,25 +33,24 @@ export default function (name, app, options) {
       let devices = user.devices || []
 
       // Check whether we need to update or to register the device
-      let device = _.find(devices, { 'uuid': data.uuid })
+      let device = this.findDeviceByUuid(data, user)
       if (device) {
-        debug('device already registered')
+        debug('Device already stored for user ', user._id)
         if (device.registrationId === id) return device
-        debug('unbinding the device from the pusher service')
-        await pusherService.remove(device.registrationId, { query: { action: 'device' }, user: user })
-        device.registrationId = data.registrationId
-      } else {
-        debug('device not found: registering the device')
-        device = Object.assign({}, data)
-        devices.push(device)
+        debug('Unbinding old device', device)
+        await pusherService.remove(device.registrationId, { query: { action: 'device' }, user })
+        // Remove device from user list
+        devices = devices.filter(userDevice => userDevice.uuid !== device.uuid)
       }
+      // Store new device
+      device = Object.assign({}, data)
+      devices.push(device)
+      debug('Storing new device for user ', user)
       // Bind the device
-      debug(`binding the device to the pusher service with the registrationId ${device.registrationId}`)
+      debug('Binding new device', device)
+      // FIXME: These operations can probably be done in parallel
       device.arn = await pusherService.create({ action: 'device', device: data }, { user })
-
       await usersService.patch(user._id, { devices }, { user, checkAuthorisation: true })
-      // Update user for hooks
-      params.user.devices = devices
       return device
     }
   }
