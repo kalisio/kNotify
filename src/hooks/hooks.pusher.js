@@ -80,7 +80,7 @@ export async function unsubscribeSubjectsFromResourceTopic (hook) {
   return hook
 }
 
-export function updateSubjectSubscriptions (field, service, filter) {
+export function updateSubjectSubscriptions (options) {
   return async function (hook) {
     function isTopicEqual (topic1, topic2) {
       return topic1.arn === topic2.arn
@@ -88,20 +88,20 @@ export function updateSubjectSubscriptions (field, service, filter) {
 
     let item = getItems(hook)
     // Field might be on the service object or subject
-    let topics = _.get(item, field)
+    let topics = _.get(item, options.field)
     if (!topics) {
-      topics = _.get(hook.params, 'user.' + field)
+      topics = _.get(hook.params, 'user.' + options.field)
       if (!topics) {
         return Promise.resolve(hook)
       }
     }
 
     // Service can be contextual, look for context on initiator service
-    const itemService = hook.app.getService(service, hook.service.context)
+    const itemService = hook.app.getService(options.service, hook.service.context)
     let pusherService = hook.app.getService('pusher')
     topics = (Array.isArray(topics) ? topics : [topics])
     // Retrieve previous version of the item
-    let previousTopics = _.get(hook.params.previousItem, field)
+    let previousTopics = _.get(hook.params.previousItem, options.field)
     if (previousTopics) {
       previousTopics = (Array.isArray(previousTopics) ? previousTopics : [previousTopics])
       // Find common topics
@@ -109,28 +109,28 @@ export function updateSubjectSubscriptions (field, service, filter) {
       // Unsubscribe removed topics
       let removedTopics = _.pullAllWith(previousTopics, commonTopics, isTopicEqual)
       // Apply filter if any
-      if (typeof filter === 'function') {
-        removedTopics = filter('unsubscribe', removedTopics)
+      if (typeof options.filter === 'function') {
+        removedTopics = options.filter('unsubscribe', removedTopics)
       }
       debug('Removing topic subscriptions for object ', item, removedTopics, hook.params.user)
       const unsubscribePromises = removedTopics.map(topic => pusherService.remove(topic._id.toString(), {
         query: { action: 'subscriptions' },
         pushObject: topic,
         pushObjectService: itemService,
-        users: [hook.params.user]
+        users: [(options.userAsObject ? item : hook.params.user)]
       }))
       // And subscribe new ones
       let addedTopics = _.pullAllWith(topics, commonTopics, isTopicEqual)
       // Apply filter if any
-      if (typeof filter === 'function') {
-        addedTopics = filter('subscribe', addedTopics)
+      if (typeof options.filter === 'function') {
+        addedTopics = options.filter('subscribe', addedTopics)
       }
       debug('Adding topic subscriptions for object ', item, addedTopics, hook.params.user)
       const subscribePromises = addedTopics.map(topic => pusherService.create(
       { action: 'subscriptions' }, {
         pushObject: topic,
         pushObjectService: itemService,
-        users: [hook.params.user]
+        users: [(options.userAsObject ? item : hook.params.user)]
       }))
       const results = await Promise.all([ Promise.all(unsubscribePromises), Promise.all(subscribePromises) ])
       for (let i = 0; i < results[0].length; i++) {
@@ -155,14 +155,14 @@ export function updateSubjectSubscriptions (field, service, filter) {
       // Subscribed new topics
       debug('Adding topic subscriptions for object ', item, topics, hook.params.user)
       // Apply filter if any
-      if (typeof filter === 'function') {
-        topics = filter('subscribe', topics)
+      if (typeof options.filter === 'function') {
+        topics = options.filter('subscribe', topics)
       }
       const subscribePromises = topics.map(topic => pusherService.create(
       { action: 'subscriptions' }, {
         pushObject: topic,
         pushObjectService: itemService,
-        users: [hook.params.user]
+        users: [(options.userAsObject ? item : hook.params.user)]
       }))
       const results = await Promise.all(subscribePromises)
       for (let i = 0; i < results.length; i++) {
