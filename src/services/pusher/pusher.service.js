@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import crypto from 'crypto'
+import moment from 'moment'
 import { GeneralError } from 'feathers-errors'
 import SNS from 'sns-mobile'
 import makeDebug from 'debug'
@@ -26,17 +26,31 @@ export default function (name, app, options) {
       return _.find(snsApplications, application => application.platform === platform.toUpperCase())
     },
     getMessagePayload (message, platform) {
+      // Transform in internal data structure if only a string is given
+      if (typeof message === 'string') {
+        message = { title: message, body: message }
+      }
       // Add SMS protocol target in case we have some phone numbers registered to the topic
-      let jsonMessage = { default: message, sms: message }
-      // For stacking we need a unique ID per notification on Android
-      // Use MD5 of the message then take care to overflow (32-bits integer)
-      const notId = parseInt(crypto.createHash('md5').update(message).digest('hex').substring(0, 8), 16)
+      let jsonMessage = { default: message.title, sms: message.body }
+      // For stacking we need a unique increasing ID per notification on Android
+      let notId = 0
+      if (message.createdAt && message.updatedAt) {
+        // Use the difference in seconds between creation/update time
+        if (moment.isMoment(message.createdAt) && moment.isMoment(message.updatedAt)) {
+          notId = message.updatedAt.diff(message.createdAt, 'seconds')
+        } else if (message.createdAt instanceof Date && message.updatedAt instanceof Date) {
+          notId = 1000 * (message.updatedAt.getTime() - message.createdAt.getTime())
+        } else {
+          // Assume strings
+          notId = 1000 * (new Date(message.updatedAt).getTime() - new Date(message.createdAt).getTime())
+        }
+      }
       if (platform === SNS.SUPPORTED_PLATFORMS.IOS) {
         // iOS
-        jsonMessage.APNS = JSON.stringify({ data: { message } })
+        jsonMessage.APNS = JSON.stringify({ data: { alert: message.title, notId } })
       } else {
         // ANDROID
-        jsonMessage.GCM = JSON.stringify({ data: { message, notId } })
+        jsonMessage.GCM = JSON.stringify({ data: { title: message.title, message: message.body, notId } })
       }
       return jsonMessage
     },
