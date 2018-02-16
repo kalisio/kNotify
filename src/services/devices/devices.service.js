@@ -1,7 +1,7 @@
 import makeDebug from 'debug'
 import _ from 'lodash'
 
-const debug = makeDebug('kalisio:kNotify:devices')
+const debug = makeDebug('kalisio:kNotify:devices:service')
 
 export default function (name, app, options) {
     // Keep track of config

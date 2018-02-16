@@ -4,7 +4,7 @@ import path from 'path'
 import makeDebug from 'debug'
 import _ from 'lodash'
 
-const debug = makeDebug('kalisio:kNotify:account')
+const debug = makeDebug('kalisio:kNotify:account:service')
 
 export default function (name, app, options) {
   // Keep track of notifier
