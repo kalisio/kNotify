@@ -47,10 +47,22 @@ export default function (name, app, options) {
       }
       if (platform === SNS.SUPPORTED_PLATFORMS.IOS) {
         // iOS
-        jsonMessage.APNS = JSON.stringify({ data: { alert: message.title, notId } })
+        let data = {
+          alert: message.title,
+          notId
+        }
+        if (message.sound) data.sound = message.sound
+        jsonMessage.APNS = JSON.stringify({ data })
       } else {
         // ANDROID
-        jsonMessage.GCM = JSON.stringify({ data: { title: message.title, message: message.body, notId } })
+        let data = {
+          title: message.title,
+          message: message.body,
+          notId
+        }
+        if (message.sound) data.soundname = message.sound
+        if (message.vibration) data.vibrationPattern = message.vibration 
+        jsonMessage.GCM = JSON.stringify({ data })
       }
       return jsonMessage
     },
