@@ -42,14 +42,14 @@ export default function (name, app, options) {
         // Remove device from user list
         devices = devices.filter(userDevice => userDevice.uuid !== device.uuid)
       }
-      // Store new device
       device = Object.assign({}, data)
-      devices.push(device)
-      debug('Storing new device for user ', user)
       // Bind the device
       debug('Binding new device', device)
       // FIXME: These operations can probably be done in parallel
       device.arn = await pusherService.create({ action: 'device', device: data }, { user })
+      // Store new device
+      devices.push(device)
+      debug('Storing new device for user ', user)
       await usersService.patch(user._id, { devices }, { user, checkAuthorisation: true })
       return device
     }
