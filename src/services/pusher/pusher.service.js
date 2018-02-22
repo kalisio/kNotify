@@ -61,7 +61,7 @@ export default function (name, app, options) {
           notId
         }
         if (message.sound) data.soundname = message.sound
-        if (message.vibration) data.vibrationPattern = message.vibration 
+        if (message.vibration) data.vibrationPattern = message.vibration
         jsonMessage.GCM = JSON.stringify({ data })
       }
       return jsonMessage
@@ -265,8 +265,8 @@ export default function (name, app, options) {
         })
       })
       // FIXME: We should be tolerent to faulty subscriptions
-      //return Promise.all(subscriptionPromises.map(promise => promise.catch(error => console.log(error))))
-      //.then(results => results.reduce((subscriptions, subscription) => Object.assign(subscriptions, subscription), {}))
+      // return Promise.all(subscriptionPromises.map(promise => promise.catch(error => console.log(error))))
+      // .then(results => results.reduce((subscriptions, subscription) => Object.assign(subscriptions, subscription), {}))
       return Promise.all(subscriptionPromises)
     },
     getPlatformSubscriptions (object, topicField) {
@@ -319,8 +319,8 @@ export default function (name, app, options) {
           })
         })
         // FIXME: We should be tolerent to faulty unsubscriptions
-        //return Promise.all(unsubscriptionPromises.map(promise => promise.catch(error => console.log(error))))
-        //.then(results => results.reduce((unsubscriptions, unsubscription) => Object.assign(unsubscriptions, unsubscription), {}))
+        // return Promise.all(unsubscriptionPromises.map(promise => promise.catch(error => console.log(error))))
+        // .then(results => results.reduce((unsubscriptions, unsubscription) => Object.assign(unsubscriptions, unsubscription), {}))
         return Promise.all(unsubscriptionPromises)
       })
     },

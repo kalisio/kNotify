@@ -8,11 +8,11 @@ export default function (name, app, options) {
   Object.assign(options, app.get('devices'))
   debug('devices service created with config ', options)
   return {
-    findDeviceByUuid(device, user) {
+    findDeviceByUuid (device, user) {
       const devices = user.devices || []
       return _.find(devices, { uuid: device.uuid })
     },
-    isDeviceRegistered(device, user) {
+    isDeviceRegistered (device, user) {
       // Find existing device if any
       const previousDevice = this.findDeviceByUuid(device, user)
       if (previousDevice) {

@@ -136,7 +136,7 @@ export function updateSubjectSubscriptions (options) {
       for (let i = 0; i < results[0].length; i++) {
         const unsubscriptions = results[0][i]
         const topic = removedTopics[i]
-        if (unsubscriptions.length > 0 ) {
+        if (unsubscriptions.length > 0) {
           debug('Unsubscribed from topic ' + topic)
         } else {
           debug('No unsubscription on topic ' + topic)
@@ -145,7 +145,7 @@ export function updateSubjectSubscriptions (options) {
       for (let i = 0; i < results[1].length; i++) {
         const subscriptions = results[1][i]
         const topic = addedTopics[i]
-        if (subscriptions.length > 0 ) {
+        if (subscriptions.length > 0) {
           debug('Subscribed from topic ', topic)
         } else {
           debug('No subscription on topic ', topic)
@@ -168,7 +168,7 @@ export function updateSubjectSubscriptions (options) {
       for (let i = 0; i < results.length; i++) {
         const subscriptions = results[i]
         const topic = topics[i]
-        if (subscriptions.length > 0 ) {
+        if (subscriptions.length > 0) {
           debug('Subscribed from topic ', topic)
         } else {
           debug('No subscription on topic ', topic)
