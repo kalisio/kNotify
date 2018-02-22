@@ -88,7 +88,7 @@ export default {
       let result = this.$refs.form.validate()
       if (result.isValid) {
         this.resetPassword(this.$route.params.token, result.values.password)
-        .then(_ => {
+        .then(() => {
           this.message = 'Password reset, you will receive a confirmation email'
           this.reset = true
           this.success = true

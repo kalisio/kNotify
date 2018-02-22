@@ -4,5 +4,5 @@ export function checkUnique (hook) {
     action: 'checkUnique',
     value: { email: hook.data.email }
   })
-  .then(_ => hook)
+  .then(() => hook)
 }

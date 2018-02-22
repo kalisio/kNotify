@@ -92,7 +92,7 @@ export default {
       let result = this.$refs.form.validate()
       if (result.isValid) {
         this.sendChangeIdentity(this.$store.get('user.email'), result.values.email, result.values.password)
-        .then(_ => {
+        .then(() => {
           this.message = 'Email sent to your new email account, please check your inbox'
           this.sent = true
           this.success = true

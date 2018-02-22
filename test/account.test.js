@@ -119,7 +119,7 @@ describe('kNotify:account', () => {
 
   it('check signup verification email', (done) => {
     // Add some delay to wait for email reception
-    setTimeout(_ => {
+    setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Confirm your signup', done)
     }, 5000)
   })
@@ -141,7 +141,7 @@ describe('kNotify:account', () => {
 
   it('check signup verified email', (done) => {
     // Add some delay to wait for email reception
-    setTimeout(_ => {
+    setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Thank you, your email has been verified', done)
     }, 5000)
   })
@@ -168,7 +168,7 @@ describe('kNotify:account', () => {
 
   it('check reset password request email', (done) => {
     // Add some delay to wait for email reception
-    setTimeout(_ => {
+    setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Reset your password', done)
     }, 5000)
   })
@@ -198,7 +198,7 @@ describe('kNotify:account', () => {
 
   it('check reset password email', (done) => {
     // Add some delay to wait for email reception
-    setTimeout(_ => {
+    setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Your password was reset', done)
     }, 5000)
   })
@@ -238,7 +238,7 @@ describe('kNotify:account', () => {
 
   it('check changed password email', (done) => {
     // Add some delay to wait for email reception
-    setTimeout(_ => {
+    setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Your password was changed', done)
     }, 5000)
   })
@@ -280,7 +280,7 @@ describe('kNotify:account', () => {
 
   it('check identity change email', (done) => {
     // Add some delay to wait for email reception
-    setTimeout(_ => {
+    setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Your account information was changed', done)
     }, 5000)
   })

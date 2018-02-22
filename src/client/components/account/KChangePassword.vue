@@ -108,7 +108,7 @@ export default {
       let result = this.$refs.form.validate()
       if (result.isValid) {
         this.changePassword(this.$store.get('user.email'), result.values.oldPassword, result.values.password)
-        .then(_ => {
+        .then(() => {
           this.message = 'Password changed, you will receive a confirmation email'
           this.changed = true
           this.success = true

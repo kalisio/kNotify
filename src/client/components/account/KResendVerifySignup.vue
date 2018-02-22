@@ -84,7 +84,7 @@ export default {
       let result = this.$refs.form.validate()
       if (result.isValid) {
         this.resendVerifySignup(result.values.email)
-        .then(_ => {
+        .then(() => {
           this.message = 'Email sent, please check your inbox'
           this.sent = true
           this.success = true
