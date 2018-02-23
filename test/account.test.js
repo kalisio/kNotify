@@ -315,8 +315,8 @@ describe('kNotify:account', () => {
   })
 
   // Cleanup
-  after(() => {
-    if (server) server.close()
-    userService.Model.drop()
+  after(async () => {
+    if (server) await server.close()
+    app.db.instance.dropDatabase()
   })
 })
