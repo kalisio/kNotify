@@ -8,16 +8,16 @@
               <q-icon name="check" v-show="applied && !applying"/>
               <q-icon name="error" v-show="!applied && !applying"/>
               &nbsp;&nbsp;
-              {{ message }}.
+              {{message}}.
             </p>
           </div>
           <div class="self-center">
             <a @click="$router.push({name: 'send-change-identity'})">
-              Resend change email -
+              {{$t('KChangeIdentity.ACTION')}}
             </a>
             &nbsp;&nbsp;
             <a @click="$router.push({name: 'login'})">
-              Log in or back to home
+              {{$t('KChangeIdentity.BACK_LINK')}}
             </a>
           </div>
       </div>
@@ -63,31 +63,31 @@ export default {
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
   },
   mounted () {
-    this.title = 'Changes verification'
-    this.message = 'Please wait while applying your changes'
+    this.title = this.$t('KChangeIdentity.VERIFICATION_TITLE')
+    this.message = this.$t('KChangeIdentity.VERIFICATION_MESSAGE')
     this.verifySignup(this.$route.params.token)
     .then(user => {
-      this.title = 'Changes applied'
-      this.message = `Your email address ${user.email} has been changed`
+      this.title = this.$t('KChangeIdentity.NOMINAL_TITLE')
+      this.message = this.$t('KChangeIdentity.NOMINAL_MESSAGE', {email: user.email})
       this.applied = true
       this.applying = false
     })
     .catch(error => {
-      this.title = 'Changes error'
+      this.title = 'KChangeIdentity.ERROR_TITLE'
       const type = _.get(error, 'errors.$className')
       switch (type) {
         case 'isNotVerified':
         case 'nothingToVerify':
-          this.message = 'Your changes have already been applied'
+          this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_ALREADY_APPLIED')
           break
         case 'badParams':
-          this.message = 'Your changes have already been verified or your account has been removed'
+          this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_BAD_PARAMS')
           break
         case 'verifyExpired':
-          this.message = 'The delay to apply your changes has expired, please resend the changes email with the link below'
+          this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_VERIFY_EXPIRED')
           break
         default:
-          this.message = 'Your changes have not been applied'
+          this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_DEFAULT')
       }
       this.applied = false
       this.applying = false

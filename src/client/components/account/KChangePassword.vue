@@ -1,5 +1,5 @@
 <template>
-  <k-screen :title="title">
+  <k-screen :title="$t('KChangePassword.TITLE')">
     <div slot="screen-content">
       <div class="column justify-center sm-gutter">
           <div :class="textClass">
@@ -13,7 +13,7 @@
               <q-icon name="keyboard_backspace"/>
               &nbsp;&nbsp;
               <a @click="$router.push({name: 'home'})">
-              Back to home
+                {{$t('KChangePassword.BACK_LINK')}}
               </a>
             </p>
           </div>
@@ -22,7 +22,7 @@
           </div>
           <div>
             <div class="row justify-around">
-              <q-btn color="primary" loader @click="onChange">Change</q-btn>
+              <q-btn color="primary" loader @click="onChange">{{$t('KChangePassword.ACTION')}}</q-btn>
             </div>
           </div>
       </div>
@@ -42,7 +42,6 @@ export default {
   },
   data () {
     return {
-      title: '',
       message: '',
       success: false,
       changed: false,
@@ -50,23 +49,20 @@ export default {
         "$schema": "http://json-schema.org/draft-06/schema#",
         "$id": "http://kalisio.xyz/schemas/change-password.json#",
         "title": "Change Password form",
-        "description": "Change password form",
         "type": "object",
         "properties": {
           "oldPassword": { 
             "type": "string", 
             "field": {
               "component": "form/KPasswordField",
-              "label": "Old password",
-              "helper": "Enter your old password",
+              "helper": "KChangePassword.OLD_PASSWORD_FIELD_HELPER"
             }
           },
           "password": { 
             "type": "string",
             "field": {
               "component": "form/KPasswordField",
-              "label": "New password",
-              "helper": "Type your new password",
+              "helper": "KChangePassword.PASSWORD_FIELD_HELPER"
             }
           },
           "confirmPassword": { 
@@ -75,20 +71,11 @@ export default {
             },
             "field": {
               "component": "form/KPasswordField",
-              "label": "Confirm new password",
-              "helper": "Type your new password again",
+              "helper": "KChangePassword.CONFIRM_PASSWORD_FIELD_HELPER"
             }
           }
         },
-        "required": ["password"],
-        "form": {
-          "type": "object",
-          "properties":  {
-            "icon": false,
-            "label": true,
-            "labelWidth": 3
-          }
-        }
+        "required": ["oldPassword", "password"]
       }
     }
   },
@@ -109,7 +96,7 @@ export default {
       if (result.isValid) {
         this.changePassword(this.$store.get('user.email'), result.values.oldPassword, result.values.password)
         .then(() => {
-          this.message = 'Password changed, you will receive a confirmation email'
+          this.message = this.$t('KChangePassword.NOMINAL_MESSAGE')
           this.changed = true
           this.success = true
           done()
@@ -118,10 +105,10 @@ export default {
           const type = _.get(error, 'errors.$className')
           switch (type) {
             case 'badParams':
-              this.message = 'Your password has already been changed or your account has been removed'
+              this.message = this.$t('KChangePassword.ERROR_MESSAGE_BAD_PARAMS')
               break
             default:
-              this.message = 'Error while trying to change password, please try again later'
+              this.message = this.$t('KChangePassword.ERROR_MESSAGE_DEFAULT')
           }
           this.changed = true
           this.success = false
@@ -133,12 +120,11 @@ export default {
     }
   },
   created () {
+    // Load the required components
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
     this.$options.components['k-form'] = this.$load('form/KForm')
-  },
-  mounted () {
-    this.title = 'Change password'
-    this.message = 'Please enter your old and new passwords to proceed'
+    // Initialize the data
+    this.message = this.$t('KChangePassword.MESSAGE')
   }
 }
 </script>

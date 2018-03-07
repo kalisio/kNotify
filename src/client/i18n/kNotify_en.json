@@ -1,1 +1,45 @@
-{}
+{
+  "KChangeIdentity": {
+    "ACTION": "Resend change email",
+    "BACK_LINK": "Go back",
+    "VERIFICATION_TITLE": "Changes verification",
+    "VERIFICATION_MESSAGE": "Please wait while applying your changes",
+    "NOMINAL_TITLE": "Changes applied",
+    "NOMINAL_MESSAGE": "Your email address {{email}} has been changed",
+    "ERROR_TITLE": "Changes error",
+    "ERROR_MESSAGE_ALREADY_APPLIED": "Your changes have already been applied",
+    "ERROR_MESSAGE_BAD_PARAMS": "Your changes have already been verified or your account has been removed",
+    "ERROR_MESSAGE_VERIFY_EXPIRED": "The delay to apply your changes has expired, please resend the changes email with the link below",
+    "ERROR_MESSAGE_DEFAULT": "Your changes have not been applied"
+  },
+  "KChangePassword": {
+    "TITLE": "Change password ?",
+    "MESSAGE": "Please enter your old and new passwords to proceed",
+    "ACTION": "Apply",
+    "BACK_LINK": "Go back",
+    "OLD_PASSWORD_FIELD_HELPER": "Enter your old password",
+    "PASSWORD_FIELD_HELPER": "Enter your new password",
+    "CONFIRM_PASSWORD_FIELD_HELPER": "Confirm your new password",
+    "NOMINAL_MESSAGE": "Password changed, you will receive a confirmation email",
+    "ERROR_MESSAGE_BAD_PARAMS": "Your password has already been changed or your account has been removed",
+    "ERROR_MESSAGE_DEFAULT": "Error while trying to change password, please try again later"
+  },
+  "KResendVerifySignup": {
+
+  },
+  "KResetPassword": {
+
+  },
+  "KSendChangedIdentity": {
+
+  }, 
+  "KSendResetPassword": {
+
+  },
+  "KSignupAlert": {
+
+  },
+  "KVerifySignup": {
+
+  }
+}
