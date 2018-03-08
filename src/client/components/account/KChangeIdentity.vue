@@ -67,8 +67,8 @@ export default {
     this.message = this.$t('KChangeIdentity.VERIFICATION_MESSAGE')
     this.verifySignup(this.$route.params.token)
     .then(user => {
-      this.title = this.$t('KChangeIdentity.NOMINAL_TITLE')
-      this.message = this.$t('KChangeIdentity.NOMINAL_MESSAGE', {email: user.email})
+      this.title = this.$t('KChangeIdentity.SUCCESS_TITLE')
+      this.message = this.$t('KChangeIdentity.SUCCESS_MESSAGE', {email: user.email})
       this.applied = true
       this.applying = false
     })

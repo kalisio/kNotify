@@ -1,5 +1,5 @@
 <template>
-  <k-screen :title="title">
+  <k-screen :title="$t('KResetPassword.TITLE')">
     <div slot="screen-content">
       <div class="column justify-center sm-gutter">
           <div :class="textClass">
@@ -15,12 +15,14 @@
           </div>
           <div>
             <div class="row justify-around">
-              <q-btn color="primary" loader @click="onReset">Reset</q-btn>
+              <q-btn color="primary" loader @click="onReset">
+                {{$t('KResetPassword.ACTION')}}
+              </q-btn>
             </div>
           </div>
           <div class="self-center">
             <a @click="$router.push({name: 'send-reset-password'})">
-              Resend reset password email
+              {{$t('KResetPassword.RESEND_LINK')}}
             </a>
           </div>
       </div>
@@ -55,20 +57,20 @@ export default {
             "type": "string", 
             "field": {
               "component": "form/KPasswordField",
-              "label": "Password",
-              "helper": "Enter your password",
+              "helper": "KResetPassword.PASSWORD_FIELD_HELPER"
+            }
+          },
+          "confirmPassword": { 
+            "const": { 
+              "$data": "1/password" 
+            },
+            "field": {
+              "component": "form/KPasswordField",
+              "helper": "KResetPassword.CONFIRM_PASSWORD_FIELD_HELPER"
             }
           }
         },
-        "required": ["password"],
-        "form": {
-          "type": "object",
-          "properties":  {
-            "icon": false,
-            "label": true,
-            "labelWidth": 3
-          }
-        }
+        "required": ["password"]
       }
     }
   },
@@ -89,7 +91,7 @@ export default {
       if (result.isValid) {
         this.resetPassword(this.$route.params.token, result.values.password)
         .then(() => {
-          this.message = 'Password reset, you will receive a confirmation email'
+          this.message = this.$t('KResetPassword.SUCCESS_MESSAGE')
           this.reset = true
           this.success = true
           done()
@@ -98,13 +100,13 @@ export default {
           const type = _.get(error, 'errors.$className')
           switch (type) {
             case 'badParams':
-              this.message = 'Your password has already been reset or your account has been removed'
+              this.message = this.$t('KResetPassword.ERROR_MESSAGE_BAD_PARAMS')
               break
             case 'verifyExpired':
-              this.message = 'The delay to reset has expired, please resend the reset password email with the link below'
+              this.message = this.$t('KResetPassword.ERROR_MESSAGE_VERIFY_EXPIRED')
               break
             default:
-              this.message = 'Error while trying to reset password, please try again later'
+              this.message = this.$t('KResetPassword.ERROR_MESSAGE_DEFAULT')
           }
           this.reset = true
           this.success = false
@@ -116,12 +118,11 @@ export default {
     },
   },
   created () {
+    // Load the required components
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
-    this.$options.components['k-form'] = this.$load('form/KForm')
-  },
-  mounted () {
-    this.title = 'Reset password'
-    this.message = 'Please enter your new password to proceed'
+     this.$options.components['k-form'] = this.$load('form/KForm')
+    // Components initialization
+    this.message = $t('KResetPassword.MESSAGE')
   }
 }
 </script>

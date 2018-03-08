@@ -8,16 +8,16 @@
               <q-icon name="check" v-show="verified && !verifying"/>
               <q-icon name="error" v-show="!verified && !verifying"/>
               &nbsp;&nbsp;
-              {{ message }}.
+              {{message}}.
             </p>
           </div>
           <div class="self-center">
             <a @click="$router.push({name: 'resend-verify-signup'})">
-              Resend verification email -
+              {{$t('KVerifySignup.RESEND_LINK')}}
             </a>
-            &nbsp;&nbsp;
+            &nbsp;-&nbsp;
             <a @click="$router.push({name: 'login'})">
-              Log in or back to home
+              {{$t('KVerifySignup.BACK_LINK')}}
             </a>
           </div>
       </div>
@@ -60,31 +60,31 @@ export default {
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
   },
   mounted () {
-    this.title = 'Email verification'
-    this.message = 'Please wait while verifying your email'
+    this.title = this.$t('KVerifySignup.TITLE')
+    this.message = this.$t('KVerifySignup.MESSAGE')
     this.verifySignup(this.$route.params.token)
     .then(user => {
-      this.title = 'Email verified'
-      this.message = `Your email address ${user.email} has been verified`
+      this.title = this.$t('KVerifySignup.SUCCESS_TITLE')
+      this.message = this.$t('KVerifySignup.SUCCESS_MESSAGE', { email: user.email })
       this.verified = true
       this.verifying = false
     })
     .catch(error => {
-      this.title = 'Email verification error'
+      this.title = this.$t('KVerifySignup.ERROR_TITLE')
       const type = _.get(error, 'errors.$className')
       switch (type) {
         case 'isNotVerified':
         case 'nothingToVerify':
-          this.message = 'Your email address has already been verified'
+          this.message = this.$t('KVerifySignup.ERROR_MESSAGE_NOTHING_TO_VERIFY')
           break
         case 'badParams':
-          this.message = 'Your email address has already been verified or your account has been removed'
+          this.message = this.$t('KVerifySignup.ERROR_MESSAGE_BAD_PARAMS')
           break
         case 'verifyExpired':
-          this.message = 'The delay to verify has expired, please resend the verification email with the link below'
+          this.message = this.$t('KVerifySignup.ERROR_MESSAGE_VERIFY_EXPIRED')
           break
         default:
-          this.message = 'Your email address has not been verified'
+          this.message = this.$t('KVerifySignup.ERROR_MESSAGE_DEFAULT')
       }
       this.verified = false
       this.verifying = false

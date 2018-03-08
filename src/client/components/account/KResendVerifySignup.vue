@@ -1,5 +1,5 @@
 <template>
-  <k-screen :title="title">
+  <k-screen :title="$t('KResendVerifySignup.TITLE')">
     <div slot="screen-content">
       <div class="column justify-center sm-gutter">
           <div :class="textClass">
@@ -7,7 +7,7 @@
               <q-icon name="check" v-show="sent && success"/>
               <q-icon name="error" v-show="sent && !success"/>
               &nbsp;&nbsp;
-              {{ message }}.
+              {{message}}.
             </p>
           </div>
           <div>
@@ -15,7 +15,9 @@
           </div>
           <div>
             <div class="row justify-around">
-              <q-btn color="primary" loader @click="onSend">Send</q-btn>
+              <q-btn color="primary" loader @click="onSend">
+                {{$t('KResendVerifySignup.ACTION')}}
+              </q-btn>
             </div>
           </div>
       </div>
@@ -43,7 +45,6 @@ export default {
         "$schema": "http://json-schema.org/draft-06/schema#",
         "$id": "http://kalisio.xyz/schemas/resend-verification-email#",
         "title": "Resend verification email form",
-        "description": "Resend verification email form",
         "type": "object",
         "properties": {
           "email": { 
@@ -51,20 +52,11 @@ export default {
             "format": "email",
             "field": {
               "component": "form/KEmailField",
-              "label": "Email",
-              "helper": "Enter your email address",
+              "helper": "KResendVerifySignup.EMAIL_FIELD_HELPER",
             }
           }
         },
-        "required": ["email"],
-        "form": {
-          "type": "object",
-          "properties":  {
-            "icon": false,
-            "label": true,
-            "labelWidth": 3
-          }
-        }
+        "required": ["email"]
       }
     }
   },
@@ -85,7 +77,7 @@ export default {
       if (result.isValid) {
         this.resendVerifySignup(result.values.email)
         .then(() => {
-          this.message = 'Email sent, please check your inbox'
+          this.message = this.$t('KResendVerifySignup.SUCCESS_MESSAGE')
           this.sent = true
           this.success = true
           done()
@@ -97,10 +89,10 @@ export default {
           switch (type) {
             case 'isNotVerified':
             case 'nothingToVerify':
-              this.message = 'Your email address has already been verified'
+              this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_NOTHING_TO_VERIFY')
               break
             default:
-              this.message = 'Error while sending email, please check the address and send it again or try again later'
+              this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_DEFAULT')
           }
           done()
         })
@@ -110,12 +102,11 @@ export default {
     },
   },
   created () {
+    // Load the required components
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
     this.$options.components['k-form'] = this.$load('form/KForm')
-  },
-  mounted () {
-    this.title = 'Resend verification email'
-    this.message = 'We\'ll send you the signup verification email again'
+    // Components initialization
+    this.message = this.$t('KResendVerifySignup.MESSAGE')
   }
 }
 </script>

@@ -7,7 +7,7 @@
               <q-icon name="check" v-show="changed && success"/>
               <q-icon name="error" v-show="changed && !success"/>
               &nbsp;&nbsp;
-              {{ message }}.
+              {{message}}.
             </p>
             <p v-show="changed && success">
               <q-icon name="keyboard_backspace"/>
@@ -22,7 +22,9 @@
           </div>
           <div>
             <div class="row justify-around">
-              <q-btn color="primary" loader @click="onChange">{{$t('KChangePassword.ACTION')}}</q-btn>
+              <q-btn color="primary" loader @click="onChange">
+                {{$t('KChangePassword.ACTION')}}
+              </q-btn>
             </div>
           </div>
       </div>
@@ -96,7 +98,7 @@ export default {
       if (result.isValid) {
         this.changePassword(this.$store.get('user.email'), result.values.oldPassword, result.values.password)
         .then(() => {
-          this.message = this.$t('KChangePassword.NOMINAL_MESSAGE')
+          this.message = this.$t('KChangePassword.SUCCESS_MESSAGE')
           this.changed = true
           this.success = true
           done()
@@ -123,7 +125,7 @@ export default {
     // Load the required components
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
     this.$options.components['k-form'] = this.$load('form/KForm')
-    // Initialize the data
+    // Components initialization
     this.message = this.$t('KChangePassword.MESSAGE')
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <k-screen :title="title">
+  <k-screen :title="$t('KSendResetPassword.TITLE')">
     <div slot="screen-content">
       <div class="column justify-center sm-gutter">
           <div :class="textClass">
@@ -15,7 +15,9 @@
           </div>
           <div>
             <div class="row justify-around">
-              <q-btn color="primary" loader @click="onSend">Send</q-btn>
+              <q-btn color="primary" loader @click="onSend">
+                {{$t('KSendResetPassword.ACTION')}}
+              </q-btn>
             </div>
           </div>
       </div>
@@ -35,7 +37,6 @@ export default {
   },
   data () {
     return {
-      title: '',
       message: '',
       success: false,
       sent: false,
@@ -43,7 +44,6 @@ export default {
         "$schema": "http://json-schema.org/draft-06/schema#",
         "$id": "http://kalisio.xyz/schemas/send-reset-password#",
         "title": "Send reset password form",
-        "description": "Send reset password form",
         "type": "object",
         "properties": {
           "email": { 
@@ -51,20 +51,11 @@ export default {
             "format": "email",
             "field": {
               "component": "form/KEmailField",
-              "label": "Email",
-              "helper": "Enter your email address",
+              "helper": "KSendResetPassword.EMAIL_FIELD_HELPER",
             }
           }
         },
-        "required": ["email"],
-        "form": {
-          "type": "object",
-          "properties":  {
-            "icon": false,
-            "label": true,
-            "labelWidth": 3
-          }
-        }
+        "required": ["email"]
       }
     }
   },
@@ -85,7 +76,7 @@ export default {
       if (result.isValid) {
         this.sendResetPassword(result.values.email)
         .then(() => {
-          this.message = 'Email sent, please check your inbox'
+          this.message = this.$t('KSendResetPassword.SUCCESS_MESSAGE')
           this.sent = true
           this.success = true
           done()
@@ -94,10 +85,10 @@ export default {
           const type = _.get(error, 'errors.$className')
           switch (type) {
             case 'isVerified':
-              this.message = 'Check your inbox and verify your email address first'
+              this.message = this.$t('KSendResetPassword.ERROR_MESSAGE_IS_VERIFIED')
               break
             default:
-              this.message = 'Error while sending email, please check the address and send it again or try again later'
+              this.message = this.$t('KSendResetPassword.ERROR_MESSAGE_DEFAULT')
           }
           this.sent = true
           this.success = false
@@ -109,12 +100,11 @@ export default {
     },
   },
   created () {
+    // Load the required components
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
     this.$options.components['k-form'] = this.$load('form/KForm')
-  },
-  mounted () {
-    this.title = 'Send reset password email'
-    this.message = 'We\'ll email you instructions on how to reset your password'
+    // Components initialization
+    this.message = this.$t('KSendResetPassword.MESSAGE')
   }
 }
 </script>
