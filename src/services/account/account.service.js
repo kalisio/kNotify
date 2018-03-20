@@ -1,6 +1,7 @@
 import accountManager from 'feathers-authentication-management'
 import emails from 'email-templates'
 import path from 'path'
+import logger from 'winston'
 import makeDebug from 'debug'
 import _ from 'lodash'
 
@@ -8,7 +9,7 @@ const debug = makeDebug('kalisio:kNotify:account:service')
 
 export default function (name, app, options) {
   // Keep track of notifier
-  options.notifier = function (type, user, notifierOptions) {
+  options.notifier = async function (type, user, notifierOptions) {
     // OAuth2 providers
     const message = 'You cannot modify your account because it is managed by '
     for (let provider of app.authenticationProviders) {
@@ -53,16 +54,18 @@ export default function (name, app, options) {
     }
     const templateDir = path.join(mailerService.options.templateDir, emailTemplateDir)
     const template = new emails.EmailTemplate(templateDir)
-    return template.render({
-      email,
-      user
-    }, user.locale || 'en-us')
-    .then(emailContent => {
+    // Errors does not seem to be correctly catched by the caller
+    // so we catch them here to avoid any problem
+    try {
+      const emailContent = await template.render({ email, user }, user.locale || 'en-us')
       // Update compiled content
       email.html = emailContent.html
       debug('Sending email ', email)
       return mailerService.create(email)
-    })
+    } catch (error) {
+      debug('Sending email failed', error)
+      logger.error(error)
+    }
   }
 
   const servicePath = app.get('apiPath') + '/account'

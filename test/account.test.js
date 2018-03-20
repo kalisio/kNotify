@@ -121,10 +121,10 @@ describe('kNotify:account', () => {
     // Add some delay to wait for email reception
     setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Confirm your signup', done)
-    }, 5000)
+    }, 10000)
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(15000)
 
   it('verify user signup', () => {
     return accountService.create({
@@ -143,10 +143,10 @@ describe('kNotify:account', () => {
     // Add some delay to wait for email reception
     setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Thank you, your email has been verified', done)
-    }, 5000)
+    }, 10000)
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(15000)
 
   it('ask password reset for a user', () => {
     return accountService.create({
@@ -170,10 +170,10 @@ describe('kNotify:account', () => {
     // Add some delay to wait for email reception
     setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Reset your password', done)
-    }, 5000)
+    }, 10000)
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(15000)
 
   it('reset user password', () => {
     return accountService.create({
@@ -200,10 +200,10 @@ describe('kNotify:account', () => {
     // Add some delay to wait for email reception
     setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Your password was reset', done)
-    }, 5000)
+    }, 10000)
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(15000)
 
   it('authenticates a user with reset password', () => {
     return request
@@ -240,10 +240,10 @@ describe('kNotify:account', () => {
     // Add some delay to wait for email reception
     setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Your password was changed', done)
-    }, 5000)
+    }, 10000)
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(15000)
 
   it('authenticates a user with changed password', () => {
     return request
@@ -282,10 +282,10 @@ describe('kNotify:account', () => {
     // Add some delay to wait for email reception
     setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Your account information was changed', done)
-    }, 5000)
+    }, 10000)
   })
   // Let enough time to process
-  .timeout(10000)
+  .timeout(15000)
 
   it('verify user changes', () => {
     return accountService.create({
