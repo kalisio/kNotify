@@ -73,7 +73,8 @@
     "quasar-extras": "1.0.0",
     "quasar-framework": "0.14.7",
     "sns-mobile": "https://github.com/kalisio/sns-mobile#protocol",
-    "vue": "2.5.15"
+    "vue": "2.5.15",
+    "winston": "^2.3.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
