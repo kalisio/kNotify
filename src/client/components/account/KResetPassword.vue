@@ -2,7 +2,7 @@
   <k-screen :title="$t('KResetPassword.TITLE')">
     <div slot="screen-content">
       <div class="column justify-center sm-gutter">
-          <div :class="textClass">
+          <div :class="textClass" v-if="message" >
             <p>
               <q-icon name="check" v-show="reset && success"/>
               <q-icon name="error" v-show="reset && !success"/>

@@ -12,10 +12,10 @@
             </p>
           </div>
           <div class="self-center">
-            <a @click="$router.push({name: 'resend-verify-signup'})">
+            <a v-if="!verifying && !verified" @click="$router.push({name: 'resend-verify-signup'})">
               {{$t('KVerifySignup.RESEND_LINK')}}
             </a>
-            &nbsp;-&nbsp;
+            <span v-if="!verifying && !verified">&nbsp;-&nbsp;</span>
             <a @click="$router.push({name: (authenticated ? 'home' : 'login')})">
               {{$t('KVerifySignup.BACK_LINK')}}
             </a>
@@ -27,7 +27,7 @@
 
 <script>
 import _ from 'lodash'
-import { QSpinner, QIcon } from 'quasar'
+import { QSpinner, QIcon, Events } from 'quasar'
 import { mixins as coreMixins } from 'kCore/client'
 import mixins from '../../mixins'
 
@@ -57,10 +57,18 @@ export default {
     }
   },
   mixins: [coreMixins.authentication, mixins.account],
+  methods: {
+    refreshUser () {
+      this.authenticated = !_.isNil(this.$store.get('user'))
+    }
+  },
   created () {
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
     // Check if logged in
-    this.authenticated = !_.isNil(this.$store.get('user'))
+    Events.$on('user-changed', this.refreshUser)
+  },
+  beforeDestroy() {
+    Events.$off('user-changed', this.refreshUser)
   },
   mounted () {
     this.title = this.$t('KVerifySignup.TITLE')
