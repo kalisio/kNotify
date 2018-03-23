@@ -16,7 +16,7 @@
               {{$t('KVerifySignup.RESEND_LINK')}}
             </a>
             &nbsp;-&nbsp;
-            <a @click="$router.push({name: 'login'})">
+            <a @click="$router.push({name: (authenticated ? 'home' : 'login')})">
               {{$t('KVerifySignup.BACK_LINK')}}
             </a>
           </div>
@@ -42,7 +42,8 @@ export default {
       title: '',
       message: '',
       verifying: true,
-      verified: false
+      verified: false,
+      authenticated: false
     }
   },
   computed: {
@@ -58,6 +59,8 @@ export default {
   mixins: [coreMixins.authentication, mixins.account],
   created () {
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
+    // Check if logged in
+    this.authenticated = !_.isNil(this.$store.get('user'))
   },
   mounted () {
     this.title = this.$t('KVerifySignup.TITLE')

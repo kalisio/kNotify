@@ -16,7 +16,7 @@
               {{$t('KChangeIdentity.ACTION')}}
             </a>
             &nbsp;&nbsp;
-            <a @click="$router.push({name: 'login'})">
+            <a @click="$router.push({name: (authenticated ? 'home' : 'login')})">
               {{$t('KChangeIdentity.BACK_LINK')}}
             </a>
           </div>
@@ -42,7 +42,8 @@ export default {
       title: '',
       message: '',
       applying: true,
-      applied: false
+      applied: false,
+      authenticated: false
     }
   },
   computed: {
@@ -61,6 +62,8 @@ export default {
     // We need this so that we can dynamically load the component
     // with a function that has previously been statically analyzed by the bundler (eg webpack)
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
+    // Check if logged in
+    this.authenticated = !_.isNil(this.$store.get('user'))
   },
   mounted () {
     this.title = this.$t('KChangeIdentity.VERIFICATION_TITLE')
@@ -73,7 +76,7 @@ export default {
       this.applying = false
     })
     .catch(error => {
-      this.title = 'KChangeIdentity.ERROR_TITLE'
+      this.title = this.$t('KChangeIdentity.ERROR_TITLE')
       const type = _.get(error, 'errors.$className')
       switch (type) {
         case 'isNotVerified':
