@@ -282,10 +282,10 @@ describe('kNotify:account', () => {
     // Add some delay to wait for email reception
     setTimeout(() => {
       checkEmail(userObject, mailerService.options.auth.user, 'Your account information was changed', done)
-    }, 10000)
+    }, 15000)
   })
   // Let enough time to process
-  .timeout(15000)
+  .timeout(20000)
 
   it('verify user changes', () => {
     return accountService.create({
