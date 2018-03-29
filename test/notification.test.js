@@ -62,6 +62,8 @@ describe('kNotify:notifications', () => {
       publisherObject = user
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('creates a subscriber', () => {
     return userService.create({
@@ -73,6 +75,8 @@ describe('kNotify:notifications', () => {
       subscriberObject = user
     })
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('a subscriber should be able to register its device', () => {
     return request
