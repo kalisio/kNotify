@@ -117,7 +117,7 @@ export function updateSubjectSubscriptions (options) {
         query: { action: 'subscriptions' },
         pushObject: topic,
         pushObjectService: itemService,
-        users: [(options.userAsObject ? item : hook.params.user)]
+        users: [(options.subjectAsItem ? item : hook.params.user)]
       }))
       // And subscribe new ones
       let addedTopics = _.pullAllWith(topics, commonTopics, isTopicEqual)
@@ -130,7 +130,7 @@ export function updateSubjectSubscriptions (options) {
       { action: 'subscriptions' }, {
         pushObject: topic,
         pushObjectService: itemService,
-        users: [(options.userAsObject ? item : hook.params.user)]
+        users: [(options.subjectAsItem ? item : hook.params.user)]
       }))
       const results = await Promise.all([ Promise.all(unsubscribePromises), Promise.all(subscribePromises) ])
       for (let i = 0; i < results[0].length; i++) {
@@ -152,26 +152,51 @@ export function updateSubjectSubscriptions (options) {
         }
       }
     } else {
-      // Subscribed new topics
-      debug('Adding topic subscriptions for object ', item, topics, hook.params.user)
-      // Apply filter if any
-      if (typeof options.filter === 'function') {
-        topics = options.filter('subscribe', topics)
-      }
-      const subscribePromises = topics.map(topic => pusherService.create(
-      { action: 'subscriptions' }, {
-        pushObject: topic,
-        pushObjectService: itemService,
-        users: [(options.userAsObject ? item : hook.params.user)]
-      }))
-      const results = await Promise.all(subscribePromises)
-      for (let i = 0; i < results.length; i++) {
-        const subscriptions = results[i]
-        const topic = topics[i]
-        if (subscriptions.length > 0) {
-          debug('Subscribed from topic ', topic)
-        } else {
-          debug('No subscription on topic ', topic)
+      if (hook.method !== 'remove') {
+        // Subscribed new topics
+        debug('Adding topic subscriptions for object ', item, topics, hook.params.user)
+        // Apply filter if any
+        if (typeof options.filter === 'function') {
+          topics = options.filter('subscribe', topics)
+        }
+        const subscribePromises = topics.map(topic => pusherService.create(
+        { action: 'subscriptions' }, {
+          pushObject: topic,
+          pushObjectService: itemService,
+          users: [(options.subjectAsItem ? item : hook.params.user)]
+        }))
+        const results = await Promise.all(subscribePromises)
+        for (let i = 0; i < results.length; i++) {
+          const subscriptions = results[i]
+          const topic = topics[i]
+          if (subscriptions.length > 0) {
+            debug('Subscribed from topic ', topic)
+          } else {
+            debug('No subscription on topic ', topic)
+          }
+        }
+      } else {
+        // Subscribed new topics
+        debug('Removing topic subscriptions for object ', item, topics, hook.params.user)
+        // Apply filter if any
+        if (typeof options.filter === 'function') {
+          topics = options.filter('unsubscribe', topics)
+        }
+        const unsubscribePromises = topics.map(topic => pusherService.remove(topic._id.toString(), {
+          query: { action: 'subscriptions' },
+          pushObject: topic,
+          pushObjectService: itemService,
+          users: [(options.subjectAsItem ? item : hook.params.user)]
+        }))
+        const results = await Promise.all(unsubscribePromises)
+        for (let i = 0; i < results.length; i++) {
+          const unsubscriptions = results[i]
+          const topic = topics[i]
+          if (unsubscriptions.length > 0) {
+            debug('Unsubscribed from topic ', topic)
+          } else {
+            debug('No unsubscription on topic ', topic)
+          }
         }
       }
     }
