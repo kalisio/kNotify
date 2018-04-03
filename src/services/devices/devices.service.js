@@ -10,7 +10,15 @@ export default function (name, app, options) {
   return {
     findDeviceByUuid (device, user) {
       const devices = user.devices || []
-      return _.find(devices, { uuid: device.uuid })
+      // Input could be a device object or an ID
+      const uuid = (typeof device === 'string' ? device : device.uuid)
+      return _.find(devices, { uuid })
+    },
+    findDeviceByRegistrationId (device, user) {
+      const devices = user.devices || []
+      // Input could be a device object or an ID
+      const registrationId = (typeof device === 'string' ? device : device.registrationId)
+      return _.find(devices, { registrationId })
     },
     isDeviceRegistered (device, user) {
       // Find existing device if any
@@ -37,21 +45,36 @@ export default function (name, app, options) {
       if (device) {
         debug('Device already stored for user ', user._id)
         if (device.registrationId === id) return device
-        debug('Unbinding old device', device)
-        await pusherService.remove(device.registrationId, { query: { action: 'device' }, user })
+        await this.remove(device.registrationId, { user })
         // Remove device from user list
         devices = devices.filter(userDevice => userDevice.uuid !== device.uuid)
       }
       device = Object.assign({}, data)
       // Bind the device
-      debug('Binding new device', device)
       // FIXME: These operations can probably be done in parallel
-      device.arn = await pusherService.create({ action: 'device', device: data }, { user })
+      device = await this.create(device, { user })
       // Store new device
       devices.push(device)
       debug('Storing new device for user ', user)
       await usersService.patch(user._id, { devices }, { user, checkAuthorisation: true })
       return device
+    },
+    async create (data, params) {
+      // data: device
+      let user = params.user
+      const pusherService = app.getService('pusher')
+      // Bind the device
+      debug('Binding new device', data)
+      // FIXME: These operations can probably be done in parallel
+      data.arn = await pusherService.create({ action: 'device', device: data }, { user })
+      return data
+    },
+    async remove (id, params) {
+      // id: registrationId
+      let user = params.user
+      const pusherService = app.getService('pusher')
+      debug('Unbinding old device', id)
+      await pusherService.remove(id, { query: { action: 'device' }, user })
     }
   }
 }

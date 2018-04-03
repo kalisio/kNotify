@@ -1,12 +1,14 @@
+import { disallow } from 'feathers-hooks-common'
+
 module.exports = {
   before: {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [ disallow('external') ],
     update: [],
     patch: [],
-    remove: []
+    remove: [ disallow('external') ]
   },
 
   after: {
