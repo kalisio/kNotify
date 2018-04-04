@@ -15,7 +15,7 @@
           </div>
           <div>
             <div class="row justify-around">
-              <q-btn color="primary" loader @click="onSend">
+              <q-btn id="change-identity" color="primary" loader @click="onSend">
                 {{$t('KSendChangeIdentity.ACTION')}}
               </q-btn>
             </div>

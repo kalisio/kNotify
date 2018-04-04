@@ -22,7 +22,7 @@
           </div>
           <div>
             <div class="row justify-around">
-              <q-btn color="primary" loader @click="onChange">
+              <q-btn id="change-password" color="primary" loader @click="onChange">
                 {{$t('KChangePassword.ACTION')}}
               </q-btn>
             </div>
