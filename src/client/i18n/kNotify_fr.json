@@ -4,17 +4,17 @@
     "BACK_LINK": "Se connecter ou revenir",
     "VERIFICATION_TITLE": "Vérification du changement",
     "VERIFICATION_MESSAGE": "Merci de patienter",
-    "SUCCESS_TITLE": "Changement appliqués",
+    "SUCCESS_TITLE": "Changements appliqués",
     "SUCCESS_MESSAGE": "Votre adresse mail {{email}} a bien été prise en compte",
     "ERROR_TITLE": "Erreur de la procédure",
     "ERROR_MESSAGE_ALREADY_APPLIED": "Vos changements ont déjà été appliqués",
-    "ERROR_MESSAGE_BAD_PARAMS": "Vos changement ont déjà été réalisé ou votre compte a été supprimé",
+    "ERROR_MESSAGE_BAD_PARAMS": "Vos changements ont déjà été réalisés ou votre compte a été supprimé",
     "ERROR_MESSAGE_VERIFY_EXPIRED": "Le délai pour effectuer les changements a expiré. Merci de relancer la procédure en cliquant sur le lien ci-dessous",
     "ERROR_MESSAGE_DEFAULT": "Une erreur est survenue pendant l'opération, essayez plus tard"
   },
   "KChangePassword": {
     "TITLE": "Changer votre mot de passe ?",
-    "MESSAGE": "Saisissez votre ancien et nouveaux mots de passe",
+    "MESSAGE": "Saisissez votre ancien et votre nouveau mot de passe",
     "ACTION": "Appliquer",
     "BACK_LINK": "Revenir",
     "OLD_PASSWORD_FIELD_HELPER": "Saisissez votre ancien mot de passe",
@@ -25,11 +25,11 @@
     "ERROR_MESSAGE_DEFAULT": "Une erreur est survenue pendant l'opération, essayez plus tard"
   },
   "KResendVerifySignup": {
-    "TITLE": "'Me renvoyer un mail de verification'",
+    "TITLE": "'Me renvoyer un mail de vérification'",
     "MESSAGE": "Nous allons vous envoyer un mail de vérification",
     "ACTION": "Envoyer",
     "EMAIL_FIELD_HELPER": "Saisissez votre adresse mail",
-    "SUCCESS_MESSAGE": "Mail envoyé, vérifier votre messagerie",
+    "SUCCESS_MESSAGE": "Mail envoyé, vérifiez votre messagerie",
     "ERROR_MESSAGE_NOTHING_TO_VERIFY": "Votre adresse mail a déjà été vérifiée",
     "ERROR_MESSAGE_DEFAULT": "Impossible d'envoyer le mail, merci de vérifier votre adresse et essayez à nouveau"
   },
@@ -42,8 +42,8 @@
     "CONFIRM_PASSWORD_FIELD_HELPER": "Confirmez votre nouveau mot de passe",
     "SUCCESS_MESSAGE": "Mot de passe réinitialisé, vous allez recevoir un mail de confirmation",
     "ERROR_MESSAGE_BAD_PARAMS": "Votre mot de passe a déjà été réinitialisé ou votre compte a été supprimé",
-    "ERROR_MESSAGE_VERIFY_EXPIRED": "Le délai pour réinitialiser votre mot de passe a expiré, pour refaire la procédure merci de cliquer sur le lien ci-dessous",
-    "ERROR_MESSAGE_DEFAULT": "Impossible de réinitialiser votre mot de passe; merci d'essayer plus tard"
+    "ERROR_MESSAGE_VERIFY_EXPIRED": "Le délai pour réinitialiser votre mot de passe a expiré. Pour refaire la procédure, merci de cliquer sur le lien ci-dessous",
+    "ERROR_MESSAGE_DEFAULT": "Impossible de réinitialiser votre mot de passe. Merci d'essayer plus tard"
   },
   "KSendChangeIdentity": {
     "TITLE": "Changer votre adresse mail ?",
@@ -53,24 +53,24 @@
     "EMAIL_FIELD_HELPER": "Saisissez votre nouvelle adresse mail",
     "SUCCESS_MESSAGE": "Un mail de confirmation a été envoyé à votre nouvelle adresse, merci de vérifier votre messagerie",
     "ERROR_MESSAGE_BAD_PASSWORD": "Le mot de passe est incorrect. Veuillez recommencer",
-    "ERROR_MESSAGE_BAD_PARAMS": "Votre mail a déjà été changée ou votre compte a été supprimé",
-    "ERROR_MESSAGE_DEFAULT": "Impossible de changer votre addresse mail, essayez plus tard"
+    "ERROR_MESSAGE_BAD_PARAMS": "Votre mail a déjà été changé ou votre compte a été supprimé",
+    "ERROR_MESSAGE_DEFAULT": "Impossible de changer votre adresse mail, essayez plus tard"
   }, 
   "KSendResetPassword": {
     "TITLE": "M'envoyer un mail de réinitialisation du mot de passe",
     "MESSAGE": "Nous allons vous envoyer un mail contenant les instructions pour réinitialiser votre mot de passe",
     "ACTION": "Envoyer",
     "EMAIL_FIELD_HELPER": "Saisissez votre adresse mail",
-    "SUCCESS_MESSAGE": "Mail envoyé, vérifier votre messagerie",
-    "ERROR_MESSAGE_IS_VERIFIED": "Veuillez vérifiez votre messagerie et votre adresse mail préalablement",
+    "SUCCESS_MESSAGE": "Mail envoyé, consultez votre messagerie",
+    "ERROR_MESSAGE_IS_VERIFIED": "Veuillez vérifier votre adresse mail puis consultez votre messagerie",
     "ERROR_MESSAGE_DEFAULT": "Impossible d'envoyer le mail, merci de vérifier votre adresse et essayez à nouveau"
   },
   "KSignupAlert": {
-    "TITLE": "Votre adresse mail n'a pas été vérifiée, merci de vérifier votre messagerie",
+    "TITLE": "Votre adresse mail n'a pas été vérifiée, merci de consulter votre messagerie",
     "HELP_LABEL": "Pourquoi dois-je vérifier mon adresse mail ?",
-    "HELP_TEXT": "Vérifier votre adresse mail améliore la sécurité de votre compte. Une fois que votre adresse mail est validé, vous serez en mesure d'apporter des changements à votre compte tels que votre mot de passe. Cela permet de nous aider pour protéger votre compte contre d'éventuels actes de piraterie.",
+    "HELP_TEXT": "Vérifier votre adresse mail améliore la sécurité de votre compte. Une fois que votre adresse mail est validée, vous serez en mesure d'apporter des changements à votre compte tels que votre mot de passe. Cela permet de nous aider pour protéger votre compte contre d'éventuels actes de piraterie.",
     "EMAIL_LABEL": "Je n'ai jamais reçu de mail de vérification. Que dois-je faire ?",
-    "EMAIL_TEXT": "Si vous n'avez pas reçu de mail de vérifcation, vérifiez que le mail n'a pas été filtré et déplacé dans les spams de votre messagerie. Merci d'ajouter dans vos contacts l'adresse <b>email-notifications@kalisio.com</b> dans votre client de messagerie. Vous pouvez également cliquer sur le bouton ci-dessous pour recevoir un nouveau mail de vérification.",
+    "EMAIL_TEXT": "Si vous n'avez pas reçu de mail de vérification, assurez-vous que le mail n'a pas été filtré et déplacé dans les spams de votre messagerie. Merci d'ajouter dans vos contacts l'adresse <b>email-notifications@kalisio.com</b> dans votre client de messagerie. Vous pouvez également cliquer sur le bouton ci-dessous pour recevoir un nouveau mail de vérification.",
     "ACTION": "Me renvoyer un mail de vérification"
   },
   "KVerifySignup": {
