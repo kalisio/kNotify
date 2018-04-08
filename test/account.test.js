@@ -84,6 +84,8 @@ describe('kNotify:account', () => {
     server = app.listen(port)
     server.once('listening', _ => done())
   })
+  // Let enough time to process
+  .timeout(5000)
 
   it('setup access to gmail', (done) => {
     jwtClient = new google.auth.JWT(
