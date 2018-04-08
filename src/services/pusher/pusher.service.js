@@ -127,7 +127,10 @@ export default function (name, app, options) {
           const jsonMessage = this.getMessagePayload(message, application.platform)
           application.sendMessage(device.arn, jsonMessage, (err, messageId) => {
             if (err) {
-              reject(err)
+              // Be tolerant to SNS errors because some endpoints might have been revoked
+              //reject(err)
+              debug('Unable to publish message to device ' + device.registrationId + ' with ARN ' + device.arn + ' for platform ' + application.platform, jsonMessage, err)
+              resolve({ [application.platform]: null })
             } else {
               debug('Published message ' + messageId + ' to device ' + device.registrationId + ' with ARN ' + device.arn + ' for platform ' + application.platform, jsonMessage)
               resolve({ [application.platform]: messageId })
@@ -238,14 +241,20 @@ export default function (name, app, options) {
                 const topicArn = _.get(object, topicField + '.' + application.platform)
                 application.subscribeWithProtocol(device.arn, topicArn, 'application', (err, subscriptionArn) => {
                   if (err) {
-                    reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
+                    // Be tolerant to SNS errors because some endpoints might have been revoked
+                    //reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
+                    debug('Unable to subscribe device ' + device.registrationId + ' with ARN ' + device.arn + ' to application topic with ARN ' + topicArn, err)
+                    resolve({ [device.registrationId]: { user: user._id, arn: null } })
                   } else {
                     debug('Subscribed device ' + device.registrationId + ' with ARN ' + device.arn + ' to application topic with ARN ' + topicArn)
                     // Register for SMS as well
                     if (device.number) {
                       application.subscribeWithProtocol(device.number, topicArn, 'sms', (err, smsSubscriptionArn) => {
                         if (err) {
-                          reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
+                          // Be tolerant to SNS errors because some endpoints might have been revoked
+                          //reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
+                          debug('Unable to subscribe device number ' + device.number + ' with ARN ' + device.arn + ' to application topic with ARN ' + topicArn, err)
+                          resolve({ [device.registrationId]: { user: user._id, arn: subscriptionArn } })
                         } else {
                           debug('Subscribed device number  ' + device.number + ' with ARN ' + device.arn + ' to SMS topic with ARN ' + topicArn)
                           resolve({
@@ -264,7 +273,7 @@ export default function (name, app, options) {
           })
         })
       })
-      // FIXME: We should be tolerent to faulty subscriptions
+      // FIXME: We should be tolerent to faulty subscriptions > maybe better to adress errors specifically like above
       // return Promise.all(subscriptionPromises.map(promise => promise.catch(error => console.log(error))))
       // .then(results => results.reduce((subscriptions, subscription) => Object.assign(subscriptions, subscription), {}))
       return Promise.all(subscriptionPromises)
@@ -306,7 +315,10 @@ export default function (name, app, options) {
                     const topicArn = _.get(object, topicField + '.' + application.platform)
                     application.unsubscribe(subscription.SubscriptionArn, (err) => {
                       if (err) {
-                        reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
+                        // Be tolerant to SNS errors because some endpoints might have been revoked
+                        //reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
+                        debug('Unable to unsubscribe device ' + device.registrationId + ' with ARN ' + device.arn + ' from topic with ARN ' + topicArn, err)
+                        resolve({ [device.registrationId]: { user: user._id, arn: null } })
                       } else {
                         debug('Unsubscribed device ' + device.registrationId + ' with ARN ' + device.arn + ' from topic with ARN ' + topicArn)
                         resolve({ [device.registrationId]: { user: user._id, arn: subscription.SubscriptionArn } })
@@ -318,7 +330,7 @@ export default function (name, app, options) {
             })
           })
         })
-        // FIXME: We should be tolerent to faulty unsubscriptions
+        // FIXME: We should be tolerent to faulty unsubscriptions > maybe better to adress errors specifically like above
         // return Promise.all(unsubscriptionPromises.map(promise => promise.catch(error => console.log(error))))
         // .then(results => results.reduce((unsubscriptions, unsubscription) => Object.assign(unsubscriptions, unsubscription), {}))
         return Promise.all(unsubscriptionPromises)
