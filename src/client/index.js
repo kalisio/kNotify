@@ -71,7 +71,7 @@ export default function init () {
       window.device.registrationId = data.registrationId
       // update the user device
       const user = Store.get('user')
-      if (user) {
+      if (user && window.device && window.device.registrationId) {
         const devicesService = api.getService('devices')
         devicesService.update(window.device.registrationId, window.device)
         .then(device => {
@@ -96,10 +96,13 @@ export default function init () {
     })
     api.on('authenticated', response => {
       const devicesService = api.getService('devices')
-      devicesService.update(window.device.registrationId, window.device)
-      .then(device => {
-        logger.debug(`device ${device.uuid} registered with the id ${device.registrationId}`)
-      })
+      // Only possible if registration ID already retrieved
+      if (window.device && window.device.registrationId) {
+        devicesService.update(window.device.registrationId, window.device)
+        .then(device => {
+          logger.debug(`device ${device.uuid} registered with the id ${device.registrationId}`)
+        })
+      }
     })
   }, false)
 }
