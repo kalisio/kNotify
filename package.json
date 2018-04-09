@@ -70,7 +70,7 @@
     "loglevel": "^1.6.0",
     "nodemailer-smtp-transport": "^2.7.4",
     "password-generator": "^2.2.0",
-    "quasar-extras": "1.0.0",
+    "quasar-extras": "0.0.8",
     "quasar-framework": "0.14.7",
     "sns-mobile": "https://github.com/kalisio/sns-mobile#protocol",
     "vue": "2.5.15",
