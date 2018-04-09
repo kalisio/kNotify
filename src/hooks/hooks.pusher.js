@@ -107,7 +107,7 @@ export function updateSubjectSubscriptions (options) {
       // Find common topics
       const commonTopics = _.intersectionWith(topics, previousTopics, isTopicEqual)
       // Unsubscribe removed topics
-      let removedTopics = _.pullAllWith(previousTopics, commonTopics, isTopicEqual)
+      let removedTopics = _.differenceWith(previousTopics, commonTopics, isTopicEqual)
       // Apply filter if any
       if (typeof options.filter === 'function') {
         removedTopics = options.filter('unsubscribe', removedTopics)
@@ -120,7 +120,7 @@ export function updateSubjectSubscriptions (options) {
         users: [(options.subjectAsItem ? item : hook.params.user)]
       }))
       // And subscribe new ones
-      let addedTopics = _.pullAllWith(topics, commonTopics, isTopicEqual)
+      let addedTopics = _.differenceWith(topics, commonTopics, isTopicEqual)
       // Apply filter if any
       if (typeof options.filter === 'function') {
         addedTopics = options.filter('subscribe', addedTopics)
