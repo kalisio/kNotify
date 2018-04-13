@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { QBtn, QIcon } from 'quasar'
 import mixins from '../../mixins'
 
@@ -48,36 +49,36 @@ export default {
       success: false,
       changed: false,
       schema: {
-        "$schema": "http://json-schema.org/draft-06/schema#",
-        "$id": "http://kalisio.xyz/schemas/change-password.json#",
-        "title": "Change Password form",
-        "type": "object",
-        "properties": {
-          "oldPassword": { 
-            "type": "string", 
-            "field": {
-              "component": "form/KPasswordField",
-              "helper": "KChangePassword.OLD_PASSWORD_FIELD_HELPER"
+        '$schema': 'http://json-schema.org/draft-06/schema#',
+        '$id': 'http://kalisio.xyz/schemas/change-password.json#',
+        'title': 'Change Password form',
+        'type': 'object',
+        'properties': {
+          'oldPassword': {
+            'type': 'string',
+            'field': {
+              'component': 'form/KPasswordField',
+              'helper': 'KChangePassword.OLD_PASSWORD_FIELD_HELPER'
             }
           },
-          "password": { 
-            "type": "string",
-            "field": {
-              "component": "form/KPasswordField",
-              "helper": "KChangePassword.PASSWORD_FIELD_HELPER"
+          'password': {
+            'type': 'string',
+            'field': {
+              'component': 'form/KPasswordField',
+              'helper': 'KChangePassword.PASSWORD_FIELD_HELPER'
             }
           },
-          "confirmPassword": { 
-            "const": { 
-              "$data": "1/password" 
+          'confirmPassword': {
+            'const': {
+              '$data': '1/password'
             },
-            "field": {
-              "component": "form/KPasswordField",
-              "helper": "KChangePassword.CONFIRM_PASSWORD_FIELD_HELPER"
+            'field': {
+              'component': 'form/KPasswordField',
+              'helper': 'KChangePassword.CONFIRM_PASSWORD_FIELD_HELPER'
             }
           }
         },
-        "required": ["oldPassword", "password"]
+        'required': ['oldPassword', 'password']
       }
     }
   },

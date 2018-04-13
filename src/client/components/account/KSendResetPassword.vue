@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { QBtn, QIcon } from 'quasar'
 import mixins from '../../mixins'
 
@@ -41,21 +42,21 @@ export default {
       success: false,
       sent: false,
       schema: {
-        "$schema": "http://json-schema.org/draft-06/schema#",
-        "$id": "http://kalisio.xyz/schemas/send-reset-password#",
-        "title": "Send reset password form",
-        "type": "object",
-        "properties": {
-          "email": { 
-            "type": "string", 
-            "format": "email",
-            "field": {
-              "component": "form/KEmailField",
-              "helper": "KSendResetPassword.EMAIL_FIELD_HELPER",
+        '$schema': 'http://json-schema.org/draft-06/schema#',
+        '$id': 'http://kalisio.xyz/schemas/send-reset-password#',
+        'title': 'Send reset password form',
+        'type': 'object',
+        'properties': {
+          'email': {
+            'type': 'string',
+            'format': 'email',
+            'field': {
+              'component': 'form/KEmailField',
+              'helper': 'KSendResetPassword.EMAIL_FIELD_HELPER'
             }
           }
         },
-        "required": ["email"]
+        'required': ['email']
       }
     }
   },
@@ -97,7 +98,7 @@ export default {
       } else {
         done()
       }
-    },
+    }
   },
   created () {
     // Load the required components

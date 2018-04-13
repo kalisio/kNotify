@@ -70,7 +70,7 @@ export default {
     // Check if logged in
     Events.$on('user-changed', this.refreshUser)
   },
-  beforeDestroy() {
+  beforeDestroy () {
     Events.$off('user-changed', this.refreshUser)
   },
   mounted () {

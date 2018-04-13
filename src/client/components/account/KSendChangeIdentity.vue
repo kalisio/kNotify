@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { QBtn, QIcon } from 'quasar'
 import mixins from '../../mixins'
 
@@ -41,28 +42,28 @@ export default {
       success: false,
       sent: false,
       schema: {
-        "$schema": "http://json-schema.org/draft-06/schema#",
-        "$id": "http://kalisio.xyz/schemas/send-change-identity#",
-        "title": "Send change identity form",
-        "type": "object",
-        "properties": {
-          "password": { 
-            "type": "string",
-            "field": {
-              "component": "form/KPasswordField",
-              "helper": "KSendChangeIdentity.PASSWORD_FIELD_HELPER",
+        '$schema': 'http://json-schema.org/draft-06/schema#',
+        '$id': 'http://kalisio.xyz/schemas/send-change-identity#',
+        'title': 'Send change identity form',
+        'type': 'object',
+        'properties': {
+          'password': {
+            'type': 'string',
+            'field': {
+              'component': 'form/KPasswordField',
+              'helper': 'KSendChangeIdentity.PASSWORD_FIELD_HELPER'
             }
           },
-          "email": { 
-            "type": "string", 
-            "format": "email",
-            "field": {
-              "component": "form/KEmailField",
-              "helper": "KSendChangeIdentity.EMAIL_FIELD_HELPER",
+          'email': {
+            'type': 'string',
+            'format': 'email',
+            'field': {
+              'component': 'form/KEmailField',
+              'helper': 'KSendChangeIdentity.EMAIL_FIELD_HELPER'
             }
           }
         },
-        "required": ["email", "password"]
+        'required': ['email', 'password']
       }
     }
   },
@@ -105,7 +106,7 @@ export default {
       } else {
         done()
       }
-    },
+    }
   },
   created () {
     // Load the required components

@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { QBtn, QIcon } from 'quasar'
 import mixins from '../../mixins'
 
@@ -47,30 +48,30 @@ export default {
       success: false,
       reset: false,
       schema: {
-        "$schema": "http://json-schema.org/draft-06/schema#",
-        "$id": "http://kalisio.xyz/schemas/reset-password.json#",
-        "title": "Reset Password form",
-        "description": "Reset password form",
-        "type": "object",
-        "properties": {
-          "password": { 
-            "type": "string", 
-            "field": {
-              "component": "form/KPasswordField",
-              "helper": "KResetPassword.PASSWORD_FIELD_HELPER"
+        '$schema': 'http://json-schema.org/draft-06/schema#',
+        '$id': 'http://kalisio.xyz/schemas/reset-password.json#',
+        'title': 'Reset Password form',
+        'description': 'Reset password form',
+        'type': 'object',
+        'properties': {
+          'password': {
+            'type': 'string',
+            'field': {
+              'component': 'form/KPasswordField',
+              'helper': 'KResetPassword.PASSWORD_FIELD_HELPER'
             }
           },
-          "confirmPassword": { 
-            "const": { 
-              "$data": "1/password" 
+          'confirmPassword': {
+            'const': {
+              '$data': '1/password'
             },
-            "field": {
-              "component": "form/KPasswordField",
-              "helper": "KResetPassword.CONFIRM_PASSWORD_FIELD_HELPER"
+            'field': {
+              'component': 'form/KPasswordField',
+              'helper': 'KResetPassword.CONFIRM_PASSWORD_FIELD_HELPER'
             }
           }
         },
-        "required": ["password"]
+        'required': ['password']
       }
     }
   },
@@ -115,14 +116,14 @@ export default {
       } else {
         done()
       }
-    },
+    }
   },
   created () {
     // Load the required components
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
-     this.$options.components['k-form'] = this.$load('form/KForm')
+    this.$options.components['k-form'] = this.$load('form/KForm')
     // Components initialization
-    this.message = $t('KResetPassword.MESSAGE')
+    this.message = this.$t('KResetPassword.MESSAGE')
   }
 }
 </script>

@@ -34,7 +34,6 @@ export default function (name, app, options) {
       // data: device
       debug('Devices service call for update', id, data)
       const usersService = app.getService('users')
-      const pusherService = app.getService('pusher')
 
       // Retrieve the user's devices
       let user = params.user

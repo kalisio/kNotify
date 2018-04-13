@@ -128,7 +128,7 @@ export default function (name, app, options) {
           application.sendMessage(device.arn, jsonMessage, (err, messageId) => {
             if (err) {
               // Be tolerant to SNS errors because some endpoints might have been revoked
-              //reject(err)
+              // reject(err)
               debug('Unable to publish message to device ' + device.registrationId + ' with ARN ' + device.arn + ' for platform ' + application.platform, jsonMessage, err)
               resolve({ [application.platform]: null })
             } else {
@@ -242,7 +242,7 @@ export default function (name, app, options) {
                 application.subscribeWithProtocol(device.arn, topicArn, 'application', (err, subscriptionArn) => {
                   if (err) {
                     // Be tolerant to SNS errors because some endpoints might have been revoked
-                    //reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
+                    // reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
                     debug('Unable to subscribe device ' + device.registrationId + ' with ARN ' + device.arn + ' to application topic with ARN ' + topicArn, err)
                     resolve({ [device.registrationId]: { user: user._id, arn: null } })
                   } else {
@@ -252,7 +252,7 @@ export default function (name, app, options) {
                       application.subscribeWithProtocol(device.number, topicArn, 'sms', (err, smsSubscriptionArn) => {
                         if (err) {
                           // Be tolerant to SNS errors because some endpoints might have been revoked
-                          //reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
+                          // reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
                           debug('Unable to subscribe device number ' + device.number + ' with ARN ' + device.arn + ' to application topic with ARN ' + topicArn, err)
                           resolve({ [device.registrationId]: { user: user._id, arn: subscriptionArn } })
                         } else {
@@ -316,7 +316,7 @@ export default function (name, app, options) {
                     application.unsubscribe(subscription.SubscriptionArn, (err) => {
                       if (err) {
                         // Be tolerant to SNS errors because some endpoints might have been revoked
-                        //reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
+                        // reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
                         debug('Unable to unsubscribe device ' + device.registrationId + ' with ARN ' + device.arn + ' from topic with ARN ' + topicArn, err)
                         resolve({ [device.registrationId]: { user: user._id, arn: null } })
                       } else {
