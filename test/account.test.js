@@ -117,7 +117,7 @@ describe('kNotify:account', () => {
     })
   })
   // Let enough time to process
-  .timeout(5000)
+  .timeout(10000)
 
   it('check signup verification email', (done) => {
     // Add some delay to wait for email reception
