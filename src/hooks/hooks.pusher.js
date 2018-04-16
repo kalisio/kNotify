@@ -88,12 +88,11 @@ export function updateSubjectSubscriptions (options) {
 
     let item = getItems(hook)
     // Field might be on the service object or subject
-    let topics = _.get(item, options.field)
+    let topics = (options.subjectAsItem ?
+      _.get(item, options.field) : _.get(hook.params, 'user.' + options.field))
     if (!topics) {
-      topics = _.get(hook.params, 'user.' + options.field)
-      if (!topics) {
-        return Promise.resolve(hook)
-      }
+      debug('No subscriptions to update for object ', item)
+      return Promise.resolve(hook)
     }
 
     // Service can be contextual, look for context on initiator service
