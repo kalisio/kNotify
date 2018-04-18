@@ -62,7 +62,7 @@
     "ACTION": "Envoyer",
     "EMAIL_FIELD_HELPER": "Saisissez votre adresse mail",
     "SUCCESS_MESSAGE": "Mail envoyé, consultez votre messagerie",
-    "ERROR_MESSAGE_IS_VERIFIED": "Veuillez vérifier votre adresse mail puis consultez votre messagerie",
+    "ERROR_MESSAGE_IS_VERIFIED": "Veuillez consulter votre messagerie et vérifier tout d'abord votre adresse mail",
     "ERROR_MESSAGE_DEFAULT": "Impossible d'envoyer le mail, merci de vérifier votre adresse et essayez à nouveau"
   },
   "KSignupAlert": {
