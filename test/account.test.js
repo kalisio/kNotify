@@ -177,6 +177,22 @@ describe('kNotify:account', () => {
   // Let enough time to process
   .timeout(15000)
 
+  it('check password policy on user password reset', (done) => {
+    accountService.create({
+      action: 'resetPwdLong',
+      value: {
+        token: userObject.resetToken,
+        password: '1234'
+      }
+    })
+    .catch(error => {
+      expect(error).toExist()
+      expect(error.name).to.equal('BadRequest')
+      expect(error.data.translation.params.failedRules.length > 0).beTrue()
+      done()
+    })
+  })
+
   it('reset user password', () => {
     return accountService.create({
       action: 'resetPwdLong',
@@ -213,6 +229,23 @@ describe('kNotify:account', () => {
     .send({ email: userObject.email, password: 'reset-password', strategy: 'local' })
     .then(response => {
       expect(response.body.accessToken).toExist()
+    })
+  })
+
+  it('check password policy on user password change', (done) => {
+    accountService.create({
+      action: 'passwordChange',
+      value: {
+        user: { email: userObject.email },
+        oldPassword: 'reset-password',
+        password: '1234'
+      }
+    })
+    .catch(error => {
+      expect(error).toExist()
+      expect(error.name).to.equal('BadRequest')
+      expect(error.data.translation.params.failedRules.length > 0).beTrue()
+      done()
     })
   })
 
@@ -315,6 +348,12 @@ describe('kNotify:account', () => {
       expect(response.body.accessToken).toExist()
     })
   })
+
+  it('removes user', () => {
+    return userService.remove(userObject._id, { user: userObject })
+  })
+  // Let enough time to process
+  .timeout(5000)
 
   // Cleanup
   after(async () => {

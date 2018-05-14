@@ -73,7 +73,7 @@ export default function (name, app, options) {
   app.configure(accountManager({
     // Be default it is impossible to reset password if email is not verified
     // The problem is that if you loose your password before validating your email you are blocked,
-    // as a consequence we release this constraint 
+    // as a consequence we release this constraint
     skipIsVerifiedCheck: true,
     service: userService.getPath(true),
     path: servicePath,

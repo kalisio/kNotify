@@ -20,7 +20,10 @@ module.exports = {
       'local'
     ],
     path: API_PREFIX + '/authentication',
-    service: API_PREFIX + '/users'
+    service: API_PREFIX + '/users',
+    passwordPolicy: {
+      minLength: 8
+    }
   },
   mailer: {
     service: 'gmail',

@@ -1,9 +1,14 @@
+import { when } from 'feathers-hooks-common'
+import { populateAccountUser } from '../../hooks'
+import { hooks as coreHooks } from 'kCore'
+
 module.exports = {
   before: {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [ when(hook => hook.data.action === 'resetPwdLong' || hook.data.action === 'passwordChange',
+              populateAccountUser, coreHooks.enforcePasswordPolicy({ userAsItem: false, passwordField: 'value.password' })) ],
     update: [],
     patch: [],
     remove: []

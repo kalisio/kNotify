@@ -24,10 +24,10 @@ export function sendInvitationEmail (hook) {
   if (hook.type !== 'before') {
     throw new Error(`The 'sendInvitationEmail' hook should only be used as a 'before' hook.`)
   }
-  // generte a password
+  // Generate a password
   let passwordRule = new RegExp('[\\w\\d\\?\\-]')
   hook.data.password = generatePassword(15, false, passwordRule)
-  // send the invitation mail
+  // Send the invitation mail
   let accountService = hook.app.getService('account')
   return accountService.options.notifier('sendInvitation', hook.data)
   .then(result => {
