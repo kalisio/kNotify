@@ -1,5 +1,5 @@
 import makeDebug from 'debug'
-import generatePassword from 'password-generator'
+
 const verifyHooks = require('feathers-authentication-management').hooks
 const debug = makeDebug('kalisio:kNotify:users:hooks')
 
@@ -21,15 +21,12 @@ export function sendVerificationEmail (hook) {
 }
 
 export function sendInvitationEmail (hook) {
-  if (hook.type !== 'before') {
-    throw new Error(`The 'sendInvitationEmail' hook should only be used as a 'before' hook.`)
+  if (hook.type !== 'after') {
+    throw new Error(`The 'sendInvitationEmail' hook should only be used as a 'after' hook.`)
   }
-  // Generate a password
-  let passwordRule = new RegExp('[\\w\\d\\?\\-]')
-  hook.data.password = generatePassword(15, false, passwordRule)
-  // Send the invitation mail
+
   let accountService = hook.app.getService('account')
-  return accountService.options.notifier('sendInvitation', hook.data)
+  return accountService.options.notifier('sendInvitation', hook.result)
   .then(result => {
     return hook
   })
