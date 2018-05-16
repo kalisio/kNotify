@@ -21,12 +21,13 @@ export function sendVerificationEmail (hook) {
 }
 
 export function sendInvitationEmail (hook) {
-  if (hook.type !== 'after') {
-    throw new Error(`The 'sendInvitationEmail' hook should only be used as a 'after' hook.`)
+  // Before because we need to send the clear password by email
+  if (hook.type !== 'before') {
+    throw new Error(`The 'sendInvitationEmail' hook should only be used as a 'before' hook.`)
   }
 
   let accountService = hook.app.getService('account')
-  return accountService.options.notifier('sendInvitation', hook.result)
+  return accountService.options.notifier('sendInvitation', hook.data)
   .then(result => {
     return hook
   })
