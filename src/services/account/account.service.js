@@ -17,12 +17,13 @@ export default function (name, app, options) {
     }
 
     const mailerService = app.getService('mailer')
+    let domainPath = app.get('domain') + '/#/'
     let email = {
       from: mailerService.options.auth.user,
       // When changing email send to the new one so that it can be verified
-      to: (type === 'identityChange' ? user.verifyChanges.email : user.email)
+      to: (type === 'identityChange' ? user.verifyChanges.email : user.email),
+      domainPath
     }
-    let domainPath = app.get('domain') + '/#/'
     // Build the subject & link to the app to perform the different actions
     let emailTemplateDir = type
     switch (type) {
@@ -51,6 +52,7 @@ export default function (name, app, options) {
         email.subject = 'Welcome'
         email.link = domainPath + 'login'
         emailTemplateDir = 'confirmInvitation'
+        break
     }
     const templateDir = path.join(mailerService.options.templateDir, emailTemplateDir)
     const template = new emails.EmailTemplate(templateDir)
