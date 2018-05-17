@@ -16,6 +16,7 @@ export default function (name, app, options) {
       if (user[provider + 'Id']) return Promise.reject(new Error(message + _.startCase(provider)))
     }
 
+    const userService = app.getService('users')
     const mailerService = app.getService('mailer')
     let domainPath = app.get('domain') + '/#/'
     let email = {
@@ -49,6 +50,12 @@ export default function (name, app, options) {
         email.link = domainPath + 'change-identity/' + user.verifyToken
         break
       case 'sendInvitation':
+        try {
+          const sponsor = await userService.get(user.sponsor.id)
+          email.sponsor = sponsor.name
+        } catch (error) {
+          // We will not send the sponsor name in this case
+        }
         email.subject = 'Welcome'
         email.link = domainPath + 'login'
         emailTemplateDir = 'confirmInvitation'
