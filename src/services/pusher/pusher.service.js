@@ -33,16 +33,16 @@ export default function (name, app, options) {
       // Add SMS protocol target in case we have some phone numbers registered to the topic
       let jsonMessage = { default: message.title, sms: message.body }
       // For stacking we need a unique increasing ID per notification on Android
-      let notId = 0
+      let notId = 1
       if (message.createdAt && message.updatedAt) {
         // Use the difference in seconds between creation/update time
         if (moment.isMoment(message.createdAt) && moment.isMoment(message.updatedAt)) {
           notId = message.updatedAt.diff(message.createdAt, 'seconds')
         } else if (message.createdAt instanceof Date && message.updatedAt instanceof Date) {
-          notId = 1000 * (message.updatedAt.getTime() - message.createdAt.getTime())
+          notId = (message.updatedAt.getTime() - message.createdAt.getTime()) / 1000
         } else {
           // Assume strings
-          notId = 1000 * (new Date(message.updatedAt).getTime() - new Date(message.createdAt).getTime())
+          notId = (new Date(message.updatedAt).getTime() - new Date(message.createdAt).getTime()) / 1000
         }
       }
       if (platform === SNS.SUPPORTED_PLATFORMS.IOS) {
