@@ -37,12 +37,12 @@ export default function (name, app, options) {
       if (message.createdAt && message.updatedAt) {
         // Use the difference in seconds between creation/update time
         if (moment.isMoment(message.createdAt) && moment.isMoment(message.updatedAt)) {
-          notId = message.updatedAt.diff(message.createdAt, 'seconds')
+          notId = (message.updatedAt.valueOf() - message.createdAt.valueOf())
         } else if (message.createdAt instanceof Date && message.updatedAt instanceof Date) {
-          notId = (message.updatedAt.getTime() - message.createdAt.getTime()) / 1000
+          notId = (message.updatedAt.getTime() - message.createdAt.getTime())
         } else {
           // Assume strings
-          notId = (new Date(message.updatedAt).getTime() - new Date(message.createdAt).getTime()) / 1000
+          notId = (new Date(message.updatedAt).getTime() - new Date(message.createdAt).getTime())
         }
       }
       if (platform === SNS.SUPPORTED_PLATFORMS.IOS) {
