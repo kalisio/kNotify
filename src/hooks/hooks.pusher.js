@@ -82,8 +82,8 @@ export async function unsubscribeSubjectsFromResourceTopic (hook) {
 
 export function updateSubjectSubscriptions (options) {
   return async function (hook) {
-    function isTopicEqual (topic1, topic2) {
-      return topic1.arn === topic2.arn
+    function isTopicObjectEqual (object1, object2) {
+      return _.isEqual(object1.topics, object2.topics)
     }
 
     let item = getItems(hook)
@@ -104,9 +104,9 @@ export function updateSubjectSubscriptions (options) {
     if (previousTopics) {
       previousTopics = (Array.isArray(previousTopics) ? previousTopics : [previousTopics])
       // Find common topics
-      const commonTopics = _.intersectionWith(topics, previousTopics, isTopicEqual)
+      const commonTopics = _.intersectionWith(topics, previousTopics, isTopicObjectEqual)
       // Unsubscribe removed topics
-      let removedTopics = _.differenceWith(previousTopics, commonTopics, isTopicEqual)
+      let removedTopics = _.differenceWith(previousTopics, commonTopics, isTopicObjectEqual)
       // Apply filter if any
       if (typeof options.filter === 'function') {
         removedTopics = options.filter('unsubscribe', removedTopics)
@@ -119,7 +119,7 @@ export function updateSubjectSubscriptions (options) {
         users: [(options.subjectAsItem ? item : hook.params.user)]
       }))
       // And subscribe new ones
-      let addedTopics = _.differenceWith(topics, commonTopics, isTopicEqual)
+      let addedTopics = _.differenceWith(topics, commonTopics, isTopicObjectEqual)
       // Apply filter if any
       if (typeof options.filter === 'function') {
         addedTopics = options.filter('subscribe', addedTopics)
