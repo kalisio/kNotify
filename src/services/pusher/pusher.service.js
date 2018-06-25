@@ -273,9 +273,6 @@ export default function (name, app, options) {
           })
         })
       })
-      // FIXME: We should be tolerent to faulty subscriptions > maybe better to adress errors specifically like above
-      // return Promise.all(subscriptionPromises.map(promise => promise.catch(error => console.log(error))))
-      // .then(results => results.reduce((subscriptions, subscription) => Object.assign(subscriptions, subscription), {}))
       return Promise.all(subscriptionPromises)
     },
     getPlatformSubscriptions (object, topicField) {
@@ -285,7 +282,10 @@ export default function (name, app, options) {
           const topicArn = _.get(object, topicField + '.' + application.platform)
           application.getSubscriptions(topicArn, (err, subscriptions) => {
             if (err) {
-              reject(err)
+              // Be tolerant to SNS errors because some topics might have been deleted
+              // reject(err)
+              debug('Unable to retrieve subscriptions for topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform, err)
+              resolve([])
             } else {
               debug('Retrieved ' + subscriptions.length + ' subscriptions for topic ' + object._id.toString() + ' with ARN ' + topicArn + ' for platform ' + application.platform)
               resolve(subscriptions)
@@ -330,9 +330,6 @@ export default function (name, app, options) {
             })
           })
         })
-        // FIXME: We should be tolerent to faulty unsubscriptions > maybe better to adress errors specifically like above
-        // return Promise.all(unsubscriptionPromises.map(promise => promise.catch(error => console.log(error))))
-        // .then(results => results.reduce((unsubscriptions, unsubscription) => Object.assign(unsubscriptions, unsubscription), {}))
         return Promise.all(unsubscriptionPromises)
       })
     },
