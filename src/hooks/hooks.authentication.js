@@ -56,4 +56,3 @@ export async function consentGuest (hook) {
 
   return hook
 }
-
