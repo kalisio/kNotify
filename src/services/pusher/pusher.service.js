@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import moment from 'moment'
-import { GeneralError } from 'feathers-errors'
+import { GeneralError } from '@feathersjs/errors'
 import SNS from 'sns-mobile'
 import makeDebug from 'debug'
 
