@@ -70,22 +70,55 @@ export default function (name, app, options) {
       return new Promise((resolve, reject) => {
         let application = this.getSnsApplication(device.platform)
         if (!application) {
-          reject(new Error('Cannot register device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
+          reject(new Error('Cannot register device with token ' + device.registrationId + ' because there is no platform application for ' + device.platform))
           return
         }
         // Check if already registered
         let devices = user.devices || []
         const previousDevice = _.find(devices, userDevice => userDevice.registrationId === device.registrationId)
         if (previousDevice) {
-          debug('Already registered device ' + previousDevice.registrationId + ' with ARN ' + previousDevice.arn + ' for user ' + user._id.toString())
+          debug('Already registered device with token ' + previousDevice.registrationId + ' and ARN ' + previousDevice.arn + ' for user ' + user._id.toString())
           resolve(device.arn)
           return
         }
         application.addUser(device.registrationId, '', (err, endpointArn) => {
           if (err) reject(err)
           else {
-            debug('Registered device ' + device.registrationId + ' with ARN ' + endpointArn + ' for user ' + user._id.toString())
+            debug('Registered device with token ' + device.registrationId + ' and ARN ' + endpointArn + ' for user ' + user._id.toString())
             resolve(endpointArn)
+          }
+        })
+      })
+    },
+    updateDevice (registrationId, device, user) {
+      return new Promise((resolve, reject) => {
+        // Check if already registered
+        let devices = user.devices || []
+        const previousDevice = _.find(devices, userDevice => userDevice.registrationId === device.registrationId)
+        if (!previousDevice) {
+          reject(new Error('Cannot find device with token ' + device.registrationId + ' and ARN ' + device.arn + ' for user ' + user._id.toString()))
+          return
+        }
+        let application = this.getSnsApplication(device.platform)
+        if (!application) {
+          reject(new Error('Cannot update device with token ' + device.registrationId + ' because there is no platform application for ' + device.platform))
+          return
+        }
+        // First check if device do exists
+        application.getUser(device.arn, (err, attributes) => {
+          if (err) reject(err)
+          else if ((attributes.Token !== registrationId) || (attributes.Enabled === 'false')) {
+            // Update token and ensure device is enabled
+            debug('Updating device with token ' + device.registrationId + ' and ARN ' + device.arn + ' to ' + registrationId + ' for user ' + user._id.toString())
+            application.setAttributes(device.arn, { Token: registrationId, Enabled: 'true' }, (err, attributes) => {
+              if (err) reject(err)
+              else {
+                device.registrationId = registrationId
+                resolve(device)
+              }
+            })
+          } else {
+            resolve(device)
           }
         })
       })
@@ -96,18 +129,19 @@ export default function (name, app, options) {
         let devices = user.devices || []
         let device = _.find(devices, device => device.registrationId === registrationId)
         if (!device) {
+          debug('Cannot find device with token ' + registrationId + ' for user ' + user._id.toString())
           resolve()
           return
         }
         let application = this.getSnsApplication(device.platform)
         if (!application) {
-          reject(new Error('Cannot unbind device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
+          reject(new Error('Cannot unbind device with token ' + device.registrationId + ' because there is no platform application for ' + device.platform))
           return
         }
         application.deleteUser(device.arn, (err) => {
           if (err) reject(err)
           else {
-            debug('Unregistered device ' + device.registrationId + ' with ARN ' + device.arn + ' for user ' + user._id.toString())
+            debug('Unregistered device with token ' + device.registrationId + ' and ARN ' + device.arn + ' for user ' + user._id.toString())
             resolve(device)
           }
         })
@@ -121,7 +155,7 @@ export default function (name, app, options) {
         let application = this.getSnsApplication(device.platform)
         messagePromises.push(new Promise((resolve, reject) => {
           if (!application) {
-            reject(new Error('Cannot send message to device ' + device.registrationId + ' because there is no platform application for ' + device.platform))
+            reject(new Error('Cannot send message to device with token ' + device.registrationId + ' because there is no platform application for ' + device.platform))
             return
           }
           const jsonMessage = this.getMessagePayload(message, application.platform)
@@ -129,10 +163,10 @@ export default function (name, app, options) {
             if (err) {
               // Be tolerant to SNS errors because some endpoints might have been revoked
               // reject(err)
-              debug('Unable to publish message to device ' + device.registrationId + ' with ARN ' + device.arn + ' for platform ' + application.platform, jsonMessage, err)
+              debug('Unable to publish message to device with token ' + device.registrationId + ' and ARN ' + device.arn + ' for platform ' + application.platform, jsonMessage, err)
               resolve({ [application.platform]: null })
             } else {
-              debug('Published message ' + messageId + ' to device ' + device.registrationId + ' with ARN ' + device.arn + ' for platform ' + application.platform, jsonMessage)
+              debug('Published message ' + messageId + ' to device with token ' + device.registrationId + ' and ARN ' + device.arn + ' for platform ' + application.platform, jsonMessage)
               resolve({ [application.platform]: messageId })
             }
           })
@@ -243,20 +277,20 @@ export default function (name, app, options) {
                   if (err) {
                     // Be tolerant to SNS errors because some endpoints might have been revoked
                     // reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
-                    debug('Unable to subscribe device ' + device.registrationId + ' with ARN ' + device.arn + ' to application topic with ARN ' + topicArn, err)
+                    debug('Unable to subscribe device with token ' + device.registrationId + ' and ARN ' + device.arn + ' to application topic with ARN ' + topicArn, err)
                     resolve({ [device.registrationId]: { user: user._id, arn: null } })
                   } else {
-                    debug('Subscribed device ' + device.registrationId + ' with ARN ' + device.arn + ' to application topic with ARN ' + topicArn)
+                    debug('Subscribed device with token ' + device.registrationId + ' and ARN ' + device.arn + ' to application topic with ARN ' + topicArn)
                     // Register for SMS as well
                     if (device.number) {
                       application.subscribeWithProtocol(device.number, topicArn, 'sms', (err, smsSubscriptionArn) => {
                         if (err) {
                           // Be tolerant to SNS errors because some endpoints might have been revoked
                           // reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
-                          debug('Unable to subscribe device number ' + device.number + ' with ARN ' + device.arn + ' to application topic with ARN ' + topicArn, err)
+                          debug('Unable to subscribe device number ' + device.number + ' and ARN ' + device.arn + ' to application topic with ARN ' + topicArn, err)
                           resolve({ [device.registrationId]: { user: user._id, arn: subscriptionArn } })
                         } else {
-                          debug('Subscribed device number  ' + device.number + ' with ARN ' + device.arn + ' to SMS topic with ARN ' + topicArn)
+                          debug('Subscribed device number  ' + device.number + ' and ARN ' + device.arn + ' to SMS topic with ARN ' + topicArn)
                           resolve({
                             [device.registrationId]: { user: user._id, arn: subscriptionArn },
                             [device.number]: { user: user._id, arn: smsSubscriptionArn }
@@ -317,10 +351,10 @@ export default function (name, app, options) {
                       if (err) {
                         // Be tolerant to SNS errors because some endpoints might have been revoked
                         // reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
-                        debug('Unable to unsubscribe device ' + device.registrationId + ' with ARN ' + device.arn + ' from topic with ARN ' + topicArn, err)
+                        debug('Unable to unsubscribe device with token ' + device.registrationId + ' and ARN ' + device.arn + ' from topic with ARN ' + topicArn, err)
                         resolve({ [device.registrationId]: { user: user._id, arn: null } })
                       } else {
-                        debug('Unsubscribed device ' + device.registrationId + ' with ARN ' + device.arn + ' from topic with ARN ' + topicArn)
+                        debug('Unsubscribed device with token ' + device.registrationId + ' and ARN ' + device.arn + ' from topic with ARN ' + topicArn)
                         resolve({ [device.registrationId]: { user: user._id, arn: subscription.SubscriptionArn } })
                       }
                     })
@@ -352,6 +386,15 @@ export default function (name, app, options) {
             ? this.publishToPlatformTopics(params.pushObject, data.message, topicField)
             : this.publishToDevices(params.pushObject, data.message)
         }
+      }
+    },
+    // Used to perform service actions such as update a user
+    update (id, data, params) {
+      debug(`pusher service called for update action=${data.action}`)
+
+      switch (data.action) {
+        case 'device':
+          return this.updateDevice(id, data.device, params.user)
       }
     },
     // Used to perform service actions such as remove a user, a topic, etc.
