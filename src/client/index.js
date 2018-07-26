@@ -19,7 +19,7 @@ export default function init () {
   logger.debug('Initializing kalisio notify')
 
   api.declareService('account')
-  api.declareService('device')
+  api.declareService('devices')
 
   // -----------------------------------------------------------------------
   // | After this we should only have specific cordova initialisation code |

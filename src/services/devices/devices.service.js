@@ -32,7 +32,7 @@ export default function (name, app, options) {
     async update (id, data, params) {
       // id: registrationId
       // data: device
-      debug('Devices service call for update', id, data)
+      debug('Updating device', id, data)
       const usersService = app.getService('users')
       const pusherService = app.getService('pusher')
 
@@ -82,10 +82,18 @@ export default function (name, app, options) {
     },
     async remove (id, params) {
       // id: registrationId
-      let user = params.user
-      const pusherService = app.getService('pusher')
       debug('Unbinding old device', id)
+      const usersService = app.getService('users')
+      const pusherService = app.getService('pusher')
+      // Retrieve the user's devices
+      let user = params.user
+      let devices = user.devices || []
+
       await pusherService.remove(id, { query: { action: 'device' }, user })
+      const device = this.findDeviceByRegistrationId(id, user)
+      _.remove(devices, userDevice => userDevice.registrationId === id)
+      await usersService.patch(user._id, { devices }, { user, checkAuthorisation: true })
+      return device
     }
   }
 }

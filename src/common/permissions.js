@@ -5,4 +5,5 @@ export function defineUserAbilities (subject, can, cannot) {
   can('create', 'account')
   can('service', 'devices')
   can('update', 'devices')
+  can('remove', 'devices')
 }

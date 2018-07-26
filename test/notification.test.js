@@ -312,7 +312,7 @@ describe('kNotify:notifications', () => {
   // Let enough time to process
   .timeout(5000)
 
-  it('a subscriber should be able to recover its device when deleted', () => {
+  it('a subscriber should be able to recover its device when disabled', () => {
     const previousDevice = Object.assign({}, subscriberObject.devices[1])
     let operation = new Promise((resolve, reject) => {
       sns.deleteUser(previousDevice.arn, (err) => {
@@ -338,7 +338,7 @@ describe('kNotify:notifications', () => {
       })
     })
     let event = new Promise((resolve, reject) => {
-      sns.on('userAdded', (endpointArn, registrationId) => {
+      sns.once('userAdded', (endpointArn, registrationId) => {
         expect(registrationId).to.equal(otherDevice.registrationId)
         expect(endpointArn).not.to.equal(previousDevice.arn)
         resolve()
@@ -357,6 +357,33 @@ describe('kNotify:notifications', () => {
   })
   // Let enough time to process
   .timeout(15000)
+
+  it('a subscriber should be able to delete its device', () => {
+    const previousDevice = Object.assign({}, subscriberObject.devices[1])
+    let operation = devicesService.remove(otherDevice.registrationId, { user: subscriberObject })
+    .then(device => {
+      return userService.get(subscriberObject._id)
+    })
+    .then(user => {
+      // Check updated device
+      subscriberObject = user
+      expect(subscriberObject.devices).toExist()
+      expect(subscriberObject.devices.length === 1).beTrue()
+      expect(subscriberObject.devices[0].uuid).to.equal(newDevice.uuid)
+      expect(subscriberObject.devices[0].registrationId).to.equal(newDevice.registrationId)
+      expect(subscriberObject.devices[0].platform).to.equal(newDevice.platform)
+      expect(subscriberObject.devices[0].arn).toExist()
+    })
+    let event = new Promise((resolve, reject) => {
+      sns.once('userDeleted', (endpointArn) => {
+        expect(endpointArn).to.equal(previousDevice.arn)
+        resolve()
+      })
+    })
+    return Promise.all([operation, event])
+  })
+  // Let enough time to process
+  .timeout(5000)
 
   it('removes a subscriber should unregister its device', (done) => {
     userService.remove(subscriberObject._id, { user: subscriberObject })
