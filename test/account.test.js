@@ -1,57 +1,18 @@
-import _ from 'lodash'
-import google from 'googleapis'
 import request from 'superagent'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
 import core, { kalisio } from 'kCore'
+import { createGmailClient } from './utils'
 import notify, { hooks } from '../src'
 
 describe('kNotify:account', () => {
   let app, server, port, baseUrl,
-    userService, mailerService, accountService, jwtClient, gmail, gmailApiConfig, userObject
-
-  // Helper function used to check if a given email has been retrieved in GMail inbox
-  // Erase it after check
-  function checkEmail (user, fromValue, subjectValue, done) {
-    gmail.users.messages.list({
-      auth: jwtClient,
-      userId: user.email
-    }, (err, response) => {
-      if (err) done(err)
-      expect(response.messages).toExist()
-      expect(response.messages.length > 0).beTrue()
-      gmail.users.messages.get({
-        auth: jwtClient,
-        id: response.messages[0].id,
-        userId: user.email
-      }, (err, response) => {
-        if (err) done(err)
-        expect(response.payload).toExist()
-        expect(response.payload.headers).toExist()
-        const from = _.find(response.payload.headers, header => header.name === 'From')
-        expect(from.value).to.equal(fromValue)
-        const subject = _.find(response.payload.headers, header => header.name === 'Subject')
-        expect(subject.value).to.equal(subjectValue)
-        // Remove message to not pollute the mailbox
-        // or simply call done for debug
-        // done()
-        gmail.users.messages.delete({
-          auth: jwtClient,
-          id: response.id,
-          userId: user.email
-        }, (err, response) => {
-          done(err)
-        })
-      })
-    })
-  }
+    userService, mailerService, accountService, gmailClient, gmailUser, userObject
 
   before(() => {
     chailint(chai, util)
 
-    gmail = google.gmail('v1')
     app = kalisio()
-    gmailApiConfig = app.get('gmailApi')
     port = app.get('port')
     baseUrl = `http://localhost:${port}${app.get('apiPath')}`
     return app.db.connect()
@@ -87,25 +48,17 @@ describe('kNotify:account', () => {
   // Let enough time to process
   .timeout(5000)
 
-  it('setup access to gmail', (done) => {
-    jwtClient = new google.auth.JWT(
-      gmailApiConfig.clientEmail,
-      null,
-      gmailApiConfig.privateKey,
-      ['https://mail.google.com/', 'https://www.googleapis.com/auth/gmail.readonly'], // an array of auth scopes
-      gmailApiConfig.user
-    )
-
-    jwtClient.authorize((err, tokens) => {
-      done(err)
-    })
+  it('setup access to gmail', async () => {
+    const gmailApiConfig = app.get('gmailApi')
+    gmailUser = gmailApiConfig.user
+    gmailClient = await createGmailClient(gmailApiConfig)
   })
   // Let enough time to process
   .timeout(5000)
 
   it('creates a user', () => {
     return userService.create({
-      email: gmailApiConfig.user,
+      email: gmailUser,
       password: 'test-password',
       name: 'test-user'
     })
@@ -122,7 +75,7 @@ describe('kNotify:account', () => {
   it('check signup verification email', (done) => {
     // Add some delay to wait for email reception
     setTimeout(() => {
-      checkEmail(userObject, mailerService.options.auth.user, 'Confirm your signup', done)
+      gmailClient.checkEmail(userObject, mailerService.options.auth.user, 'Confirm your signup', done)
     }, 10000)
   })
   // Let enough time to process
@@ -144,7 +97,7 @@ describe('kNotify:account', () => {
   it('check signup verified email', (done) => {
     // Add some delay to wait for email reception
     setTimeout(() => {
-      checkEmail(userObject, mailerService.options.auth.user, 'Thank you, your email has been verified', done)
+      gmailClient.checkEmail(userObject, mailerService.options.auth.user, 'Thank you, your email has been verified', done)
     }, 10000)
   })
   // Let enough time to process
@@ -157,7 +110,7 @@ describe('kNotify:account', () => {
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailApiConfig.user } })
+      return userService.find({ query: { email: gmailUser } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -171,7 +124,7 @@ describe('kNotify:account', () => {
   it('check reset password request email', (done) => {
     // Add some delay to wait for email reception
     setTimeout(() => {
-      checkEmail(userObject, mailerService.options.auth.user, 'Reset your password', done)
+      gmailClient.checkEmail(userObject, mailerService.options.auth.user, 'Reset your password', done)
     }, 10000)
   })
   // Let enough time to process
@@ -203,7 +156,7 @@ describe('kNotify:account', () => {
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailApiConfig.user } })
+      return userService.find({ query: { email: gmailUser } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -217,7 +170,7 @@ describe('kNotify:account', () => {
   it('check reset password email', (done) => {
     // Add some delay to wait for email reception
     setTimeout(() => {
-      checkEmail(userObject, mailerService.options.auth.user, 'Your password was reset', done)
+      gmailClient.checkEmail(userObject, mailerService.options.auth.user, 'Your password was reset', done)
     }, 10000)
   })
   // Let enough time to process
@@ -260,7 +213,7 @@ describe('kNotify:account', () => {
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailApiConfig.user } })
+      return userService.find({ query: { email: gmailUser } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -274,7 +227,7 @@ describe('kNotify:account', () => {
   it('check changed password email', (done) => {
     // Add some delay to wait for email reception
     setTimeout(() => {
-      checkEmail(userObject, mailerService.options.auth.user, 'Your password was changed', done)
+      gmailClient.checkEmail(userObject, mailerService.options.auth.user, 'Your password was changed', done)
     }, 10000)
   })
   // Let enough time to process
@@ -295,12 +248,12 @@ describe('kNotify:account', () => {
       value: {
         user: { email: userObject.email },
         password: 'changed-password',
-        changes: { email: gmailApiConfig.user.replace('com', 'xyz') }
+        changes: { email: gmailUser.replace('com', 'xyz') }
       }
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailApiConfig.user } })
+      return userService.find({ query: { email: gmailUser } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
@@ -316,7 +269,7 @@ describe('kNotify:account', () => {
   it('check identity change email', (done) => {
     // Add some delay to wait for email reception
     setTimeout(() => {
-      checkEmail(userObject, mailerService.options.auth.user, 'Your account information was changed', done)
+      gmailClient.checkEmail(userObject, mailerService.options.auth.user, 'Your account information was changed', done)
     }, 15000)
   })
   // Let enough time to process
@@ -329,12 +282,12 @@ describe('kNotify:account', () => {
     })
     .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailApiConfig.user.replace('com', 'xyz') } })
+      return userService.find({ query: { email: gmailUser.replace('com', 'xyz') } })
     })
     .then(users => {
       expect(users.data.length > 0).beTrue()
       userObject = users.data[0]
-      expect(userObject.email).to.equal(gmailApiConfig.user.replace('com', 'xyz'))
+      expect(userObject.email).to.equal(gmailUser.replace('com', 'xyz'))
     })
   })
   // Let enough time to process

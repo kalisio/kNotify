@@ -67,6 +67,7 @@ export default function (name, app, options) {
       } else {
         debug('Updating device for user ', user)
       }
+      device.lastActivity = new Date()
       await usersService.patch(user._id, { devices }, { user, checkAuthorisation: true })
       return device
     },
