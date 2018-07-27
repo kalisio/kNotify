@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import { QIcon, Events } from 'quasar'
 import { mixins as coreMixins } from 'kCore/client'
 
