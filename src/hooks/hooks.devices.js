@@ -19,7 +19,7 @@ export async function sendNewDeviceEmail (hook) {
     from: mailerService.options.auth.user,
     // When changing email send to the new one so that it can be verified
     to: user.email,
-    link: domainPath + 'account/security',
+    link: domainPath + 'home/account/security',
     domainPath
   }
   const device = hook.result
