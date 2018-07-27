@@ -85,5 +85,15 @@
     "ERROR_MESSAGE_BAD_PARAMS": "Your email address has already been verified or your account has been removed",
     "ERROR_MESSAGE_VERIFY_EXPIRED": "The delay to verify your email address has expired, please resend the verification email with the link below",
     "ERROR_MESSAGE_DEFAULT": "Your email address has not been verified"
+  },
+  "KDeviceCard": {
+    "LAST_ACTIVITY": "Last activity",
+    "SERIAL_NUMBER": "Serial number",
+    "UNLINK_LABEL": "Unlink",
+    "UNLINK_DIALOG_TITLE": "Unlink device {{description}} ?",
+    "UNLINK_DIALOG_MESSAGE": "Are you sure you want to unlink device <b>{{description}}</b> from your account ?<br><br>You will not be able to receive notifications until you reconnect using the device."
+  },
+  "KAccountDevices": {
+    "DEVICES_USED": "Check when specific devices has been used to access your account below"
   }
 }

@@ -8,7 +8,7 @@ module.exports = {
     create: [ disallow('external') ],
     update: [],
     patch: [],
-    remove: [ disallow('external') ]
+    remove: []
   },
 
   after: {
