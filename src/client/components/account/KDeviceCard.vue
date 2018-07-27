@@ -19,7 +19,6 @@
 import _ from 'lodash'
 import { QIcon, Dialog } from 'quasar'
 import { mixins as kCoreMixins } from 'kCore/client'
-import { permissions as kCorePermissions } from 'kCore/common'
 
 export default {
   name: 'k-device-card',
