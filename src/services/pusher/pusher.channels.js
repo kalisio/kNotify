@@ -1,3 +1,3 @@
 module.exports = {
-  all: (data, context) => app.channel('authenticated').filter(connection => false)
+  all: (data, context) => context.app.channel('authenticated').filter(connection => false)
 }
