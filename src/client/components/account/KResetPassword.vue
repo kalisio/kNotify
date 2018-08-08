@@ -10,10 +10,10 @@
               {{ message }}.
             </p>
           </div>
-          <div>
-            <k-form ref="form" :schema="schema" />
+          <div v-if="!success">
+            <k-form ref="form" :schema="getSchema()" />
           </div>
-          <div>
+          <div v-if="!success">
             <div class="row justify-around">
               <q-btn color="primary" loader @click="onReset">
                 {{$t('KResetPassword.ACTION')}}
@@ -21,8 +21,12 @@
             </div>
           </div>
           <div class="self-center">
-            <a @click="$router.push({name: 'send-reset-password'})">
+            <a v-if="reset && !success" @click="$router.push({name: 'send-reset-password'})">
               {{$t('KResetPassword.RESEND_LINK')}}
+            </a>
+            &nbsp;&nbsp;
+            <a v-if="reset && success" @click="$router.push({name: 'login'})">
+              {{$t('KResetPassword.LOG_IN_LINK')}}
             </a>
           </div>
       </div>
@@ -46,8 +50,23 @@ export default {
       title: '',
       message: '',
       success: false,
-      reset: false,
-      schema: {
+      reset: false
+    }
+  },
+  computed: {
+    textClass () {
+      let classObject = {}
+      if (this.reset) {
+        classObject['text-positive'] = this.success
+        classObject['text-negative'] = !this.success
+      }
+      return classObject
+    }
+  },
+  mixins: [mixins.account],
+  methods: {
+    getSchema () {
+      return {
         '$schema': 'http://json-schema.org/draft-06/schema#',
         '$id': 'http://kalisio.xyz/schemas/reset-password.json#',
         'title': 'Reset Password form',
@@ -73,20 +92,7 @@ export default {
         },
         'required': ['password']
       }
-    }
-  },
-  computed: {
-    textClass () {
-      let classObject = {}
-      if (this.reset) {
-        classObject['text-positive'] = this.success
-        classObject['text-negative'] = !this.success
-      }
-      return classObject
-    }
-  },
-  mixins: [mixins.account],
-  methods: {
+    },
     onReset (event, done) {
       let result = this.$refs.form.validate()
       if (result.isValid) {

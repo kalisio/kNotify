@@ -38,6 +38,7 @@
     "MESSAGE": "Please enter your new password to proceed",
     "ACTION": "Reset",
     "RESEND_LINK": "Resend reset password email",
+    "LOG_IN_LINK": "Log in ?",
     "PASSWORD_FIELD_HELPER": "Enter your new password",
     "CONFIRM_PASSWORD_FIELD_HELPER": "Confirm your new password",
     "SUCCESS_MESSAGE": "Password reset, you will receive a confirmation email",
@@ -57,7 +58,7 @@
     "ERROR_MESSAGE_DEFAULT": "Error while sending email, please try again later"
   }, 
   "KSendResetPassword": {
-    "TITLE": "Send reset password email",
+    "TITLE": "Reset my password ?",
     "MESSAGE": "We shall email you instructions on how to reset your password",
     "ACTION": "Send",
     "EMAIL_FIELD_HELPER": "Enter your email address",
