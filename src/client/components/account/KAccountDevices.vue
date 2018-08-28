@@ -40,7 +40,7 @@ export default {
   },
   mixins: [coreMixins.baseCollection],
   methods: {
-    refreshCollection() {
+    refreshCollection () {
       this.items = this.$store.get('user.devices', [])
       this.nbTotalItems = this.items.length
       this.$emit('collection-refreshed')
@@ -57,7 +57,7 @@ export default {
     Events.$off('user-changed', this.refreshCollection)
   },
   mounted () {
-    
+
   }
 }
 </script>
