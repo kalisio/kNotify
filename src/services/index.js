@@ -5,8 +5,8 @@ const servicesPath = path.join(__dirname, '..', 'services')
 module.exports = function () {
   const app = this
 
-  app.createService('mailer', { servicesPath })
-  app.createService('pusher', { servicesPath })
+  app.createService('mailer', { servicesPath, events: ['created', 'updated', 'removed', 'patched'] }) // Internal use only, no events
+  app.createService('pusher', { servicesPath, events: ['created', 'updated', 'removed', 'patched'] }) // Internal use only, no events
   app.createService('account', { servicesPath })
   app.createService('devices', { servicesPath })
 }
