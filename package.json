@@ -68,7 +68,7 @@
     "@feathersjs/authentication": "^2.1.7",
     "@feathersjs/errors": "^3.3.0",
     "@feathersjs/feathers": "^3.1.7",
-    "debug": "^2.6.4",
+    "debug": "^3.1.0",
     "ejs": "^2.5.7",
     "email-templates": "^2.7.1",
     "feathers-authentication-management": "^2.0.1",
