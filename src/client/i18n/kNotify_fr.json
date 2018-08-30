@@ -25,7 +25,7 @@
     "ERROR_MESSAGE_DEFAULT": "Une erreur est survenue pendant l'opération, essayez plus tard"
   },
   "KResendVerifySignup": {
-    "TITLE": "'Me renvoyer un mail de vérification'",
+    "TITLE": "Me renvoyer un mail de vérification",
     "MESSAGE": "Nous allons vous envoyer un mail de vérification",
     "ACTION": "Envoyer",
     "EMAIL_FIELD_HELPER": "Saisissez votre adresse mail",

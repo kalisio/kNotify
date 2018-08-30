@@ -25,7 +25,7 @@
     "ERROR_MESSAGE_DEFAULT": "Error while trying to change password, please try again later"
   },
   "KResendVerifySignup": {
-    "TITLE": "'Resend verification email'",
+    "TITLE": "Resend verification email",
     "MESSAGE": "We shall send you the signup verification email again",
     "ACTION": "Send",
     "EMAIL_FIELD_HELPER": "Enter your email address",
