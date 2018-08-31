@@ -6,7 +6,7 @@ import { createGmailClient } from './utils'
 import notify, { hooks } from '../src'
 
 describe('kNotify:account', () => {
-  let app, server, port, baseUrl,
+  let app, server, port, baseUrl, token,
     userService, mailerService, accountService, gmailClient, gmailUser, userObject
 
   before(() => {
@@ -124,7 +124,19 @@ describe('kNotify:account', () => {
   it('check reset password request email', (done) => {
     // Add some delay to wait for email reception
     setTimeout(() => {
-      gmailClient.checkEmail(userObject, mailerService.options.auth.user, 'Reset your password', done)
+      gmailClient.checkEmail(userObject, mailerService.options.auth.user, 'Reset your password', (err, message) => {
+        if (err) done(err)
+        else {
+          // Extract token from email
+          message = Buffer.from(message.body.data, 'base64').toString()
+          const tokenEntry = 'reset-password/' // Then come the token in the link
+          const firstTokenIndex = message.indexOf(tokenEntry) + tokenEntry.length
+          const lastTokenIndex = message.indexOf('"', firstTokenIndex)
+          // Token is the last part of the URL in the <a href="xxx/reset-password/token"> tag
+          token = message.substring(firstTokenIndex, lastTokenIndex)
+          done()
+        }
+      })
     }, 10000)
   })
   // Let enough time to process
@@ -134,7 +146,7 @@ describe('kNotify:account', () => {
     accountService.create({
       action: 'resetPwdLong',
       value: {
-        token: userObject.resetToken,
+        token,
         password: '1234'
       }
     })
@@ -150,7 +162,7 @@ describe('kNotify:account', () => {
     return accountService.create({
       action: 'resetPwdLong',
       value: {
-        token: userObject.resetToken,
+        token,
         password: 'reset-password'
       }
     })
