@@ -40,7 +40,8 @@ module.exports = {
     apiVersion: '2010-03-31',
     platforms: {
       ANDROID: process.env.SNS_ANDROID_ARN
-    }
+    },
+    topicName: (object) => object._id.toString()
   },
   logs: {
     Console: {

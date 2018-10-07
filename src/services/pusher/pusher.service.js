@@ -9,6 +9,10 @@ const defaultTopicField = 'topics'
 
 export default function (name, app, options) {
   const config = app.get('pusher')
+  function generateTopicName(object) {
+    if (config.topicName && (typeof config.topicName === 'function')) return config.topicName(object)
+    else return object._id.toString()
+  }
   // Instanciate a SNS interface for each platform found in config
   let snsApplications = []
   _.forOwn(config.platforms, (platformArn, platform) => {
@@ -181,7 +185,7 @@ export default function (name, app, options) {
       snsApplications.forEach(application => {
         topicPromises.push(new Promise((resolve, reject) => {
           // The topic name will be the object ID
-          application.createTopic(object._id.toString(), (err, topicArn) => {
+          application.createTopic(generateTopicName(object), (err, topicArn) => {
             if (err) {
               reject(err)
             } else {
