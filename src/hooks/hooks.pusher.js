@@ -1,7 +1,7 @@
 import makeDebug from 'debug'
 import _ from 'lodash'
 import { getItems } from 'feathers-hooks-common'
-import { hooks } from 'kCore'
+import { hooks } from '@kalisio/kCore'
 const debug = makeDebug('kalisio:kNotify:pusher:hooks')
 
 export function populatePushObject (hook) {

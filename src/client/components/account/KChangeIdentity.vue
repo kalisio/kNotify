@@ -28,7 +28,7 @@
 <script>
 import _ from 'lodash'
 import { QSpinner, QIcon, Events } from 'quasar'
-import { mixins as coreMixins } from 'kCore/client'
+import { mixins as coreMixins } from '@kalisio/kCore/client'
 import mixins from '../../mixins'
 
 export default {

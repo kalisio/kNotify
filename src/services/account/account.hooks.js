@@ -1,6 +1,6 @@
 import { when } from 'feathers-hooks-common'
 import { populateAccountUser } from '../../hooks'
-import { hooks as coreHooks } from 'kCore'
+import { hooks as coreHooks } from '@kalisio/kCore'
 
 module.exports = {
   before: {
