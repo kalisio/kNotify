@@ -25,7 +25,7 @@
 
 <script>
 import { QIcon, Events } from 'quasar'
-import { mixins as coreMixins } from 'kCore/client'
+import { mixins as coreMixins } from '@kalisio/kCore/client'
 
 export default {
   name: 'k-account-devices',
