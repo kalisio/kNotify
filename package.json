@@ -33,7 +33,7 @@
     "release:patch": "npm version patch && npm publish --access=public",
     "release:minor": "npm version minor && npm publish --access=public",
     "release:major": "npm version major && npm publish --access=public",
-    "changelog": "github_changelog_generator-u kalisio -p kNotify && git add CHANGELOG.md && git commit -am \"Updating changelog\"",
+    "changelog": "github_changelog_generator -u kalisio -p kNotify && git add CHANGELOG.md && git commit -am \"Updating changelog\"",
     "compile": "shx rm -rf lib/ && babel -d lib/ src/ -s --copy-files",
     "watch:js": "babel --watch -d lib/ src/ --copy-files",
     "watch:vue": "cpx src/**/*.vue lib/ --watch",
