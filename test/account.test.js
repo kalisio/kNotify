@@ -1,7 +1,7 @@
 import request from 'superagent'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
-import core, { kalisio } from '@kalisio/kCore'
+import core, { kalisio } from '@kalisio/kdk-core'
 import { createGmailClient } from './utils'
 import notify, { hooks } from '../src'
 
