@@ -12,9 +12,9 @@
 ## Installation
 
 ```
-npm install kNotify --save
+npm install @kalisio/kdk-notify --save
 // Or with Yarn
-yarn add kNotify
+yarn add @kalisio/kdk-notify
 ```
 
 ## Documentation
