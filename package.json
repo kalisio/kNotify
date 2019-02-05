@@ -76,7 +76,7 @@
     "feathers-hooks-common": "^3.0.0",
     "feathers-mailer": "^2.0.0",
     "fs-extra": "^3.0.0",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.11",
     "loglevel": "^1.6.0",
     "moment": "^2.22.2",
     "nodemailer-smtp-transport": "^2.7.4",
