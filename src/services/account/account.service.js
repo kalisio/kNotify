@@ -1,4 +1,5 @@
 import accountManager from 'feathers-authentication-management'
+import { BadRequest } from '@feathersjs/errors'
 import emails from 'email-templates'
 import path from 'path'
 import logger from 'winston'
@@ -10,13 +11,26 @@ const debug = makeDebug('kalisio:kNotify:account:service')
 export default function (name, app, options) {
   // Keep track of notifier
   options.notifier = async function (type, user, notifierOptions) {
-    // OAuth2 providers
-    const message = 'You cannot modify your account because it is managed by '
+    const userService = app.getService('users')
+    // Using OAuth2 providers disallow some operations
+    let identityProvider
     for (let provider of app.authenticationProviders) {
-      if (user[provider + 'Id']) return Promise.reject(new Error(message + _.startCase(provider)))
+      if (user[provider + 'Id']) identityProvider = _.startCase(provider)
+    }
+    // Password/Identity change is already filtered by the fact the user does not have an old password to be provided
+    if (identityProvider && (type === 'resendVerifySignup')) {
+      const userWithPassword = await userService.get(user._id.toString())
+      console.log(userWithPassword)
+      if (!userWithPassword.password) {
+        return Promise.reject(new BadRequest(`You cannot update your account because it is managed by ${identityProvider}`, {
+          translation: {
+            key: 'OAUTH2_PROVIDER',
+            params: { provider: identityProvider }
+          }
+        }))
+      }
     }
 
-    const userService = app.getService('users')
     const mailerService = app.getService('mailer')
     let domainPath = app.get('domain') + '/#/'
     let email = {

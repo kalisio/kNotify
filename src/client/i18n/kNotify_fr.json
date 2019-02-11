@@ -1,4 +1,7 @@
 {
+  "errors": {
+    "OAUTH2_PROVIDER": "Vous ne pouvez modifier votre compte car il est géré par {{provider}}, pour utiliser un compte local réinitialisez tout d'abord votre mot de passe"
+  },
   "KChangeIdentity": {
     "ACTION": "Appliquer",
     "BACK_LINK": "Se connecter ou revenir",

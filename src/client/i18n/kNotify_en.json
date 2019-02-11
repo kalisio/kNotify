@@ -1,4 +1,7 @@
 {
+  "errors": {
+    "OAUTH2_PROVIDER": "You cannot update your account because it is managed by {{provider}}, in order to switch to a local account reset your password first"
+  },
   "KChangeIdentity": {
     "ACTION": "Resend change email",
     "BACK_LINK": "Go back",
