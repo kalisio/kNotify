@@ -4,7 +4,7 @@
 [![Code Climate](https://codeclimate.com/github/kalisio/kNotify/badges/gpa.svg)](https://codeclimate.com/github/kalisio/kNotify)
 [![Test Coverage](https://codeclimate.com/github/kalisio/kNotify/badges/coverage.svg)](https://codeclimate.com/github/kalisio/kNotify/coverage)
 [![Dependency Status](https://img.shields.io/david/kalisio/kNotify.svg?style=flat-square)](https://david-dm.org/kalisio/kNotify)
-[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://kalisio.gitbooks.io/kalisio/api)
+[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://kalisio.github.io/kdk/)
 [![Known Vulnerabilities](https://snyk.io/test/github/kalisio/kNotify/badge.svg)](https://snyk.io/test/github/kalisio/kNotify)
 
 > Basic utils to support notifications (push, emails, etc.) for KDK-based applications and services
