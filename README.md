@@ -7,7 +7,7 @@
 [![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://kalisio.gitbooks.io/kalisio/api)
 [![Known Vulnerabilities](https://snyk.io/test/github/kalisio/kNotify/badge.svg)](https://snyk.io/test/github/kalisio/kNotify)
 
-> Basic utils to support notifications (push, emails, etc.) for Kalisio applications and services
+> Basic utils to support notifications (push, emails, etc.) for KDK-based applications and services
 
 ## Installation
 
@@ -19,7 +19,7 @@ yarn add @kalisio/kdk-notify
 
 ## Documentation
 
-The [kDocs](https://kalisio.gitbooks.io/kalisio/) are loaded with awesome stuff and tell you everything you need to know about using and configuring it.
+The [kDocs](https://kalisio.github.io/kdk/) are loaded with awesome stuff and tell you everything you need to know about using and configuring it.
 
 ## Tests
 
