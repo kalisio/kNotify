@@ -66,13 +66,14 @@ export default {
         message: this.$t('KDeviceCard.UNLINK_DIALOG_MESSAGE', { description }),
         buttons: [
           {
-            label: 'Ok',
+            label: this.$t('OK'),
             handler: () => {
               let devicesService = this.$api.getService('devices')
               devicesService.remove(device.registrationId)
             }
-          },
-          'Cancel'
+          }, {
+            label: this.$t('CANCEL')
+          }
         ]
       })
     }
