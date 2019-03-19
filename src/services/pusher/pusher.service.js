@@ -55,7 +55,7 @@ export default function (name, app, options) {
           alert: message.title,
           notId
         }
-        if (message.sound) data.sound = message.sound
+        if (message.sound) aps.sound = message.sound
         jsonMessage.APNS = JSON.stringify({ aps })
       } else {
         // ANDROID
