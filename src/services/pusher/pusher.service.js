@@ -9,7 +9,7 @@ const defaultTopicField = 'topics'
 
 export default function (name, app, options) {
   const config = app.get('pusher')
-  function generateTopicName(object) {
+  function generateTopicName (object) {
     if (config.topicName && (typeof config.topicName === 'function')) return config.topicName(object)
     else return object._id.toString()
   }
@@ -51,12 +51,12 @@ export default function (name, app, options) {
       }
       if (platform === SNS.SUPPORTED_PLATFORMS.IOS) {
         // iOS
-        let data = {
+        let aps = {
           alert: message.title,
           notId
         }
         if (message.sound) data.sound = message.sound
-        jsonMessage.APNS = JSON.stringify({ data })
+        jsonMessage.APNS = JSON.stringify({ aps })
       } else {
         // ANDROID
         let data = {
