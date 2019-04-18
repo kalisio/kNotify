@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.1.0](https://github.com/kalisio/kNotify/tree/v1.1.0) (2019-04-18)
+
+[Full Changelog](https://github.com/kalisio/kNotify/compare/v1.0.0...v1.1.0)
+
+**Implemented enhancements:**
+
+- Support iOS notifications [\#22](https://github.com/kalisio/kNotify/issues/22)
+
 ## [v1.0.0](https://github.com/kalisio/kNotify/tree/v1.0.0) (2018-10-11)
 
 [Full Changelog](https://github.com/kalisio/kNotify/compare/15300f90e2bd9a88dcf202f3070212ae05eea644...v1.0.0)
