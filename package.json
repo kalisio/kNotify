@@ -1,7 +1,7 @@
 {
   "name": "@kalisio/kdk-notify",
   "description": "Module to support notifications (push, emails, etc.) for Kalisio applications and services",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "homepage": "https://github.com/kalisio/kNotify",
   "main": "lib/",
   "browser": {
