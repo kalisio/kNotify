@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { QIcon, Events } from 'quasar'
+import { QIcon } from 'quasar'
 import { mixins as coreMixins } from '@kalisio/kdk-core/client'
 
 export default {
@@ -51,10 +51,10 @@ export default {
     this.$options.components['k-device-card'] = this.$load('account/KDeviceCard')
     this.refreshCollection()
     // Whenever the user is updated, update collection as well
-    Events.$on('user-changed', this.refreshCollection)
+    this.$events.$on('user-changed', this.refreshCollection)
   },
   beforeDestroy () {
-    Events.$off('user-changed', this.refreshCollection)
+    this.$events.$off('user-changed', this.refreshCollection)
   },
   mounted () {
 

@@ -27,7 +27,7 @@
 
 <script>
 import _ from 'lodash'
-import { QSpinner, QIcon, Events } from 'quasar'
+import { QSpinner, QIcon } from 'quasar'
 import { mixins as coreMixins } from '@kalisio/kdk-core/client'
 import mixins from '../../mixins'
 
@@ -68,10 +68,10 @@ export default {
     // with a function that has previously been statically analyzed by the bundler (eg webpack)
     this.$options.components['k-screen'] = this.$load('frame/KScreen')
     // Check if logged in
-    Events.$on('user-changed', this.refreshUser)
+    this.$events.$on('user-changed', this.refreshUser)
   },
   beforeDestroy () {
-    Events.$off('user-changed', this.refreshUser)
+    this.$events.$off('user-changed', this.refreshUser)
   },
   mounted () {
     this.title = this.$t('KChangeIdentity.VERIFICATION_TITLE')
