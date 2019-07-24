@@ -1,6 +1,6 @@
 import logger from 'loglevel'
-import { Platform, Toast } from 'quasar'
-import { Store } from '@kalisio/kdk-core/client'
+import { Platform } from 'quasar'
+import { Store, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 
 // We faced a bug in babel so that transform-runtime with export * from 'x' generates import statements in transpiled code
 // Tracked here : https://github.com/babel/babel/issues/2877
@@ -38,8 +38,8 @@ export default function init () {
   function permissionsError() {
     const message = 'Required permissions for push notifications are missing or have been rejected, the application will not work as expected'
     logger.error(message)
-    Toast.create.negative({
-      html: message,
+    utils.toast({
+      message,
       timeout: 10000
     })
   }
@@ -89,8 +89,8 @@ export default function init () {
     })
     notifier.on('error', (error) => {
       logger.error(error)
-      Toast.create.negative({
-        html: error.message,
+      utils.toast({
+        message: error.message,
         timeout: 10000
       })
     })
