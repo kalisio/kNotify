@@ -78,28 +78,23 @@
     "loglevel": "^1.6.0",
     "moment": "^2.22.2",
     "nodemailer-smtp-transport": "^2.7.4",
-    "quasar-extras": "0.0.8",
-    "quasar-framework": "0.14.7",
+    "quasar": "^1.0.3",
     "sns-mobile": "https://github.com/kalisio/sns-mobile#protocol",
     "vue": "2.5.17",
     "winston": "^2.3.1"
   },
   "devDependencies": {
+    "@quasar/app": "^1.0.1",
     "babel-cli": "^6.24.1",
-    "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.3",
-    "babel-loader": "^7.1.2",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-export-extensions": "^6.22.0",
-    "babel-plugin-transform-runtime": "^6.0.0",
-    "babel-polyfill": "^6.23.0",
-    "babel-preset-env": "^1.7.0",
+     "babel-preset-env": "^1.7.0",
     "chai": "^3.5.0",
     "chai-lint": "^0.1.1",
     "containerized": "^1.0.2",
     "cpx": "^1.5.0",
     "cross-env": "^4.0.0",
-    "css-loader": "^0.28.7",
     "eslint-plugin-html": "^3.1.1",
     "googleapis": "^21.3.0",
     "istanbul": "^1.1.0-alpha.1",
@@ -107,10 +102,7 @@
     "npm-run-all": "^4.1.1",
     "shx": "^0.2.2",
     "standard": "^10.0.2",
-    "superagent": "^3.5.2",
-    "vue-loader": "^13.0.4",
-    "vue-style-loader": "^3.0.1",
-    "vue-template-compiler": "2.5.2"
+    "superagent": "^3.5.2"
   },
   "peerDependencies": {}
 }

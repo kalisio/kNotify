@@ -64,17 +64,15 @@ export default {
       Dialog.create({
         title: this.$t('KDeviceCard.UNLINK_DIALOG_TITLE', { description }),
         message: this.$t('KDeviceCard.UNLINK_DIALOG_MESSAGE', { description }),
-        buttons: [
-          {
-            label: this.$t('OK'),
-            handler: () => {
-              let devicesService = this.$api.getService('devices')
-              devicesService.remove(device.registrationId)
-            }
-          }, {
-            label: this.$t('CANCEL')
-          }
-        ]
+        ok: {
+          label: this.$t('OK'),
+        },
+        cancel: {
+          label: this.$t('CANCEL')
+        }
+      }).onOk(() => {
+        let devicesService = this.$api.getService('devices')
+        devicesService.remove(device.registrationId)
       })
     }
   },
