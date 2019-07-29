@@ -72,7 +72,7 @@ export default {
   },
   mixins: [mixins.account],
   methods: {
-    onSend (event, done) {
+    onSend () {
       let result = this.$refs.form.validate()
       if (result.isValid) {
         this.sendResetPassword(result.values.email)
@@ -93,10 +93,7 @@ export default {
           }
           this.sent = true
           this.success = false
-          done()
         })
-      } else {
-        done()
       }
     }
   },

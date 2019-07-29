@@ -79,7 +79,7 @@ export default {
   },
   mixins: [mixins.account],
   methods: {
-    onSend (event, done) {
+    onSend () {
       let result = this.$refs.form.validate()
       if (result.isValid) {
         this.sendChangeIdentity(this.$store.get('user.email'), result.values.email, result.values.password)
@@ -101,10 +101,7 @@ export default {
           }
           this.sent = true
           this.success = false
-          done()
         })
-      } else {
-        done()
       }
     }
   },

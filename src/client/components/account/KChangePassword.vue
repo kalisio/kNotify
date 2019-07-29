@@ -94,7 +94,7 @@ export default {
   },
   mixins: [mixins.account],
   methods: {
-    onChange (event, done) {
+    onChange () {
       let result = this.$refs.form.validate()
       if (result.isValid) {
         this.changePassword(this.$store.get('user.email'), result.values.oldPassword, result.values.password)
@@ -115,10 +115,7 @@ export default {
           }
           this.changed = true
           this.success = false
-          done()
         })
-      } else {
-        done()
       }
     }
   },

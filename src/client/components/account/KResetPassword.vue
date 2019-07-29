@@ -93,7 +93,7 @@ export default {
         'required': ['password']
       }
     },
-    onReset (event, done) {
+    onReset () {
       let result = this.$refs.form.validate()
       if (result.isValid) {
         this.resetPassword(this.$route.params.token, result.values.password)
@@ -117,10 +117,7 @@ export default {
           }
           this.reset = true
           this.success = false
-          done()
         })
-      } else {
-        done()
       }
     }
   },

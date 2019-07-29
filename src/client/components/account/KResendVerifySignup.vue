@@ -73,7 +73,7 @@ export default {
   },
   mixins: [mixins.account],
   methods: {
-    onSend (event, done) {
+    onSend () {
       let result = this.$refs.form.validate()
       if (result.isValid) {
         this.resendVerifySignup(result.values.email)
@@ -95,10 +95,7 @@ export default {
             default:
               this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_DEFAULT')
           }
-          done()
         })
-      } else {
-        done()
       }
     }
   },
