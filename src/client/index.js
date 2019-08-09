@@ -89,7 +89,7 @@ export default function init () {
     })
     notifier.on('error', (error) => {
       logger.error(error)
-      utils.toast({
+      kCoreUtils.toast({
         message: error.message,
         timeout: 10000
       })
