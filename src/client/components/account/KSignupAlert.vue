@@ -1,11 +1,9 @@
 <template>
-  <div>
-    <q-banner
-      rounded 
-      class="bg-warning text-black fixed"
-      style="top: 18px"
-      v-if="!isVerified"
-    >
+  <q-dialog 
+    v-model="show" 
+    full-width
+    position="bottom">
+    <q-card class="bg-warning q-pa-md">
       {{$t('KSignupAlert.TITLE')}}
       <q-expansion-item icon="explore" :label="$t('KSignupAlert.HELP_LABEL')">
         <q-card class="bg-warning">
@@ -21,11 +19,11 @@
           </q-card-section>
         </q-card>
       </q-expansion-item>
-      <template v-slot:action>
+      <q-card-actions align="right">
         <q-btn flat color="black" :label="$t('KSignupAlert.ACTION')" @click="resendVerifySignup(email)" />
-      </template>
-    </q-banner>
-  </div>
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
@@ -33,20 +31,15 @@ import mixins from '../../mixins'
 
 export default {
   name: 'k-signup-alert',
+  mixins: [mixins.account],
   props: {
-    isVerified: {
+    show: {
       type: Boolean,
-      required: true
+      required: false
     },
     email: {
       type: String,
       required: true
-    }
-  },
-  mixins: [mixins.account],
-  computed: {
-    showAlert () {
-      return !this.isVerified
     }
   }
 }
