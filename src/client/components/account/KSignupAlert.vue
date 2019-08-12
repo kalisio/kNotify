@@ -1,18 +1,24 @@
 <template>
   <q-dialog 
     v-model="isVisible" 
+    persistent
     full-width
     position="bottom">
-    <q-card class="bg-warning q-pa-md">
-      {{$t('KSignupAlert.TITLE')}}
-      <q-expansion-item icon="explore" :label="$t('KSignupAlert.HELP_LABEL')">
+    <q-card class="bg-warning q-pa-sm">
+      <q-toolbar>
+        <q-toolbar-title>
+          {{$t('KSignupAlert.TITLE')}}
+        </q-toolbar-title>
+        <q-btn icon="close" flat dense round v-close-popup />
+      </q-toolbar>
+      <q-expansion-item icon="contact_support" :label="$t('KSignupAlert.HELP_LABEL')">
         <q-card class="bg-warning">
           <q-card-section>
             <p v-html="$t('KSignupAlert.HELP_TEXT')" />
           </q-card-section>
         </q-card>
       </q-expansion-item>
-      <q-expansion-item icon="explore" :label="$t('KSignupAlert.EMAIL_LABEL')">
+      <q-expansion-item icon="contact_support" :label="$t('KSignupAlert.EMAIL_LABEL')">
         <q-card class="bg-warning">
           <q-card-section>
             <p v-html="$t('KSignupAlert.EMAIL_TEXT')" />
