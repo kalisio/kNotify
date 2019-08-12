@@ -1,6 +1,6 @@
 <template>
   <q-dialog 
-    v-model="show" 
+    v-model="isVisible" 
     full-width
     position="bottom">
     <q-card class="bg-warning q-pa-md">
@@ -33,7 +33,7 @@ export default {
   name: 'k-signup-alert',
   mixins: [mixins.account],
   props: {
-    show: {
+    isVerified: {
       type: Boolean,
       required: false
     },
@@ -41,6 +41,14 @@ export default {
       type: String,
       required: true
     }
+  },
+  data () {
+    return {
+      isVisible: false
+    }
+  },
+  created () {
+    this.isVisible = !this.isVerified
   }
 }
 </script>
