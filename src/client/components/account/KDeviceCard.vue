@@ -66,7 +66,7 @@ export default {
         message: this.$t('KDeviceCard.UNLINK_DIALOG_MESSAGE', { description }),
         html: true,
         ok: {
-          label: this.$t('OK'),
+          label: this.$t('OK')
         },
         cancel: {
           label: this.$t('CANCEL')
