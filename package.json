@@ -39,17 +39,20 @@
     "watch:vue": "cpx src/**/*.vue lib/ --watch",
     "watch": "npm-run-all --parallel watch:**",
     "lint": "standard src/**/*.js src/**/*.vue test/**/*.js --fix",
-    "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ mocha --opts mocha.opts",
+    "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ mocha --require babel-core/register",
     "coverage": "cross-env NODE_CONFIG_DIR=./test/config/ node node_modules/istanbul/lib/cli cover node_modules/mocha/bin/_mocha -- --opts mocha.opts",
     "test": "npm run compile && npm run lint && npm run coverage",
     "start": "npm run compile && node lib"
   },
   "standard": {
-    "parser": "babel-eslint",
+    "parser": "vue-eslint-parser",
+    "parserOptions": {
+      "parser": "babel-eslint",
+      "sourceType": "module"
+    },
     "plugins": [
-      "html"
+      "vue"
     ],
-    "sourceType": "module",
     "env": [
       "mocha"
     ],
@@ -67,43 +70,38 @@
   },
   "dependencies": {
     "@feathersjs/errors": "^3.3.0",
-    "@kalisio/kdk-core": "^1.1.0",
-    "debug": "^3.1.0",
+    "debug": "^4.1.0",
     "ejs": "^2.5.7",
     "email-templates": "^2.7.1",
     "feathers-authentication-management": "^2.0.1",
     "feathers-hooks-common": "^3.0.0",
     "feathers-mailer": "^2.0.0",
-    "fs-extra": "^3.0.0",
-    "lodash": "^4.17.4",
-    "loglevel": "^1.6.0",
-    "moment": "^2.22.2",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
     "nodemailer-smtp-transport": "^2.7.4",
-    "quasar": "^1.0.3",
     "sns-mobile": "https://github.com/kalisio/sns-mobile#protocol",
-    "vue": "2.5.17",
-    "winston": "^2.3.1"
+    "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@quasar/app": "^1.0.1",
     "babel-cli": "^6.24.1",
-    "babel-eslint": "^7.2.3",
+    "babel-eslint": "^10.0.3",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-export-extensions": "^6.22.0",
-     "babel-preset-env": "^1.7.0",
-    "chai": "^3.5.0",
+    "babel-preset-env": "^1.7.0",
+    "chai": "^4.2.0",
     "chai-lint": "^0.1.1",
     "containerized": "^1.0.2",
     "cpx": "^1.5.0",
-    "cross-env": "^4.0.0",
-    "eslint-plugin-html": "^3.1.1",
+    "cross-env": "^5.2.0",
+    "eslint": "^6.1.0",
+    "eslint-plugin-vue": "^5.2.3",
     "googleapis": "^21.3.0",
     "istanbul": "^1.1.0-alpha.1",
-    "mocha": "^3.2.0",
+    "mocha": "^6.2.0",
     "npm-run-all": "^4.1.1",
-    "shx": "^0.2.2",
-    "standard": "^10.0.2",
-    "superagent": "^3.5.2"
+    "shx": "^0.3.2",
+    "standard": "^14.0.0",
+    "superagent": "^5.1.0"
   },
   "peerDependencies": {}
 }

@@ -1,4 +1,4 @@
-let accountMixin = {
+const accountMixin = {
   methods: {
     resendVerifySignup (email) {
       return this.accountService.create({

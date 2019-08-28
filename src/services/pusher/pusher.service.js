@@ -14,13 +14,13 @@ export default function (name, app, options) {
     else return object._id.toString()
   }
   // Instanciate a SNS interface for each platform found in config
-  let snsApplications = []
+  const snsApplications = []
   _.forOwn(config.platforms, (platformArn, platform) => {
     const snsConfig = Object.assign({
       platform,
       platformApplicationArn: platformArn
     }, _.omit(config, ['platforms']))
-    let snsApplication = new SNS(snsConfig)
+    const snsApplication = new SNS(snsConfig)
     debug('SNS application created with config ', snsConfig)
     snsApplications.push(snsApplication)
   })
@@ -35,7 +35,7 @@ export default function (name, app, options) {
         message = { title: message, body: message }
       }
       // Add SMS protocol target in case we have some phone numbers registered to the topic
-      let jsonMessage = { default: message.title, sms: message.body }
+      const jsonMessage = { default: message.title, sms: message.body }
       // For stacking we need a unique increasing ID per notification on Android
       let notId = 1
       if (message.createdAt && message.updatedAt) {
@@ -51,7 +51,7 @@ export default function (name, app, options) {
       }
       if (platform === SNS.SUPPORTED_PLATFORMS.IOS) {
         // iOS
-        let aps = {
+        const aps = {
           alert: message.title,
           notId
         }
@@ -59,7 +59,7 @@ export default function (name, app, options) {
         jsonMessage.APNS = JSON.stringify({ aps })
       } else {
         // ANDROID
-        let data = {
+        const data = {
           title: message.title,
           message: message.body,
           notId
@@ -72,13 +72,13 @@ export default function (name, app, options) {
     },
     createDevice (device, user) {
       return new Promise((resolve, reject) => {
-        let application = this.getSnsApplication(device.platform)
+        const application = this.getSnsApplication(device.platform)
         if (!application) {
           reject(new Error('Cannot register device with token ' + device.registrationId + ' because there is no platform application for ' + device.platform))
           return
         }
         // Check if already registered
-        let devices = user.devices || []
+        const devices = user.devices || []
         const previousDevice = _.find(devices, userDevice => userDevice.registrationId === device.registrationId)
         if (previousDevice) {
           debug('Already registered device with token ' + previousDevice.registrationId + ' and ARN ' + previousDevice.arn + ' for user ' + user._id.toString())
@@ -97,13 +97,13 @@ export default function (name, app, options) {
     updateDevice (registrationId, device, user) {
       return new Promise((resolve, reject) => {
         // Check if already registered
-        let devices = user.devices || []
+        const devices = user.devices || []
         const previousDevice = _.find(devices, userDevice => userDevice.registrationId === device.registrationId)
         if (!previousDevice) {
           reject(new Error('Cannot find device with token ' + device.registrationId + ' and ARN ' + device.arn + ' for user ' + user._id.toString()))
           return
         }
-        let application = this.getSnsApplication(device.platform)
+        const application = this.getSnsApplication(device.platform)
         if (!application) {
           reject(new Error('Cannot update device with token ' + device.registrationId + ' because there is no platform application for ' + device.platform))
           return
@@ -130,14 +130,14 @@ export default function (name, app, options) {
     removeDevice (registrationId, user) {
       return new Promise((resolve, reject) => {
         // Check if already registered
-        let devices = user.devices || []
-        let device = _.find(devices, device => device.registrationId === registrationId)
+        const devices = user.devices || []
+        const device = _.find(devices, device => device.registrationId === registrationId)
         if (!device) {
           debug('Cannot find device with token ' + registrationId + ' for user ' + user._id.toString())
           resolve()
           return
         }
-        let application = this.getSnsApplication(device.platform)
+        const application = this.getSnsApplication(device.platform)
         if (!application) {
           reject(new Error('Cannot unbind device with token ' + device.registrationId + ' because there is no platform application for ' + device.platform))
           return
@@ -153,10 +153,10 @@ export default function (name, app, options) {
     },
     publishToDevices (user, message) {
       // Process with each registered platform
-      let messagePromises = []
+      const messagePromises = []
       const devices = user.devices || []
       devices.forEach(device => {
-        let application = this.getSnsApplication(device.platform)
+        const application = this.getSnsApplication(device.platform)
         messagePromises.push(new Promise((resolve, reject) => {
           if (!application) {
             reject(new Error('Cannot send message to device with token ' + device.registrationId + ' because there is no platform application for ' + device.platform))
@@ -177,11 +177,11 @@ export default function (name, app, options) {
         }))
       })
       return Promise.all(messagePromises)
-      .then(results => results.reduce((messageIds, messageId) => Object.assign(messageIds, messageId), {}))
+        .then(results => results.reduce((messageIds, messageId) => Object.assign(messageIds, messageId), {}))
     },
     async createPlatformTopics (object, service, topicField, patch = true) {
       // Process with each registered platform
-      let topicPromises = []
+      const topicPromises = []
       snsApplications.forEach(application => {
         topicPromises.push(new Promise((resolve, reject) => {
           // The topic name will be the object ID
@@ -195,8 +195,8 @@ export default function (name, app, options) {
           })
         }))
       })
-      let results = await Promise.all(topicPromises)
-      let topics = results.reduce((topics, topic) => Object.assign(topics, topic), {})
+      const results = await Promise.all(topicPromises)
+      const topics = results.reduce((topics, topic) => Object.assign(topics, topic), {})
       if (patch) {
         return service.patch(object._id, { [topicField]: topics })
       } else {
@@ -205,7 +205,7 @@ export default function (name, app, options) {
     },
     publishToPlatformTopics (object, message, topicField) {
       // Process with each registered platform
-      let messagePromises = []
+      const messagePromises = []
       snsApplications.forEach(application => {
         messagePromises.push(new Promise((resolve, reject) => {
           const topicArn = _.get(object, topicField + '.' + application.platform)
@@ -221,15 +221,15 @@ export default function (name, app, options) {
         }))
       })
       return Promise.all(messagePromises)
-      .then(results => results.reduce((messageIds, messageId) => Object.assign(messageIds, messageId), {}))
+        .then(results => results.reduce((messageIds, messageId) => Object.assign(messageIds, messageId), {}))
     },
     async removePlatformTopics (object, service, topicField, patch = true) {
       // First get all subscribers of the topic because we do not store them
       // Process with each registered platform
-      let platformSubscriptions = await this.getPlatformSubscriptions(object, topicField)
+      const platformSubscriptions = await this.getPlatformSubscriptions(object, topicField)
       // Process with each registered platform
-      let unsubscriptionPromises = []
-      let topicPromises = []
+      const unsubscriptionPromises = []
+      const topicPromises = []
       snsApplications.forEach((application, i) => {
         const topicArn = _.get(object, topicField + '.' + application.platform)
         // Unsubscribe all users
@@ -258,7 +258,7 @@ export default function (name, app, options) {
         }))
       })
       await Promise.all(unsubscriptionPromises)
-      let topicArns = await Promise.all(topicPromises)
+      const topicArns = await Promise.all(topicPromises)
       if (patch) {
         return service.patch(object._id, { [topicField]: null })
       } else {
@@ -267,11 +267,11 @@ export default function (name, app, options) {
     },
     createPlatformSubscriptions (object, users, topicField) {
       // Process with each registered platform
-      let subscriptionPromises = []
+      const subscriptionPromises = []
       snsApplications.forEach(application => {
         // Then each target user
         users.forEach(user => {
-          let devices = user.devices || []
+          const devices = user.devices || []
           // Then each target device
           devices.forEach(device => {
             if (device.platform.toUpperCase() === application.platform) {
@@ -314,7 +314,7 @@ export default function (name, app, options) {
       return Promise.all(subscriptionPromises)
     },
     getPlatformSubscriptions (object, topicField) {
-      let subscriptionPromises = []
+      const subscriptionPromises = []
       snsApplications.forEach(application => {
         subscriptionPromises.push(new Promise((resolve, reject) => {
           const topicArn = _.get(object, topicField + '.' + application.platform)
@@ -337,39 +337,39 @@ export default function (name, app, options) {
       // First get all subscribers of the topic because we do not store them
       // Process with each registered platform
       return this.getPlatformSubscriptions(object, topicField)
-      .then(platformSubscriptions => {
-        let unsubscriptionPromises = []
-        // Process with each registered platform
-        platformSubscriptions.forEach(subscriptions => {
+        .then(platformSubscriptions => {
+          const unsubscriptionPromises = []
+          // Process with each registered platform
+          platformSubscriptions.forEach(subscriptions => {
           // Remove the given subscribers from the topic
-          subscriptions.forEach(subscription => {
-            users.forEach(user => {
-              let devices = user.devices || []
-              devices.forEach(device => {
+            subscriptions.forEach(subscription => {
+              users.forEach(user => {
+                const devices = user.devices || []
+                devices.forEach(device => {
                 // check for number as well for SMS subscriptions
-                if ((device.arn === subscription.Endpoint) || (device.number === subscription.Endpoint)) {
-                  unsubscriptionPromises.push(new Promise((resolve, reject) => {
-                    let application = this.getSnsApplication(device.platform)
-                    const topicArn = _.get(object, topicField + '.' + application.platform)
-                    application.unsubscribe(subscription.SubscriptionArn, (err) => {
-                      if (err) {
+                  if ((device.arn === subscription.Endpoint) || (device.number === subscription.Endpoint)) {
+                    unsubscriptionPromises.push(new Promise((resolve, reject) => {
+                      const application = this.getSnsApplication(device.platform)
+                      const topicArn = _.get(object, topicField + '.' + application.platform)
+                      application.unsubscribe(subscription.SubscriptionArn, (err) => {
+                        if (err) {
                         // Be tolerant to SNS errors because some endpoints might have been revoked
                         // reject(new GeneralError(err, { [device.registrationId]: { user: user._id } }))
-                        debug('Unable to unsubscribe device with token ' + device.registrationId + ' and ARN ' + device.arn + ' from topic with ARN ' + topicArn, err)
-                        resolve({ [device.registrationId]: { user: user._id, arn: null } })
-                      } else {
-                        debug('Unsubscribed device with token ' + device.registrationId + ' and ARN ' + device.arn + ' from topic with ARN ' + topicArn)
-                        resolve({ [device.registrationId]: { user: user._id, arn: subscription.SubscriptionArn } })
-                      }
-                    })
-                  }))
-                }
+                          debug('Unable to unsubscribe device with token ' + device.registrationId + ' and ARN ' + device.arn + ' from topic with ARN ' + topicArn, err)
+                          resolve({ [device.registrationId]: { user: user._id, arn: null } })
+                        } else {
+                          debug('Unsubscribed device with token ' + device.registrationId + ' and ARN ' + device.arn + ' from topic with ARN ' + topicArn)
+                          resolve({ [device.registrationId]: { user: user._id, arn: subscription.SubscriptionArn } })
+                        }
+                      })
+                    }))
+                  }
+                })
               })
             })
           })
+          return Promise.all(unsubscriptionPromises)
         })
-        return Promise.all(unsubscriptionPromises)
-      })
     },
     // Used to perform service actions such as create a user, a push notification, a topic, etc.
     create (data, params) {

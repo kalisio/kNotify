@@ -4,7 +4,7 @@ import _ from 'lodash'
 const debug = makeDebug('kalisio:kNotify:devices:service')
 
 export default function (name, app, options) {
-    // Keep track of config
+  // Keep track of config
   Object.assign(options, app.get('devices'))
   debug('devices service created with config ', options)
   return {
@@ -37,8 +37,8 @@ export default function (name, app, options) {
       const pusherService = app.getService('pusher')
 
       // Retrieve the user's devices
-      let user = params.user
-      let devices = user.devices || []
+      const user = params.user
+      const devices = user.devices || []
 
       // Check whether we need to update or to register the device
       // according to https://docs.aws.amazon.com/sns/latest/dg/mobile-platform-endpoint.html
@@ -73,7 +73,7 @@ export default function (name, app, options) {
     },
     async create (data, params) {
       // data: device
-      let user = params.user
+      const user = params.user
       const pusherService = app.getService('pusher')
       // Bind the device
       debug('Binding new device', data)
@@ -86,8 +86,8 @@ export default function (name, app, options) {
       const usersService = app.getService('users')
       const pusherService = app.getService('pusher')
       // Retrieve the user's devices
-      let user = params.user
-      let devices = user.devices || []
+      const user = params.user
+      const devices = user.devices || []
 
       await pusherService.remove(id, { query: { action: 'device' }, user })
       const device = this.findDeviceByRegistrationId(id, user)

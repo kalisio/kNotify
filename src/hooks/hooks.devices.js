@@ -7,7 +7,7 @@ const debug = makeDebug('kalisio:kNotify:devices:hooks')
 
 export async function sendNewDeviceEmail (hook) {
   if (hook.type !== 'after') {
-    throw new Error(`The 'sendNewDeviceEmail' hook should only be used as a 'after' hook.`)
+    throw new Error('The \'sendNewDeviceEmail\' hook should only be used as a \'after\' hook.')
   }
 
   const app = hook.app

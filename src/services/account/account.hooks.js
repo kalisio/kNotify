@@ -7,8 +7,8 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [ when(hook => hook.data.action === 'resetPwdLong' || hook.data.action === 'passwordChange',
-              populateAccountUser, coreHooks.enforcePasswordPolicy({ userAsItem: false, passwordField: 'value.password' })) ],
+    create: [when(hook => hook.data.action === 'resetPwdLong' || hook.data.action === 'passwordChange',
+      populateAccountUser, coreHooks.enforcePasswordPolicy({ userAsItem: false, passwordField: 'value.password' }))],
     update: [],
     patch: [],
     remove: []

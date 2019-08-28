@@ -48,7 +48,7 @@ export default {
   },
   computed: {
     textClass () {
-      let classObject = {}
+      const classObject = {}
       if (!this.verifying) {
         classObject['text-positive'] = this.verified
         classObject['text-negative'] = !this.verified
@@ -74,32 +74,32 @@ export default {
     this.title = this.$t('KVerifySignup.TITLE')
     this.message = this.$t('KVerifySignup.MESSAGE')
     this.verifySignup(this.$route.params.token)
-    .then(user => {
-      this.title = this.$t('KVerifySignup.SUCCESS_TITLE')
-      this.message = this.$t('KVerifySignup.SUCCESS_MESSAGE', { email: user.email })
-      this.verified = true
-      this.verifying = false
-    })
-    .catch(error => {
-      this.title = this.$t('KVerifySignup.ERROR_TITLE')
-      const type = _.get(error, 'errors.$className')
-      switch (type) {
-        case 'isNotVerified':
-        case 'nothingToVerify':
-          this.message = this.$t('KVerifySignup.ERROR_MESSAGE_NOTHING_TO_VERIFY')
-          break
-        case 'badParams':
-          this.message = this.$t('KVerifySignup.ERROR_MESSAGE_BAD_PARAMS')
-          break
-        case 'verifyExpired':
-          this.message = this.$t('KVerifySignup.ERROR_MESSAGE_VERIFY_EXPIRED')
-          break
-        default:
-          this.message = this.$t('KVerifySignup.ERROR_MESSAGE_DEFAULT')
-      }
-      this.verified = false
-      this.verifying = false
-    })
+      .then(user => {
+        this.title = this.$t('KVerifySignup.SUCCESS_TITLE')
+        this.message = this.$t('KVerifySignup.SUCCESS_MESSAGE', { email: user.email })
+        this.verified = true
+        this.verifying = false
+      })
+      .catch(error => {
+        this.title = this.$t('KVerifySignup.ERROR_TITLE')
+        const type = _.get(error, 'errors.$className')
+        switch (type) {
+          case 'isNotVerified':
+          case 'nothingToVerify':
+            this.message = this.$t('KVerifySignup.ERROR_MESSAGE_NOTHING_TO_VERIFY')
+            break
+          case 'badParams':
+            this.message = this.$t('KVerifySignup.ERROR_MESSAGE_BAD_PARAMS')
+            break
+          case 'verifyExpired':
+            this.message = this.$t('KVerifySignup.ERROR_MESSAGE_VERIFY_EXPIRED')
+            break
+          default:
+            this.message = this.$t('KVerifySignup.ERROR_MESSAGE_DEFAULT')
+        }
+        this.verified = false
+        this.verifying = false
+      })
   }
 }
 </script>

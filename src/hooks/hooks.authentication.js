@@ -3,10 +3,10 @@ const debug = makeDebug('kalisio:kNotify:authentication:hooks')
 
 export async function verifyGuest (hook) {
   if (hook.type !== 'after') {
-    throw new Error(`The 'verifyGuest' hook should only be used as a 'after' hook.`)
+    throw new Error('The \'verifyGuest\' hook should only be used as a \'after\' hook.')
   }
-  let app = hook.app
-  let user = hook.params.user
+  const app = hook.app
+  const user = hook.params.user
   debug('verifyGuest hook called on ', user._id)
 
   // Check whether the user has been inivted. If not, nothing to do
@@ -23,7 +23,7 @@ export async function verifyGuest (hook) {
 
   // The user is a guest and need to be verified
   debug('Verifying logged guest')
-  let userService = app.getService('users')
+  const userService = app.getService('users')
   await userService.patch(user._id, { isVerified: true })
 
   return hook
@@ -31,10 +31,10 @@ export async function verifyGuest (hook) {
 
 export async function consentGuest (hook) {
   if (hook.type !== 'after') {
-    throw new Error(`The 'consentGuest' hook should only be used as a 'after' hook.`)
+    throw new Error('The \'consentGuest\' hook should only be used as a \'after\' hook.')
   }
-  let app = hook.app
-  let user = hook.params.user
+  const app = hook.app
+  const user = hook.params.user
   debug('consentGuest hook called on ', user._id)
 
   // Check whether the user has been invited. If not, nothing to do
@@ -51,7 +51,7 @@ export async function consentGuest (hook) {
 
   // The user is a guest and need to be verified
   debug('Consenting logged guest')
-  let userService = app.getService('users')
+  const userService = app.getService('users')
   await userService.patch(user._id, { consentTerms: true, expireAt: null })
 
   return hook

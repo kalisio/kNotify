@@ -3,13 +3,13 @@ import { populatePushObject } from '../../hooks'
 
 module.exports = {
   before: {
-    all: [ disallow('external') ],
+    all: [disallow('external')],
     find: [],
     get: [],
-    create: [ populatePushObject ],
+    create: [populatePushObject],
     update: [],
     patch: [],
-    remove: [ populatePushObject ]
+    remove: [populatePushObject]
   },
 
   after: {

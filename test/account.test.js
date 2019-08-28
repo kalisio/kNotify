@@ -28,12 +28,12 @@ describe('kNotify:account', () => {
     expect(userService).toExist()
     userService.hooks({
       before: {
-        create: [ hooks.addVerification ],
-        remove: [ hooks.unregisterDevices ]
+        create: [hooks.addVerification],
+        remove: [hooks.unregisterDevices]
       },
 
       after: {
-        create: [ hooks.sendVerificationEmail, hooks.removeVerification ]
+        create: [hooks.sendVerificationEmail, hooks.removeVerification]
       }
     })
     app.configure(notify)
@@ -46,7 +46,7 @@ describe('kNotify:account', () => {
     server.once('listening', _ => done())
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('setup access to gmail', async () => {
     const gmailApiConfig = app.get('gmailApi')
@@ -54,7 +54,7 @@ describe('kNotify:account', () => {
     gmailClient = await createGmailClient(gmailApiConfig)
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('creates a user', () => {
     return userService.create({
@@ -62,15 +62,15 @@ describe('kNotify:account', () => {
       password: 'test-password',
       name: 'test-user'
     })
-    .then(user => {
-      userObject = user
-      expect(userObject.isVerified).toExist()
-      expect(userObject.isVerified).beFalse()
-      expect(userObject.verifyToken).toExist()
-    })
+      .then(user => {
+        userObject = user
+        expect(userObject.isVerified).toExist()
+        expect(userObject.isVerified).beFalse()
+        expect(userObject.verifyToken).toExist()
+      })
   })
   // Let enough time to process
-  .timeout(10000)
+    .timeout(10000)
 
   it('check signup verification email', (done) => {
     // Add some delay to wait for email reception
@@ -79,20 +79,20 @@ describe('kNotify:account', () => {
     }, 10000)
   })
   // Let enough time to process
-  .timeout(15000)
+    .timeout(15000)
 
   it('verify user signup', () => {
     return accountService.create({
       action: 'verifySignupLong',
       value: userObject.verifyToken
     })
-    .then(user => {
-      userObject = user
-      expect(userObject.isVerified).beTrue()
-    })
+      .then(user => {
+        userObject = user
+        expect(userObject.isVerified).beTrue()
+      })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('check signup verified email', (done) => {
     // Add some delay to wait for email reception
@@ -101,25 +101,25 @@ describe('kNotify:account', () => {
     }, 10000)
   })
   // Let enough time to process
-  .timeout(15000)
+    .timeout(15000)
 
   it('ask password reset for a user', () => {
     return accountService.create({
       action: 'sendResetPwd',
       value: { email: userObject.email }
     })
-    .then(user => {
+      .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailUser } })
-    })
-    .then(users => {
-      expect(users.data.length > 0).beTrue()
-      userObject = users.data[0]
-      expect(userObject.resetToken).toExist()
-    })
+        return userService.find({ query: { email: gmailUser } })
+      })
+      .then(users => {
+        expect(users.data.length > 0).beTrue()
+        userObject = users.data[0]
+        expect(userObject.resetToken).toExist()
+      })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('check reset password request email', (done) => {
     // Add some delay to wait for email reception
@@ -140,7 +140,7 @@ describe('kNotify:account', () => {
     }, 10000)
   })
   // Let enough time to process
-  .timeout(15000)
+    .timeout(15000)
 
   it('check password policy on user password reset', (done) => {
     accountService.create({
@@ -150,12 +150,12 @@ describe('kNotify:account', () => {
         password: '1234'
       }
     })
-    .catch(error => {
-      expect(error).toExist()
-      expect(error.name).to.equal('BadRequest')
-      expect(error.data.translation.params.failedRules.length > 0).beTrue()
-      done()
-    })
+      .catch(error => {
+        expect(error).toExist()
+        expect(error.name).to.equal('BadRequest')
+        expect(error.data.translation.params.failedRules.length > 0).beTrue()
+        done()
+      })
   })
 
   it('reset user password', () => {
@@ -166,18 +166,18 @@ describe('kNotify:account', () => {
         password: 'reset-password'
       }
     })
-    .then(user => {
+      .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailUser } })
-    })
-    .then(users => {
-      expect(users.data.length > 0).beTrue()
-      userObject = users.data[0]
-      expect(userObject.resetToken).beNull()
-    })
+        return userService.find({ query: { email: gmailUser } })
+      })
+      .then(users => {
+        expect(users.data.length > 0).beTrue()
+        userObject = users.data[0]
+        expect(userObject.resetToken).beNull()
+      })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('check reset password email', (done) => {
     // Add some delay to wait for email reception
@@ -186,15 +186,15 @@ describe('kNotify:account', () => {
     }, 10000)
   })
   // Let enough time to process
-  .timeout(15000)
+    .timeout(15000)
 
   it('authenticates a user with reset password', () => {
     return request
-    .post(`${baseUrl}/authentication`)
-    .send({ email: userObject.email, password: 'reset-password', strategy: 'local' })
-    .then(response => {
-      expect(response.body.accessToken).toExist()
-    })
+      .post(`${baseUrl}/authentication`)
+      .send({ email: userObject.email, password: 'reset-password', strategy: 'local' })
+      .then(response => {
+        expect(response.body.accessToken).toExist()
+      })
   })
 
   it('check password policy on user password change', (done) => {
@@ -206,12 +206,12 @@ describe('kNotify:account', () => {
         password: '1234'
       }
     })
-    .catch(error => {
-      expect(error).toExist()
-      expect(error.name).to.equal('BadRequest')
-      expect(error.data.translation.params.failedRules.length > 0).beTrue()
-      done()
-    })
+      .catch(error => {
+        expect(error).toExist()
+        expect(error.name).to.equal('BadRequest')
+        expect(error.data.translation.params.failedRules.length > 0).beTrue()
+        done()
+      })
   })
 
   it('change user password', () => {
@@ -223,18 +223,18 @@ describe('kNotify:account', () => {
         password: 'changed-password'
       }
     })
-    .then(user => {
+      .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailUser } })
-    })
-    .then(users => {
-      expect(users.data.length > 0).beTrue()
-      userObject = users.data[0]
-      expect(userObject.resetToken).beNull()
-    })
+        return userService.find({ query: { email: gmailUser } })
+      })
+      .then(users => {
+        expect(users.data.length > 0).beTrue()
+        userObject = users.data[0]
+        expect(userObject.resetToken).beNull()
+      })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('check changed password email', (done) => {
     // Add some delay to wait for email reception
@@ -243,15 +243,15 @@ describe('kNotify:account', () => {
     }, 10000)
   })
   // Let enough time to process
-  .timeout(15000)
+    .timeout(15000)
 
   it('authenticates a user with changed password', () => {
     return request
-    .post(`${baseUrl}/authentication`)
-    .send({ email: userObject.email, password: 'changed-password', strategy: 'local' })
-    .then(response => {
-      expect(response.body.accessToken).toExist()
-    })
+      .post(`${baseUrl}/authentication`)
+      .send({ email: userObject.email, password: 'changed-password', strategy: 'local' })
+      .then(response => {
+        expect(response.body.accessToken).toExist()
+      })
   })
 
   it('ask user identity change', () => {
@@ -263,20 +263,20 @@ describe('kNotify:account', () => {
         changes: { email: gmailUser.replace('com', 'xyz') }
       }
     })
-    .then(user => {
+      .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailUser } })
-    })
-    .then(users => {
-      expect(users.data.length > 0).beTrue()
-      userObject = users.data[0]
-      expect(userObject.verifyToken).toExist()
-      expect(userObject.verifyChanges).toExist()
-      expect(userObject.verifyChanges.email).toExist()
-    })
+        return userService.find({ query: { email: gmailUser } })
+      })
+      .then(users => {
+        expect(users.data.length > 0).beTrue()
+        userObject = users.data[0]
+        expect(userObject.verifyToken).toExist()
+        expect(userObject.verifyChanges).toExist()
+        expect(userObject.verifyChanges.email).toExist()
+      })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('check identity change email', (done) => {
     // Add some delay to wait for email reception
@@ -285,44 +285,45 @@ describe('kNotify:account', () => {
     }, 15000)
   })
   // Let enough time to process
-  .timeout(20000)
+    .timeout(20000)
 
   it('verify user changes', () => {
     return accountService.create({
       action: 'verifySignupLong',
       value: userObject.verifyToken
     })
-    .then(user => {
+      .then(user => {
       // Because the account service filters for client hidden security attributes we need to fetch the user manually
-      return userService.find({ query: { email: gmailUser.replace('com', 'xyz') } })
-    })
-    .then(users => {
-      expect(users.data.length > 0).beTrue()
-      userObject = users.data[0]
-      expect(userObject.email).to.equal(gmailUser.replace('com', 'xyz'))
-    })
+        return userService.find({ query: { email: gmailUser.replace('com', 'xyz') } })
+      })
+      .then(users => {
+        expect(users.data.length > 0).beTrue()
+        userObject = users.data[0]
+        expect(userObject.email).to.equal(gmailUser.replace('com', 'xyz'))
+      })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('authenticates a user with changed identity', () => {
     return request
-    .post(`${baseUrl}/authentication`)
-    .send({ email: userObject.email, password: 'changed-password', strategy: 'local' })
-    .then(response => {
-      expect(response.body.accessToken).toExist()
-    })
+      .post(`${baseUrl}/authentication`)
+      .send({ email: userObject.email, password: 'changed-password', strategy: 'local' })
+      .then(response => {
+        expect(response.body.accessToken).toExist()
+      })
   })
 
   it('removes user', () => {
     return userService.remove(userObject._id, { user: userObject })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   // Cleanup
   after(async () => {
     if (server) await server.close()
-    app.db.instance.dropDatabase()
+    await app.db.instance.dropDatabase()
+    await app.db.disconnect()
   })
 })

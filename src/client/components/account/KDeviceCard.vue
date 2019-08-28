@@ -31,7 +31,7 @@ export default {
       const platform = this.item.platform.toLowerCase()
       return (platform.includes('windows') ? 'fa-windows'
         : (platform.includes('android') ? 'fa-android'
-        : (platform.includes('ios') ? 'fa-apple' : 'fa-mobile-alt')))
+          : (platform.includes('ios') ? 'fa-apple' : 'fa-mobile-alt')))
     },
     platform () {
       return _.capitalize(this.item.platform.toLowerCase())
@@ -72,7 +72,7 @@ export default {
           label: this.$t('CANCEL')
         }
       }).onOk(() => {
-        let devicesService = this.$api.getService('devices')
+        const devicesService = this.$api.getService('devices')
         devicesService.remove(device.registrationId)
       })
     }

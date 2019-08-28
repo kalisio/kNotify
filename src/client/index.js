@@ -1,6 +1,8 @@
 import logger from 'loglevel'
 import { Platform } from 'quasar'
 import { Store, utils as kCoreUtils } from '@kalisio/kdk-core/client'
+import * as mixins from './mixins'
+import * as hooks from './hooks'
 
 // We faced a bug in babel so that transform-runtime with export * from 'x' generates import statements in transpiled code
 // Tracked here : https://github.com/babel/babel/issues/2877
@@ -10,8 +12,8 @@ import { Store, utils as kCoreUtils } from '@kalisio/kdk-core/client'
 // export * from './components'
 
 export * from '../common'
-export * as mixins from './mixins'
-export * as hooks from './hooks'
+export { mixins }
+export { hooks }
 
 export default function init () {
   const api = this
@@ -60,7 +62,7 @@ export default function init () {
       return
     }
 
-    let notifier = window.PushNotification.init({
+    const notifier = window.PushNotification.init({
       android: { vibrate: true, sound: true, forceShow: true },
       ios: { alert: true, badge: true, sound: true },
       windows: { }
@@ -74,9 +76,9 @@ export default function init () {
       if (user && window.device && window.device.registrationId) {
         const devicesService = api.getService('devices')
         devicesService.update(window.device.registrationId, window.device)
-        .then(device => {
-          logger.debug(`device ${device.uuid} updated with the id ${device.registrationId}`)
-        })
+          .then(device => {
+            logger.debug(`device ${device.uuid} updated with the id ${device.registrationId}`)
+          })
       }
     })
     notifier.on('notification', (data) => {
@@ -99,9 +101,9 @@ export default function init () {
       // Only possible if registration ID already retrieved
       if (window.device && window.device.registrationId) {
         devicesService.update(window.device.registrationId, window.device)
-        .then(device => {
-          logger.debug(`device ${device.uuid} registered with the id ${device.registrationId}`)
-        })
+          .then(device => {
+            logger.debug(`device ${device.uuid} registered with the id ${device.registrationId}`)
+          })
       }
     })
   }, false)

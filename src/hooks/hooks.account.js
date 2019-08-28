@@ -4,13 +4,13 @@ const debug = makeDebug('kalisio:kNotify:account:hooks')
 
 export async function populateAccountUser (hook) {
   if (hook.type !== 'before') {
-    throw new Error(`The 'populateUser' hook should only be used as a 'before' hook.`)
+    throw new Error('The \'populateUser\' hook should only be used as a \'before\' hook.')
   }
-  let app = hook.app
+  const app = hook.app
   const data = hook.data
   // Check whether the user has been already populated.
   if (!hook.params.user) {
-    let userService = app.getService('users')
+    const userService = app.getService('users')
     const query = _.get(data, 'value.user')
     const token = _.get(data, 'value.token')
     if (query) {

@@ -48,7 +48,7 @@ export default {
   },
   computed: {
     textClass () {
-      let classObject = {}
+      const classObject = {}
       if (!this.applying) {
         classObject['text-positive'] = this.applied
         classObject['text-negative'] = !this.applied
@@ -77,32 +77,32 @@ export default {
     this.title = this.$t('KChangeIdentity.VERIFICATION_TITLE')
     this.message = this.$t('KChangeIdentity.VERIFICATION_MESSAGE')
     this.verifySignup(this.$route.params.token)
-    .then(user => {
-      this.title = this.$t('KChangeIdentity.SUCCESS_TITLE')
-      this.message = this.$t('KChangeIdentity.SUCCESS_MESSAGE', {email: user.email})
-      this.applied = true
-      this.applying = false
-    })
-    .catch(error => {
-      this.title = this.$t('KChangeIdentity.ERROR_TITLE')
-      const type = _.get(error, 'errors.$className')
-      switch (type) {
-        case 'isNotVerified':
-        case 'nothingToVerify':
-          this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_ALREADY_APPLIED')
-          break
-        case 'badParams':
-          this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_BAD_PARAMS')
-          break
-        case 'verifyExpired':
-          this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_VERIFY_EXPIRED')
-          break
-        default:
-          this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_DEFAULT')
-      }
-      this.applied = false
-      this.applying = false
-    })
+      .then(user => {
+        this.title = this.$t('KChangeIdentity.SUCCESS_TITLE')
+        this.message = this.$t('KChangeIdentity.SUCCESS_MESSAGE', { email: user.email })
+        this.applied = true
+        this.applying = false
+      })
+      .catch(error => {
+        this.title = this.$t('KChangeIdentity.ERROR_TITLE')
+        const type = _.get(error, 'errors.$className')
+        switch (type) {
+          case 'isNotVerified':
+          case 'nothingToVerify':
+            this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_ALREADY_APPLIED')
+            break
+          case 'badParams':
+            this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_BAD_PARAMS')
+            break
+          case 'verifyExpired':
+            this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_VERIFY_EXPIRED')
+            break
+          default:
+            this.message = this.$t('KChangeIdentity.ERROR_MESSAGE_DEFAULT')
+        }
+        this.applied = false
+        this.applying = false
+      })
   }
 }
 </script>

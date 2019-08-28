@@ -49,42 +49,42 @@ export default {
       success: false,
       changed: false,
       schema: {
-        '$schema': 'http://json-schema.org/draft-06/schema#',
-        '$id': 'http://kalisio.xyz/schemas/change-password.json#',
-        'title': 'Change Password form',
-        'type': 'object',
-        'properties': {
-          'oldPassword': {
-            'type': 'string',
-            'field': {
-              'component': 'form/KPasswordField',
-              'helper': 'KChangePassword.OLD_PASSWORD_FIELD_HELPER'
+        $schema: 'http://json-schema.org/draft-06/schema#',
+        $id: 'http://kalisio.xyz/schemas/change-password.json#',
+        title: 'Change Password form',
+        type: 'object',
+        properties: {
+          oldPassword: {
+            type: 'string',
+            field: {
+              component: 'form/KPasswordField',
+              helper: 'KChangePassword.OLD_PASSWORD_FIELD_HELPER'
             }
           },
-          'password': {
-            'type': 'string',
-            'field': {
-              'component': 'form/KPasswordField',
-              'helper': 'KChangePassword.PASSWORD_FIELD_HELPER'
+          password: {
+            type: 'string',
+            field: {
+              component: 'form/KPasswordField',
+              helper: 'KChangePassword.PASSWORD_FIELD_HELPER'
             }
           },
-          'confirmPassword': {
-            'const': {
-              '$data': '1/password'
+          confirmPassword: {
+            const: {
+              $data: '1/password'
             },
-            'field': {
-              'component': 'form/KPasswordField',
-              'helper': 'KChangePassword.CONFIRM_PASSWORD_FIELD_HELPER'
+            field: {
+              component: 'form/KPasswordField',
+              helper: 'KChangePassword.CONFIRM_PASSWORD_FIELD_HELPER'
             }
           }
         },
-        'required': ['oldPassword', 'password']
+        required: ['oldPassword', 'password']
       }
     }
   },
   computed: {
     textClass () {
-      let classObject = {}
+      const classObject = {}
       if (this.changed) {
         classObject['text-positive'] = this.success
         classObject['text-negative'] = !this.success
@@ -95,27 +95,27 @@ export default {
   mixins: [mixins.account],
   methods: {
     onChange () {
-      let result = this.$refs.form.validate()
+      const result = this.$refs.form.validate()
       if (result.isValid) {
         this.changePassword(this.$store.get('user.email'), result.values.oldPassword, result.values.password)
-        .then(() => {
-          this.message = this.$t('KChangePassword.SUCCESS_MESSAGE')
-          this.changed = true
-          this.success = true
-          done()
-        })
-        .catch(error => {
-          const type = _.get(error, 'errors.$className')
-          switch (type) {
-            case 'badParams':
-              this.message = this.$t('KChangePassword.ERROR_MESSAGE_BAD_PARAMS')
-              break
-            default:
-              this.message = this.$t('KChangePassword.ERROR_MESSAGE_DEFAULT')
-          }
-          this.changed = true
-          this.success = false
-        })
+          .then(() => {
+            this.message = this.$t('KChangePassword.SUCCESS_MESSAGE')
+            this.changed = true
+            this.success = true
+            done()
+          })
+          .catch(error => {
+            const type = _.get(error, 'errors.$className')
+            switch (type) {
+              case 'badParams':
+                this.message = this.$t('KChangePassword.ERROR_MESSAGE_BAD_PARAMS')
+                break
+              default:
+                this.message = this.$t('KChangePassword.ERROR_MESSAGE_DEFAULT')
+            }
+            this.changed = true
+            this.success = false
+          })
       }
     }
   },

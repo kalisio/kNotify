@@ -6,7 +6,7 @@ const debug = makeDebug('kalisio:kNotify:pusher:hooks')
 
 export function populatePushObject (hook) {
   if (hook.type !== 'before') {
-    throw new Error(`The 'populatePushObject' hook should only be used as a 'before' hook.`)
+    throw new Error('The \'populatePushObject\' hook should only be used as a \'before\' hook.')
   }
 
   // This hook is only for some of the operations
@@ -23,10 +23,10 @@ export function populatePushObject (hook) {
 
 export async function createTopic (hook) {
   if (hook.type !== 'after') {
-    throw new Error(`The 'createTopic' hook should only be used as a 'before' hook.`)
+    throw new Error('The \'createTopic\' hook should only be used as a \'before\' hook.')
   }
 
-  let pusherService = hook.app.getService('pusher')
+  const pusherService = hook.app.getService('pusher')
   hook.result = await pusherService.create(
     { action: 'topic' }, {
       pushObject: hook.result,
@@ -38,10 +38,10 @@ export async function createTopic (hook) {
 
 export async function removeTopic (hook) {
   if (hook.type !== 'after') {
-    throw new Error(`The 'removeTopic' hook should only be used as a 'after' hook.`)
+    throw new Error('The \'removeTopic\' hook should only be used as a \'after\' hook.')
   }
 
-  let pusherService = hook.app.getService('pusher')
+  const pusherService = hook.app.getService('pusher')
   await pusherService.remove(hook.result._id.toString(), {
     query: { action: 'topic' },
     pushObject: hook.result,
@@ -55,7 +55,7 @@ export async function removeTopic (hook) {
 export async function subscribeSubjectsToResourceTopic (hook) {
   if (!hook.params.resource || !hook.params.resource.topics) return Promise.resolve(hook)
 
-  let pusherService = hook.app.getService('pusher')
+  const pusherService = hook.app.getService('pusher')
   const subscriptions = await pusherService.create(
     { action: 'subscriptions' }, {
       pushObject: hook.params.resource,
@@ -69,7 +69,7 @@ export async function subscribeSubjectsToResourceTopic (hook) {
 export async function unsubscribeSubjectsFromResourceTopic (hook) {
   if (!hook.params.resource || !hook.params.resource.topics) return Promise.resolve(hook)
 
-  let pusherService = hook.app.getService('pusher')
+  const pusherService = hook.app.getService('pusher')
   const unsubscriptions = await pusherService.remove(hook.params.resource._id.toString(), {
     query: { action: 'subscriptions' },
     pushObject: hook.params.resource,
@@ -86,7 +86,7 @@ export function updateSubjectSubscriptions (options) {
       return _.isEqual(object1.topics, object2.topics)
     }
 
-    let item = getItems(hook)
+    const item = getItems(hook)
     // Field might be on the service object or subject
     let topics = (options.subjectAsItem
       ? _.get(item, options.field) : _.get(hook.params, 'user.' + options.field))
@@ -97,7 +97,7 @@ export function updateSubjectSubscriptions (options) {
 
     // Service can be contextual, look for context on initiator service
     const itemService = hook.app.getService(options.service, hook.service.context)
-    let pusherService = hook.app.getService('pusher')
+    const pusherService = hook.app.getService('pusher')
     topics = (Array.isArray(topics) ? topics : [topics])
     // Retrieve previous version of the item
     let previousTopics = _.get(hook.params.previousItem, options.field)
@@ -126,12 +126,12 @@ export function updateSubjectSubscriptions (options) {
       }
       debug('Adding topic subscriptions for object ', item, addedTopics, hook.params.user)
       const subscribePromises = addedTopics.map(topic => pusherService.create(
-      { action: 'subscriptions' }, {
-        pushObject: topic,
-        pushObjectService: itemService,
-        users: [(options.subjectAsItem ? item : hook.params.user)]
-      }))
-      const results = await Promise.all([ Promise.all(unsubscribePromises), Promise.all(subscribePromises) ])
+        { action: 'subscriptions' }, {
+          pushObject: topic,
+          pushObjectService: itemService,
+          users: [(options.subjectAsItem ? item : hook.params.user)]
+        }))
+      const results = await Promise.all([Promise.all(unsubscribePromises), Promise.all(subscribePromises)])
       for (let i = 0; i < results[0].length; i++) {
         const unsubscriptions = results[0][i]
         const topic = removedTopics[i]
@@ -159,11 +159,11 @@ export function updateSubjectSubscriptions (options) {
           topics = options.filter('subscribe', topics)
         }
         const subscribePromises = topics.map(topic => pusherService.create(
-        { action: 'subscriptions' }, {
-          pushObject: topic,
-          pushObjectService: itemService,
-          users: [(options.subjectAsItem ? item : hook.params.user)]
-        }))
+          { action: 'subscriptions' }, {
+            pushObject: topic,
+            pushObjectService: itemService,
+            users: [(options.subjectAsItem ? item : hook.params.user)]
+          }))
         const results = await Promise.all(subscribePromises)
         for (let i = 0; i < results.length; i++) {
           const subscriptions = results[i]

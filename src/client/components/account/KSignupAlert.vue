@@ -1,6 +1,6 @@
 <template>
-  <q-dialog 
-    v-model="isVisible" 
+  <q-dialog
+    v-model="isVisible"
     persistent
     full-width
     position="bottom">

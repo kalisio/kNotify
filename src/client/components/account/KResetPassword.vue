@@ -55,7 +55,7 @@ export default {
   },
   computed: {
     textClass () {
-      let classObject = {}
+      const classObject = {}
       if (this.reset) {
         classObject['text-positive'] = this.success
         classObject['text-negative'] = !this.success
@@ -67,57 +67,57 @@ export default {
   methods: {
     getSchema () {
       return {
-        '$schema': 'http://json-schema.org/draft-06/schema#',
-        '$id': 'http://kalisio.xyz/schemas/reset-password.json#',
-        'title': 'Reset Password form',
-        'description': 'Reset password form',
-        'type': 'object',
-        'properties': {
-          'password': {
-            'type': 'string',
-            'field': {
-              'component': 'form/KPasswordField',
-              'helper': 'KResetPassword.PASSWORD_FIELD_HELPER'
+        $schema: 'http://json-schema.org/draft-06/schema#',
+        $id: 'http://kalisio.xyz/schemas/reset-password.json#',
+        title: 'Reset Password form',
+        description: 'Reset password form',
+        type: 'object',
+        properties: {
+          password: {
+            type: 'string',
+            field: {
+              component: 'form/KPasswordField',
+              helper: 'KResetPassword.PASSWORD_FIELD_HELPER'
             }
           },
-          'confirmPassword': {
-            'const': {
-              '$data': '1/password'
+          confirmPassword: {
+            const: {
+              $data: '1/password'
             },
-            'field': {
-              'component': 'form/KPasswordField',
-              'helper': 'KResetPassword.CONFIRM_PASSWORD_FIELD_HELPER'
+            field: {
+              component: 'form/KPasswordField',
+              helper: 'KResetPassword.CONFIRM_PASSWORD_FIELD_HELPER'
             }
           }
         },
-        'required': ['password']
+        required: ['password']
       }
     },
     onReset () {
-      let result = this.$refs.form.validate()
+      const result = this.$refs.form.validate()
       if (result.isValid) {
         this.resetPassword(this.$route.params.token, result.values.password)
-        .then(() => {
-          this.message = this.$t('KResetPassword.SUCCESS_MESSAGE')
-          this.reset = true
-          this.success = true
-          done()
-        })
-        .catch(error => {
-          const type = _.get(error, 'errors.$className')
-          switch (type) {
-            case 'badParams':
-              this.message = this.$t('KResetPassword.ERROR_MESSAGE_BAD_PARAMS')
-              break
-            case 'verifyExpired':
-              this.message = this.$t('KResetPassword.ERROR_MESSAGE_VERIFY_EXPIRED')
-              break
-            default:
-              this.message = this.$t('KResetPassword.ERROR_MESSAGE_DEFAULT')
-          }
-          this.reset = true
-          this.success = false
-        })
+          .then(() => {
+            this.message = this.$t('KResetPassword.SUCCESS_MESSAGE')
+            this.reset = true
+            this.success = true
+            done()
+          })
+          .catch(error => {
+            const type = _.get(error, 'errors.$className')
+            switch (type) {
+              case 'badParams':
+                this.message = this.$t('KResetPassword.ERROR_MESSAGE_BAD_PARAMS')
+                break
+              case 'verifyExpired':
+                this.message = this.$t('KResetPassword.ERROR_MESSAGE_VERIFY_EXPIRED')
+                break
+              default:
+                this.message = this.$t('KResetPassword.ERROR_MESSAGE_DEFAULT')
+            }
+            this.reset = true
+            this.success = false
+          })
       }
     }
   },

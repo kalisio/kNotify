@@ -43,27 +43,27 @@ export default {
       success: false,
       sent: false,
       schema: {
-        '$schema': 'http://json-schema.org/draft-06/schema#',
-        '$id': 'http://kalisio.xyz/schemas/resend-verification-email#',
-        'title': 'Resend verification email form',
-        'type': 'object',
-        'properties': {
-          'email': {
-            'type': 'string',
-            'format': 'email',
-            'field': {
-              'component': 'form/KEmailField',
-              'helper': 'KResendVerifySignup.EMAIL_FIELD_HELPER'
+        $schema: 'http://json-schema.org/draft-06/schema#',
+        $id: 'http://kalisio.xyz/schemas/resend-verification-email#',
+        title: 'Resend verification email form',
+        type: 'object',
+        properties: {
+          email: {
+            type: 'string',
+            format: 'email',
+            field: {
+              component: 'form/KEmailField',
+              helper: 'KResendVerifySignup.EMAIL_FIELD_HELPER'
             }
           }
         },
-        'required': ['email']
+        required: ['email']
       }
     }
   },
   computed: {
     textClass () {
-      let classObject = {}
+      const classObject = {}
       if (this.sent) {
         classObject['text-positive'] = this.success
         classObject['text-negative'] = !this.success
@@ -74,28 +74,28 @@ export default {
   mixins: [mixins.account],
   methods: {
     onSend () {
-      let result = this.$refs.form.validate()
+      const result = this.$refs.form.validate()
       if (result.isValid) {
         this.resendVerifySignup(result.values.email)
-        .then(() => {
-          this.message = this.$t('KResendVerifySignup.SUCCESS_MESSAGE')
-          this.sent = true
-          this.success = true
-          done()
-        })
-        .catch(error => {
-          this.sent = true
-          this.success = false
-          const type = _.get(error, 'errors.$className')
-          switch (type) {
-            case 'isNotVerified':
-            case 'nothingToVerify':
-              this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_NOTHING_TO_VERIFY')
-              break
-            default:
-              this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_DEFAULT')
-          }
-        })
+          .then(() => {
+            this.message = this.$t('KResendVerifySignup.SUCCESS_MESSAGE')
+            this.sent = true
+            this.success = true
+            done()
+          })
+          .catch(error => {
+            this.sent = true
+            this.success = false
+            const type = _.get(error, 'errors.$className')
+            switch (type) {
+              case 'isNotVerified':
+              case 'nothingToVerify':
+                this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_NOTHING_TO_VERIFY')
+                break
+              default:
+                this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_DEFAULT')
+            }
+          })
       }
     }
   },

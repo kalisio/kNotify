@@ -14,7 +14,7 @@ export default function (name, app, options) {
     const userService = app.getService('users')
     // Using OAuth2 providers disallow some operations
     let identityProvider
-    for (let provider of app.authenticationProviders) {
+    for (const provider of app.authenticationProviders) {
       if (user[provider + 'Id']) identityProvider = _.startCase(provider)
     }
     // Password/Identity change is already filtered by the fact the user does not have an old password to be provided
@@ -32,8 +32,8 @@ export default function (name, app, options) {
     }
 
     const mailerService = app.getService('mailer')
-    let domainPath = app.get('domain') + '/#/'
-    let email = {
+    const domainPath = app.get('domain') + '/#/'
+    const email = {
       from: mailerService.options.auth.user,
       // When changing email send to the new one so that it can be verified
       to: (type === 'identityChange' ? user.verifyChanges.email : user.email),

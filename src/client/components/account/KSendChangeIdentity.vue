@@ -42,34 +42,34 @@ export default {
       success: false,
       sent: false,
       schema: {
-        '$schema': 'http://json-schema.org/draft-06/schema#',
-        '$id': 'http://kalisio.xyz/schemas/send-change-identity#',
-        'title': 'Send change identity form',
-        'type': 'object',
-        'properties': {
-          'password': {
-            'type': 'string',
-            'field': {
-              'component': 'form/KPasswordField',
-              'helper': 'KSendChangeIdentity.PASSWORD_FIELD_HELPER'
+        $schema: 'http://json-schema.org/draft-06/schema#',
+        $id: 'http://kalisio.xyz/schemas/send-change-identity#',
+        title: 'Send change identity form',
+        type: 'object',
+        properties: {
+          password: {
+            type: 'string',
+            field: {
+              component: 'form/KPasswordField',
+              helper: 'KSendChangeIdentity.PASSWORD_FIELD_HELPER'
             }
           },
-          'email': {
-            'type': 'string',
-            'format': 'email',
-            'field': {
-              'component': 'form/KEmailField',
-              'helper': 'KSendChangeIdentity.EMAIL_FIELD_HELPER'
+          email: {
+            type: 'string',
+            format: 'email',
+            field: {
+              component: 'form/KEmailField',
+              helper: 'KSendChangeIdentity.EMAIL_FIELD_HELPER'
             }
           }
         },
-        'required': ['email', 'password']
+        required: ['email', 'password']
       }
     }
   },
   computed: {
     textClass () {
-      let classObject = {}
+      const classObject = {}
       if (this.sent) {
         classObject['text-positive'] = this.success
         classObject['text-negative'] = !this.success
@@ -80,28 +80,28 @@ export default {
   mixins: [mixins.account],
   methods: {
     onSend () {
-      let result = this.$refs.form.validate()
+      const result = this.$refs.form.validate()
       if (result.isValid) {
         this.sendChangeIdentity(this.$store.get('user.email'), result.values.email, result.values.password)
-        .then(() => {
-          this.message = this.$t('KSendChangeIdentity.SUCCESS_MESSAGE')
-          this.sent = true
-          this.success = true
-          done()
-        })
-        .catch(error => {
-          const type = _.get(error, 'errors.$className')
-          const password = _.get(error, 'errors.password')
-          switch (type) {
-            case 'badParams':
-              this.message = this.$t(password ? 'KSendChangeIdentity.ERROR_MESSAGE_BAD_PASSWORD' : 'KSendChangeIdentity.ERROR_MESSAGE_BAD_PARAMS')
-              break
-            default:
-              this.message = this.$t('KSendChangeIdentity.ERROR_MESSAGE_DEFAULT')
-          }
-          this.sent = true
-          this.success = false
-        })
+          .then(() => {
+            this.message = this.$t('KSendChangeIdentity.SUCCESS_MESSAGE')
+            this.sent = true
+            this.success = true
+            done()
+          })
+          .catch(error => {
+            const type = _.get(error, 'errors.$className')
+            const password = _.get(error, 'errors.password')
+            switch (type) {
+              case 'badParams':
+                this.message = this.$t(password ? 'KSendChangeIdentity.ERROR_MESSAGE_BAD_PASSWORD' : 'KSendChangeIdentity.ERROR_MESSAGE_BAD_PARAMS')
+                break
+              default:
+                this.message = this.$t('KSendChangeIdentity.ERROR_MESSAGE_DEFAULT')
+            }
+            this.sent = true
+            this.success = false
+          })
       }
     }
   },

@@ -40,7 +40,7 @@ describe('kNotify:notifications', () => {
     expect(userService).toExist()
     userService.hooks({
       before: {
-        remove: [ hooks.unregisterDevices ]
+        remove: [hooks.unregisterDevices]
       }
     })
     authenticationService = app.getService('authentication')
@@ -49,7 +49,7 @@ describe('kNotify:notifications', () => {
     devicesService = app.getService('devices')
     devicesService.hooks({
       after: {
-        create: [ hooks.sendNewDeviceEmail ]
+        create: [hooks.sendNewDeviceEmail]
       }
     })
     expect(devicesService).toExist()
@@ -62,7 +62,7 @@ describe('kNotify:notifications', () => {
     server.once('listening', _ => done())
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('setup access to SNS', () => {
     // For now we only test 1 platform, should be sufficient due to SNS facade
@@ -76,7 +76,7 @@ describe('kNotify:notifications', () => {
     gmailClient = await createGmailClient(gmailApiConfig)
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('creates a publisher', () => {
     return userService.create({
@@ -84,12 +84,12 @@ describe('kNotify:notifications', () => {
       password: 'publisher-password',
       name: 'publisher-user'
     }, { noVerificationEmail: true })
-    .then(user => {
-      publisherObject = user
-    })
+      .then(user => {
+        publisherObject = user
+      })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('creates a subscriber', () => {
     return userService.create({
@@ -97,55 +97,55 @@ describe('kNotify:notifications', () => {
       password: 'subscriber-password',
       name: 'subscriber-user'
     }, { noVerificationEmail: true })
-    .then(user => {
-      subscriberObject = user
-    })
+      .then(user => {
+        subscriberObject = user
+      })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('a subscriber should be able to register its devices', () => {
-    let operation = request
-    .post(`${baseUrl}/authentication`)
-    .send({ email: gmailUser, password: 'subscriber-password', strategy: 'local' })
-    .then(response => {
-      return userService.find({ query: { email: gmailUser } })
-    })
-    .then(users => {
-      expect(users.data.length > 0).beTrue()
-      subscriberObject = users.data[0]
-      return devicesService.update(device.registrationId, device, { user: subscriberObject })
-    })
-    .then(device => {
-      return userService.get(subscriberObject._id)
-    })
-    .then(user => {
+    const operation = request
+      .post(`${baseUrl}/authentication`)
+      .send({ email: gmailUser, password: 'subscriber-password', strategy: 'local' })
+      .then(response => {
+        return userService.find({ query: { email: gmailUser } })
+      })
+      .then(users => {
+        expect(users.data.length > 0).beTrue()
+        subscriberObject = users.data[0]
+        return devicesService.update(device.registrationId, device, { user: subscriberObject })
+      })
+      .then(device => {
+        return userService.get(subscriberObject._id)
+      })
+      .then(user => {
       // Check registered device
-      subscriberObject = user
-      expect(subscriberObject.devices).toExist()
-      expect(subscriberObject.devices.length === 1).beTrue()
-      expect(subscriberObject.devices[0].uuid).to.equal(device.uuid)
-      expect(subscriberObject.devices[0].registrationId).to.equal(device.registrationId)
-      expect(subscriberObject.devices[0].platform).to.equal(device.platform)
-      expect(subscriberObject.devices[0].arn).toExist()
-      expect(subscriberObject.devices[0].lastActivity).toExist()
-      return devicesService.update(otherDevice.registrationId, otherDevice, { user: subscriberObject })
-    })
-    .then(device => {
-      return userService.get(subscriberObject._id)
-    })
-    .then(user => {
+        subscriberObject = user
+        expect(subscriberObject.devices).toExist()
+        expect(subscriberObject.devices.length === 1).beTrue()
+        expect(subscriberObject.devices[0].uuid).to.equal(device.uuid)
+        expect(subscriberObject.devices[0].registrationId).to.equal(device.registrationId)
+        expect(subscriberObject.devices[0].platform).to.equal(device.platform)
+        expect(subscriberObject.devices[0].arn).toExist()
+        expect(subscriberObject.devices[0].lastActivity).toExist()
+        return devicesService.update(otherDevice.registrationId, otherDevice, { user: subscriberObject })
+      })
+      .then(device => {
+        return userService.get(subscriberObject._id)
+      })
+      .then(user => {
       // Check registered device
-      subscriberObject = user
-      expect(subscriberObject.devices).toExist()
-      expect(subscriberObject.devices.length === 2).beTrue()
-      expect(subscriberObject.devices[1].uuid).to.equal(otherDevice.uuid)
-      expect(subscriberObject.devices[1].registrationId).to.equal(otherDevice.registrationId)
-      expect(subscriberObject.devices[1].platform).to.equal(otherDevice.platform)
-      expect(subscriberObject.devices[1].arn).toExist()
-      expect(subscriberObject.devices[1].lastActivity).toExist()
-    })
-    let events = new Promise((resolve, reject) => {
+        subscriberObject = user
+        expect(subscriberObject.devices).toExist()
+        expect(subscriberObject.devices.length === 2).beTrue()
+        expect(subscriberObject.devices[1].uuid).to.equal(otherDevice.uuid)
+        expect(subscriberObject.devices[1].registrationId).to.equal(otherDevice.registrationId)
+        expect(subscriberObject.devices[1].platform).to.equal(otherDevice.platform)
+        expect(subscriberObject.devices[1].arn).toExist()
+        expect(subscriberObject.devices[1].lastActivity).toExist()
+      })
+    const events = new Promise((resolve, reject) => {
       let count = 0
       sns.on('userAdded', (endpointArn, registrationId) => {
         expect(registrationId).to.satisfy(id => (id === device.registrationId) || (id === otherDevice.registrationId))
@@ -156,7 +156,7 @@ describe('kNotify:notifications', () => {
     return Promise.all([operation, events])
   })
   // Let enough time to process
-  .timeout(10000)
+    .timeout(10000)
 
   it('check new device emails', (done) => {
     // Add some delay to wait for email reception
@@ -168,16 +168,16 @@ describe('kNotify:notifications', () => {
     }, 10000)
   })
   // Let enough time to process
-  .timeout(15000)
+    .timeout(15000)
 
   it('publishes a message on the subscriber devices', () => {
-    let operation = pusherService.create({
+    const operation = pusherService.create({
       action: 'message',
       pushObject: subscriberObject._id.toString(),
       pushObjectService: 'users',
       message: 'test-message'
     })
-    let events = new Promise((resolve, reject) => {
+    const events = new Promise((resolve, reject) => {
       let count = 0
       sns.on('messageSent', (endpointArn, messageId) => {
         expect(endpointArn).to.satisfy(arn => (arn === subscriberObject.devices[0].arn) || (arn === subscriberObject.devices[1].arn))
@@ -188,7 +188,7 @@ describe('kNotify:notifications', () => {
     return Promise.all([operation, events])
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('creates the topic on the publisher object', (done) => {
     pusherService.create({
@@ -199,18 +199,18 @@ describe('kNotify:notifications', () => {
     sns.once('topicCreated', (topicArn, topicName) => {
       // Check for user object update
       userService.find({ query: { email: 'publisher@kalisio.xyz' } })
-      .then(users => {
-        expect(users.data.length > 0).beTrue()
-        publisherObject = users.data[0]
-        expect(publisherObject.topics).toExist()
-        expect(publisherObject.topics[device.platform]).to.equal(topicArn)
-        expect(publisherObject._id.toString()).to.equal(topicName)
-        done()
-      })
+        .then(users => {
+          expect(users.data.length > 0).beTrue()
+          publisherObject = users.data[0]
+          expect(publisherObject.topics).toExist()
+          expect(publisherObject.topics[device.platform]).to.equal(topicArn)
+          expect(publisherObject._id.toString()).to.equal(topicName)
+          done()
+        })
     })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('subscribes a user to the publisher topic', (done) => {
     pusherService.create({
@@ -229,7 +229,7 @@ describe('kNotify:notifications', () => {
     })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('publishes a message on the publisher topic', (done) => {
     pusherService.create({
@@ -244,7 +244,7 @@ describe('kNotify:notifications', () => {
     })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('unsubscribes a user from the publisher topic', (done) => {
     pusherService.remove(publisherObject._id.toString(), {
@@ -260,7 +260,7 @@ describe('kNotify:notifications', () => {
     })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('removes the topic on the publisher object', (done) => {
     pusherService.remove(publisherObject._id.toString(), {
@@ -273,34 +273,34 @@ describe('kNotify:notifications', () => {
       expect(publisherObject.topics[device.platform]).to.equal(topicArn)
       // Check for user object update
       userService.find({ query: { email: 'publisher@kalisio.xyz' } })
-      .then(users => {
-        expect(users.data.length > 0).beTrue()
-        publisherObject = users.data[0]
-        expect(publisherObject.topics).beNull()
-        done()
-      })
+        .then(users => {
+          expect(users.data.length > 0).beTrue()
+          publisherObject = users.data[0]
+          expect(publisherObject.topics).beNull()
+          done()
+        })
     })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('a subscriber should be able to update its device when registration ID changes', () => {
     const previousDevice = Object.assign({}, subscriberObject.devices[0])
-    let operation = devicesService.update(newDevice.registrationId, newDevice, { user: subscriberObject })
-    .then(device => {
-      return userService.get(subscriberObject._id)
-    })
-    .then(user => {
+    const operation = devicesService.update(newDevice.registrationId, newDevice, { user: subscriberObject })
+      .then(device => {
+        return userService.get(subscriberObject._id)
+      })
+      .then(user => {
       // Check updated device
-      subscriberObject = user
-      expect(subscriberObject.devices).toExist()
-      expect(subscriberObject.devices.length === 2).beTrue()
-      expect(subscriberObject.devices[0].uuid).to.equal(newDevice.uuid)
-      expect(subscriberObject.devices[0].registrationId).to.equal(newDevice.registrationId)
-      expect(subscriberObject.devices[0].platform).to.equal(newDevice.platform)
-      expect(subscriberObject.devices[0].arn).toExist()
-    })
-    let event = new Promise((resolve, reject) => {
+        subscriberObject = user
+        expect(subscriberObject.devices).toExist()
+        expect(subscriberObject.devices.length === 2).beTrue()
+        expect(subscriberObject.devices[0].uuid).to.equal(newDevice.uuid)
+        expect(subscriberObject.devices[0].registrationId).to.equal(newDevice.registrationId)
+        expect(subscriberObject.devices[0].platform).to.equal(newDevice.platform)
+        expect(subscriberObject.devices[0].arn).toExist()
+      })
+    const event = new Promise((resolve, reject) => {
       sns.once('attributesUpdated', (endpointArn, attributes) => {
         expect(previousDevice.arn).to.equal(endpointArn)
         expect(attributes.Token).to.equal(newDevice.registrationId)
@@ -310,11 +310,11 @@ describe('kNotify:notifications', () => {
     return Promise.all([operation, event])
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('a subscriber should be able to recover its device when disabled', () => {
     const previousDevice = Object.assign({}, subscriberObject.devices[1])
-    let operation = new Promise((resolve, reject) => {
+    const operation = new Promise((resolve, reject) => {
       sns.deleteUser(previousDevice.arn, (err) => {
         if (err) {
           reject(err)
@@ -322,22 +322,22 @@ describe('kNotify:notifications', () => {
         }
         delete previousDevice.arn
         resolve(devicesService.update(otherDevice.registrationId, otherDevice, { user: subscriberObject })
-        .then(device => {
-          return userService.get(subscriberObject._id)
-        })
-        .then(user => {
+          .then(device => {
+            return userService.get(subscriberObject._id)
+          })
+          .then(user => {
           // Check updated device
-          subscriberObject = user
-          expect(subscriberObject.devices).toExist()
-          expect(subscriberObject.devices.length === 2).beTrue()
-          expect(subscriberObject.devices[1].uuid).to.equal(otherDevice.uuid)
-          expect(subscriberObject.devices[1].registrationId).to.equal(otherDevice.registrationId)
-          expect(subscriberObject.devices[1].platform).to.equal(otherDevice.platform)
-          expect(subscriberObject.devices[1].arn).toExist()
-        }))
+            subscriberObject = user
+            expect(subscriberObject.devices).toExist()
+            expect(subscriberObject.devices.length === 2).beTrue()
+            expect(subscriberObject.devices[1].uuid).to.equal(otherDevice.uuid)
+            expect(subscriberObject.devices[1].registrationId).to.equal(otherDevice.registrationId)
+            expect(subscriberObject.devices[1].platform).to.equal(otherDevice.platform)
+            expect(subscriberObject.devices[1].arn).toExist()
+          }))
       })
     })
-    let event = new Promise((resolve, reject) => {
+    const event = new Promise((resolve, reject) => {
       sns.once('userAdded', (endpointArn, registrationId) => {
         expect(registrationId).to.equal(otherDevice.registrationId)
         expect(endpointArn).not.to.equal(previousDevice.arn)
@@ -347,7 +347,7 @@ describe('kNotify:notifications', () => {
     return Promise.all([operation, event])
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('check recovered device email', (done) => {
     // Add some delay to wait for email reception
@@ -356,25 +356,25 @@ describe('kNotify:notifications', () => {
     }, 10000)
   })
   // Let enough time to process
-  .timeout(15000)
+    .timeout(15000)
 
   it('a subscriber should be able to delete its device', () => {
     const previousDevice = Object.assign({}, subscriberObject.devices[1])
-    let operation = devicesService.remove(otherDevice.registrationId, { user: subscriberObject })
-    .then(device => {
-      return userService.get(subscriberObject._id)
-    })
-    .then(user => {
+    const operation = devicesService.remove(otherDevice.registrationId, { user: subscriberObject })
+      .then(device => {
+        return userService.get(subscriberObject._id)
+      })
+      .then(user => {
       // Check updated device
-      subscriberObject = user
-      expect(subscriberObject.devices).toExist()
-      expect(subscriberObject.devices.length === 1).beTrue()
-      expect(subscriberObject.devices[0].uuid).to.equal(newDevice.uuid)
-      expect(subscriberObject.devices[0].registrationId).to.equal(newDevice.registrationId)
-      expect(subscriberObject.devices[0].platform).to.equal(newDevice.platform)
-      expect(subscriberObject.devices[0].arn).toExist()
-    })
-    let event = new Promise((resolve, reject) => {
+        subscriberObject = user
+        expect(subscriberObject.devices).toExist()
+        expect(subscriberObject.devices.length === 1).beTrue()
+        expect(subscriberObject.devices[0].uuid).to.equal(newDevice.uuid)
+        expect(subscriberObject.devices[0].registrationId).to.equal(newDevice.registrationId)
+        expect(subscriberObject.devices[0].platform).to.equal(newDevice.platform)
+        expect(subscriberObject.devices[0].arn).toExist()
+      })
+    const event = new Promise((resolve, reject) => {
       sns.once('userDeleted', (endpointArn) => {
         expect(endpointArn).to.equal(previousDevice.arn)
         resolve()
@@ -383,7 +383,7 @@ describe('kNotify:notifications', () => {
     return Promise.all([operation, event])
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   it('removes a subscriber should unregister its device', (done) => {
     userService.remove(subscriberObject._id, { user: subscriberObject })
@@ -393,11 +393,12 @@ describe('kNotify:notifications', () => {
     })
   })
   // Let enough time to process
-  .timeout(5000)
+    .timeout(5000)
 
   // Cleanup
   after(async () => {
     if (server) await server.close()
-    app.db.instance.dropDatabase()
+    await app.db.instance.dropDatabase()
+    await app.db.disconnect()
   })
 })
