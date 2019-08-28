@@ -2,7 +2,6 @@ import accountManager from 'feathers-authentication-management'
 import { BadRequest } from '@feathersjs/errors'
 import emails from 'email-templates'
 import path from 'path'
-import logger from 'winston'
 import makeDebug from 'debug'
 import _ from 'lodash'
 
@@ -87,7 +86,7 @@ export default function (name, app, options) {
       return mailerService.create(email)
     } catch (error) {
       debug('Sending email failed', error)
-      logger.error(error)
+      app.logger.error(error)
     }
   }
 

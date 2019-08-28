@@ -1,9 +1,9 @@
 import request from 'superagent'
 import chai, { util, expect } from 'chai'
 import chailint from 'chai-lint'
-import core, { kalisio } from '@kalisio/kdk-core'
+import core, { kalisio, permissions as corePermissions, hooks as coreHooks } from '@kalisio/kdk-core'
 import { createGmailClient } from './utils'
-import notify, { hooks } from '../src'
+import notify, { hooks, permissions } from '../src'
 
 describe('kNotify:account', () => {
   let app, server, port, baseUrl, token,
@@ -12,7 +12,18 @@ describe('kNotify:account', () => {
   before(() => {
     chailint(chai, util)
 
+    // Register all default hooks for authorisation
+    // Default rules for all users
+    corePermissions.defineAbilities.registerHook(corePermissions.defineUserAbilities)
+    // Then rules for notifications
+    corePermissions.defineAbilities.registerHook(permissions.defineUserAbilities)
+
     app = kalisio()
+    // Register authorisation/log hook
+    app.hooks({
+      before: { all: [coreHooks.authorise] },
+      error: { all: coreHooks.log }
+    })
     port = app.get('port')
     baseUrl = `http://localhost:${port}${app.get('apiPath')}`
     return app.db.connect()
@@ -31,7 +42,6 @@ describe('kNotify:account', () => {
         create: [hooks.addVerification],
         remove: [hooks.unregisterDevices]
       },
-
       after: {
         create: [hooks.sendVerificationEmail, hooks.removeVerification]
       }

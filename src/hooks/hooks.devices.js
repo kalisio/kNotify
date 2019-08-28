@@ -1,6 +1,5 @@
 import emails from 'email-templates'
 import path from 'path'
-import logger from 'winston'
 import makeDebug from 'debug'
 
 const debug = makeDebug('kalisio:kNotify:devices:hooks')
@@ -36,7 +35,7 @@ export async function sendNewDeviceEmail (hook) {
     await mailerService.create(email)
   } catch (error) {
     debug('Sending email failed', error)
-    logger.error(error)
+    app.logger.error(error)
   }
 
   return hook
