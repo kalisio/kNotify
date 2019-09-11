@@ -19,7 +19,6 @@ export default function (name, app, options) {
     // Password/Identity change is already filtered by the fact the user does not have an old password to be provided
     if (identityProvider && (type === 'resendVerifySignup')) {
       const userWithPassword = await userService.get(user._id.toString())
-      console.log(userWithPassword)
       if (!userWithPassword.password) {
         return Promise.reject(new BadRequest(`You cannot update your account because it is managed by ${identityProvider}`, {
           translation: {
