@@ -67,7 +67,7 @@ export default function init () {
       ios: { alert: true, badge: true, sound: true },
       windows: { }
     })
-    notifier.on('registration', (data) => {
+    notifier.on('registration', async (data) => {
       logger.debug('Push registrationID changed: ' + data.registrationId)
       // Store the registrationId
       window.device.registrationId = data.registrationId
@@ -75,10 +75,8 @@ export default function init () {
       const user = Store.get('user')
       if (user && window.device && window.device.registrationId) {
         const devicesService = api.getService('devices')
-        devicesService.update(window.device.registrationId, window.device)
-          .then(device => {
-            logger.debug(`device ${device.uuid} updated with the id ${device.registrationId}`)
-          })
+        const device = await devicesService.update(window.device.registrationId, window.device)
+        logger.debug(`device ${device.uuid} updated with the id ${device.registrationId}`)
       }
     })
     notifier.on('notification', (data) => {
@@ -96,14 +94,12 @@ export default function init () {
         timeout: 10000
       })
     })
-    api.on('authenticated', response => {
+    api.on('authenticated', async response => {
       const devicesService = api.getService('devices')
       // Only possible if registration ID already retrieved
       if (window.device && window.device.registrationId) {
-        devicesService.update(window.device.registrationId, window.device)
-          .then(device => {
-            logger.debug(`device ${device.uuid} registered with the id ${device.registrationId}`)
-          })
+        const device = await devicesService.update(window.device.registrationId, window.device)
+        logger.debug(`device ${device.uuid} registered with the id ${device.registrationId}`)
       }
     })
   }, false)

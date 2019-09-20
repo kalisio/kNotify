@@ -1,8 +1,8 @@
-export function checkUnique (hook) {
+export async function checkUnique (hook) {
   const accountService = hook.app.getService('account')
-  return accountService.create({
+  await accountService.create({
     action: 'checkUnique',
     value: { email: hook.data.email }
   })
-    .then(() => hook)
+  return hook
 }

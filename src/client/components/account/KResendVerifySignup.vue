@@ -15,7 +15,7 @@
           </div>
           <div>
             <div class="row justify-around">
-              <q-btn color="primary" loader @click="onSend">
+              <q-btn color="primary" :loading="sending" @click="onSend">
                 {{$t('KResendVerifySignup.ACTION')}}
               </q-btn>
             </div>
@@ -42,6 +42,7 @@ export default {
       message: '',
       success: false,
       sent: false,
+      sending: false,
       schema: {
         $schema: 'http://json-schema.org/draft-06/schema#',
         $id: 'http://kalisio.xyz/schemas/resend-verification-email#',
@@ -73,29 +74,28 @@ export default {
   },
   mixins: [mixins.account],
   methods: {
-    onSend () {
+    async onSend () {
       const result = this.$refs.form.validate()
       if (result.isValid) {
-        this.resendVerifySignup(result.values.email)
-          .then(() => {
-            this.message = this.$t('KResendVerifySignup.SUCCESS_MESSAGE')
-            this.sent = true
-            this.success = true
-            done()
-          })
-          .catch(error => {
-            this.sent = true
-            this.success = false
-            const type = _.get(error, 'errors.$className')
-            switch (type) {
-              case 'isNotVerified':
-              case 'nothingToVerify':
-                this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_NOTHING_TO_VERIFY')
-                break
-              default:
-                this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_DEFAULT')
-            }
-          })
+        try {
+          this.sending = true
+          await this.resendVerifySignup(result.values.email)
+          this.message = this.$t('KResendVerifySignup.SUCCESS_MESSAGE')
+          this.success = true
+        } catch (error) {
+          this.success = false
+          const type = _.get(error, 'errors.$className')
+          switch (type) {
+            case 'isNotVerified':
+            case 'nothingToVerify':
+              this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_NOTHING_TO_VERIFY')
+              break
+            default:
+              this.message = this.$t('KResendVerifySignup.ERROR_MESSAGE_DEFAULT')
+          }
+        }
+        this.sent = true
+        this.sending = false
       }
     }
   },

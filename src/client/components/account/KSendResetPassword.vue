@@ -15,7 +15,7 @@
           </div>
           <div>
             <div class="row justify-around">
-              <q-btn color="primary" loader @click="onSend">
+              <q-btn color="primary" :loading="sending" @click="onSend">
                 {{$t('KSendResetPassword.ACTION')}}
               </q-btn>
             </div>
@@ -41,6 +41,7 @@ export default {
       message: '',
       success: false,
       sent: false,
+      sending: false,
       schema: {
         $schema: 'http://json-schema.org/draft-06/schema#',
         $id: 'http://kalisio.xyz/schemas/send-reset-password#',
@@ -72,28 +73,27 @@ export default {
   },
   mixins: [mixins.account],
   methods: {
-    onSend () {
+    async onSend () {
       const result = this.$refs.form.validate()
       if (result.isValid) {
-        this.sendResetPassword(result.values.email)
-          .then(() => {
-            this.message = this.$t('KSendResetPassword.SUCCESS_MESSAGE')
-            this.sent = true
-            this.success = true
-            done()
-          })
-          .catch(error => {
-            const type = _.get(error, 'errors.$className')
-            switch (type) {
-              case 'isVerified':
-                this.message = this.$t('KSendResetPassword.ERROR_MESSAGE_IS_VERIFIED')
-                break
-              default:
-                this.message = this.$t('KSendResetPassword.ERROR_MESSAGE_DEFAULT')
-            }
-            this.sent = true
-            this.success = false
-          })
+        try {
+          this.sending = true
+          await this.sendResetPassword(result.values.email)
+          this.message = this.$t('KSendResetPassword.SUCCESS_MESSAGE')
+          this.success = true
+        } catch (error) {
+          const type = _.get(error, 'errors.$className')
+          switch (type) {
+            case 'isVerified':
+              this.message = this.$t('KSendResetPassword.ERROR_MESSAGE_IS_VERIFIED')
+              break
+            default:
+              this.message = this.$t('KSendResetPassword.ERROR_MESSAGE_DEFAULT')
+          }
+          this.success = false
+        }
+        this.sent = true
+        this.sending = false
       }
     }
   },

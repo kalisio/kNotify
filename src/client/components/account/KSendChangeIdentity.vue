@@ -15,7 +15,7 @@
           </div>
           <div>
             <div class="row justify-around">
-              <q-btn id="change-identity" color="primary" loader @click="onSend">
+              <q-btn id="change-identity" color="primary" :loading="sending" @click="onSend">
                 {{$t('KSendChangeIdentity.ACTION')}}
               </q-btn>
             </div>
@@ -41,6 +41,7 @@ export default {
       message: '',
       success: false,
       sent: false,
+      sending: false,
       schema: {
         $schema: 'http://json-schema.org/draft-06/schema#',
         $id: 'http://kalisio.xyz/schemas/send-change-identity#',
@@ -79,29 +80,28 @@ export default {
   },
   mixins: [mixins.account],
   methods: {
-    onSend () {
+    async onSend () {
       const result = this.$refs.form.validate()
       if (result.isValid) {
-        this.sendChangeIdentity(this.$store.get('user.email'), result.values.email, result.values.password)
-          .then(() => {
-            this.message = this.$t('KSendChangeIdentity.SUCCESS_MESSAGE')
-            this.sent = true
-            this.success = true
-            done()
-          })
-          .catch(error => {
-            const type = _.get(error, 'errors.$className')
-            const password = _.get(error, 'errors.password')
-            switch (type) {
-              case 'badParams':
-                this.message = this.$t(password ? 'KSendChangeIdentity.ERROR_MESSAGE_BAD_PASSWORD' : 'KSendChangeIdentity.ERROR_MESSAGE_BAD_PARAMS')
-                break
-              default:
-                this.message = this.$t('KSendChangeIdentity.ERROR_MESSAGE_DEFAULT')
-            }
-            this.sent = true
-            this.success = false
-          })
+        try {
+          this.sending = true
+          await this.sendChangeIdentity(this.$store.get('user.email'), result.values.email, result.values.password)
+          this.message = this.$t('KSendChangeIdentity.SUCCESS_MESSAGE')
+          this.success = true
+        } catch (error) {
+          const type = _.get(error, 'errors.$className')
+          const password = _.get(error, 'errors.password')
+          switch (type) {
+            case 'badParams':
+              this.message = this.$t(password ? 'KSendChangeIdentity.ERROR_MESSAGE_BAD_PASSWORD' : 'KSendChangeIdentity.ERROR_MESSAGE_BAD_PARAMS')
+              break
+            default:
+              this.message = this.$t('KSendChangeIdentity.ERROR_MESSAGE_DEFAULT')
+          } 
+          this.success = false
+        }
+        this.sent = true
+        this.sending = false
       }
     }
   },

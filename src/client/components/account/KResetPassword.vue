@@ -15,7 +15,7 @@
           </div>
           <div v-if="!success">
             <div class="row justify-around">
-              <q-btn color="primary" loader @click="onReset">
+              <q-btn color="primary" :loading="resetting" @click="onReset">
                 {{$t('KResetPassword.ACTION')}}
               </q-btn>
             </div>
@@ -50,7 +50,8 @@ export default {
       title: '',
       message: '',
       success: false,
-      reset: false
+      reset: false,
+      resetting: false
     }
   },
   computed: {
@@ -93,31 +94,30 @@ export default {
         required: ['password']
       }
     },
-    onReset () {
+    async onReset () {
       const result = this.$refs.form.validate()
       if (result.isValid) {
-        this.resetPassword(this.$route.params.token, result.values.password)
-          .then(() => {
-            this.message = this.$t('KResetPassword.SUCCESS_MESSAGE')
-            this.reset = true
-            this.success = true
-            done()
-          })
-          .catch(error => {
-            const type = _.get(error, 'errors.$className')
-            switch (type) {
-              case 'badParams':
-                this.message = this.$t('KResetPassword.ERROR_MESSAGE_BAD_PARAMS')
-                break
-              case 'verifyExpired':
-                this.message = this.$t('KResetPassword.ERROR_MESSAGE_VERIFY_EXPIRED')
-                break
-              default:
-                this.message = this.$t('KResetPassword.ERROR_MESSAGE_DEFAULT')
-            }
-            this.reset = true
-            this.success = false
-          })
+        try {
+          this.resetting = true
+          await this.resetPassword(this.$route.params.token, result.values.password)
+          this.message = this.$t('KResetPassword.SUCCESS_MESSAGE')
+          this.success = true
+        } catch(error) {
+          const type = _.get(error, 'errors.$className')
+          switch (type) {
+            case 'badParams':
+              this.message = this.$t('KResetPassword.ERROR_MESSAGE_BAD_PARAMS')
+              break
+            case 'verifyExpired':
+              this.message = this.$t('KResetPassword.ERROR_MESSAGE_VERIFY_EXPIRED')
+              break
+            default:
+              this.message = this.$t('KResetPassword.ERROR_MESSAGE_DEFAULT')
+          }
+          this.success = false
+        }
+        this.reset = true
+        this.resetting = false
       }
     }
   },
