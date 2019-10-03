@@ -6,6 +6,7 @@ services:
 addons:
   code_climate:
     repo_token: 8c232e646237e391c746607753ca938d4ba43e5ed31206e75437a1ef041a6b51
+cache: yarn
 notifications:
   email: false
   slack:
@@ -13,10 +14,8 @@ notifications:
       secure: fTbsbYg1kkUtGhD+zvCMXsdetvX4oN7jeI7l5a0nrzvBWZNHVY1j8PkIN1cBBC0O4hKWz5P1lvEhV8kxPTOdDhkZiYjbKuqBYl8FJY/gSYQSVE9QB4I9ZQxy1WDEuaTaerKL8bKJZ2XD+0s2y/a8f8AI9GZZ8LEOIGS3h+JxQUtV/7YzkuugudkGUdfX5KwQc5B2FbvKJbcIDCaVl0QzNd1B70H+yBY4h2udAWYYjSoLXGH7GbuLOKmBGiAgspcOuY7psy+3xWw3P3Iq6O6SHteVLXVLlUNkgnoltUCR5CAGTEqz+yc1f9FO6qVSlURO5SF/EFikuMY0eUpZAR4scSIhpGJphV5FMUERSbL3CpZOvUPkuOZMjMid71hwGNu33Xciq8pkTYPXqAAH6lLxUTErijmLqaL69OorkR8y8MB4QQ0CKvpDOd07OckCivfajWNM6VLCLRttCrl1zuYsYvDH5NOSui48uVu1PzFbuEtot9fvi4OUJrS+9/z/6VmxC8dQLtSKiuTHV1JZbWTho6cvbrjjKS3kAjLnXTmtPNh/FA5jxv2d+6FXmmul+fNGcb53vk33Mf4deJpy1SXYivN2QMKi/Uo+w6RNA0q+XO7Srd/MHImDyGc1QtnfcPLtIHCxgySkgkFU47gHI0q70nIvcy79suSLz0ETAhND7fA=
     on_success: always
     on_failure: always
-before_install:
-- npm install -g yarn
 before_script:
 - npm install -g codeclimate-test-reporter
-- git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kCore.git && cd kCore && yarn install && yarn link && cd .. && yarn link @kalisio/kdk-core
+- git clone -b $TRAVIS_BRANCH https://github.com/kalisio/kCore.git && cd kCore && yarn && yarn link && cd .. && yarn link @kalisio/kdk-core
 after_script:
 - codeclimate-test-reporter < coverage/lcov.info
