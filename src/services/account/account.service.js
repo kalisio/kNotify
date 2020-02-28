@@ -92,7 +92,7 @@ export default function (name, app, options) {
   const servicePath = app.get('apiPath') + '/account'
   const userService = app.getService('users')
   app.configure(accountManager({
-    // Be default it is impossible to reset password if email is not verified
+    // By default it is impossible to reset password if email is not verified
     // The problem is that if you loose your password before validating your email you are blocked,
     // as a consequence we release this constraint
     skipIsVerifiedCheck: true,
